@@ -898,6 +898,8 @@
                 
                 // Alert
                 selectContractAlert: "Please select a contract to fill or scratch.",
+                invalidScore: "Invalid score for this contract!",
+                invalidScoreDetail: "For {contract}, score must be {rule}.",
 
                 // Dart Input
                 enterDarts: "Enter Your Darts",
@@ -975,6 +977,8 @@
                 
                 // Alert
                 selectContractAlert: "Veuillez sélectionner un contrat à remplir ou barrer.",
+                invalidScore: "Score invalide pour ce contrat !",
+                invalidScoreDetail: "Pour {contract}, le score doit être {rule}.",
 
                 // Dart Input
                 enterDarts: "Entrez Vos Fléchettes",
@@ -1052,6 +1056,8 @@
                 
                 // Alert
                 selectContractAlert: "Por favor, selecciona un contrato para completar o tachar.",
+                invalidScore: "¡Puntuación inválida para este contrato!",
+                invalidScoreDetail: "Para {contract}, la puntuación debe ser {rule}.",
 
                 // Dart Input
                 enterDarts: "Introduce Tus Dardos",
@@ -1353,6 +1359,22 @@
         }
 
         function submitRound() {
+            const contractId = CONTRACT_IDS[currentRound];
+
+            // Validate all scores first
+            for (let player of players) {
+                const playerKey = player.replace(/\s/g, '_');
+                const scoreInput = document.getElementById(`score-${playerKey}`);
+                const score = parseInt(scoreInput.value) || 0;
+
+                if (!validateScore(score, contractId)) {
+                    showValidationError(contractId);
+                    scoreInput.focus();
+                    return;
+                }
+            }
+
+            // All scores are valid, proceed with submission
             players.forEach(player => {
                 const playerKey = player.replace(/\s/g, '_');
                 const scoreInput = document.getElementById(`score-${playerKey}`);
@@ -1519,9 +1541,16 @@
             const currentPlayer = players[currentPlayerIndex];
             const playerKey = currentPlayer.replace(/\s/g, '_');
             const score = parseInt(document.getElementById('yahtzeeScoreInput').value) || 0;
-            
+
             if (!selectedContract && !selectedScratch) {
                 alert(t('selectContractAlert'));
+                return;
+            }
+
+            // Validate score for selected contract
+            if (selectedContract && !validateScore(score, selectedContract)) {
+                showValidationError(selectedContract);
+                document.getElementById('yahtzeeScoreInput').focus();
                 return;
             }
             
@@ -1842,6 +1871,80 @@
                 document.getElementById(dartInputTargetField).value = total;
             }
             closeDartInput();
+        }
+
+        // ==================== SCORE VALIDATION ====================
+
+        function getValidationRule(contractId) {
+            const rules = {
+                'en': {
+                    'capital': { validate: () => true, message: '' },
+                    '20': { validate: (score) => score === 0 || score % 20 === 0, message: '0 or a multiple of 20 (20, 40, 60)' },
+                    'side': { validate: () => true, message: '' },
+                    '19': { validate: (score) => score === 0 || score % 19 === 0, message: '0 or a multiple of 19 (19, 38, 57)' },
+                    '3row': { validate: () => true, message: '' },
+                    '18': { validate: (score) => score === 0 || score % 18 === 0, message: '0 or a multiple of 18 (18, 36, 54)' },
+                    'color': { validate: () => true, message: '' },
+                    '17': { validate: (score) => score === 0 || score % 17 === 0, message: '0 or a multiple of 17 (17, 34, 51)' },
+                    'double': { validate: (score) => score === 0 || score % 2 === 0, message: '0 or an even number (any double)' },
+                    '16': { validate: (score) => score === 0 || score % 16 === 0, message: '0 or a multiple of 16 (16, 32, 48)' },
+                    'triple': { validate: () => true, message: '' },
+                    '15': { validate: (score) => score === 0 || score % 15 === 0, message: '0 or a multiple of 15 (15, 30, 45)' },
+                    '57': { validate: (score) => score === 0 || score === 57, message: '0 or exactly 57' },
+                    '14': { validate: (score) => score === 0 || score % 14 === 0, message: '0 or a multiple of 14 (14, 28, 42)' },
+                    'bull': { validate: (score) => score === 0 || score === 25 || score === 50, message: '0, 25, or 50' }
+                },
+                'fr': {
+                    'capital': { validate: () => true, message: '' },
+                    '20': { validate: (score) => score === 0 || score % 20 === 0, message: '0 ou un multiple de 20 (20, 40, 60)' },
+                    'side': { validate: () => true, message: '' },
+                    '19': { validate: (score) => score === 0 || score % 19 === 0, message: '0 ou un multiple de 19 (19, 38, 57)' },
+                    '3row': { validate: () => true, message: '' },
+                    '18': { validate: (score) => score === 0 || score % 18 === 0, message: '0 ou un multiple de 18 (18, 36, 54)' },
+                    'color': { validate: () => true, message: '' },
+                    '17': { validate: (score) => score === 0 || score % 17 === 0, message: '0 ou un multiple de 17 (17, 34, 51)' },
+                    'double': { validate: (score) => score === 0 || score % 2 === 0, message: '0 ou un nombre pair (n\'importe quel double)' },
+                    '16': { validate: (score) => score === 0 || score % 16 === 0, message: '0 ou un multiple de 16 (16, 32, 48)' },
+                    'triple': { validate: () => true, message: '' },
+                    '15': { validate: (score) => score === 0 || score % 15 === 0, message: '0 ou un multiple de 15 (15, 30, 45)' },
+                    '57': { validate: (score) => score === 0 || score === 57, message: '0 ou exactement 57' },
+                    '14': { validate: (score) => score === 0 || score % 14 === 0, message: '0 ou un multiple de 14 (14, 28, 42)' },
+                    'bull': { validate: (score) => score === 0 || score === 25 || score === 50, message: '0, 25 ou 50' }
+                },
+                'es': {
+                    'capital': { validate: () => true, message: '' },
+                    '20': { validate: (score) => score === 0 || score % 20 === 0, message: '0 o un múltiplo de 20 (20, 40, 60)' },
+                    'side': { validate: () => true, message: '' },
+                    '19': { validate: (score) => score === 0 || score % 19 === 0, message: '0 o un múltiplo de 19 (19, 38, 57)' },
+                    '3row': { validate: () => true, message: '' },
+                    '18': { validate: (score) => score === 0 || score % 18 === 0, message: '0 o un múltiplo de 18 (18, 36, 54)' },
+                    'color': { validate: () => true, message: '' },
+                    '17': { validate: (score) => score === 0 || score % 17 === 0, message: '0 o un múltiplo de 17 (17, 34, 51)' },
+                    'double': { validate: (score) => score === 0 || score % 2 === 0, message: '0 o un número par (cualquier doble)' },
+                    '16': { validate: (score) => score === 0 || score % 16 === 0, message: '0 o un múltiplo de 16 (16, 32, 48)' },
+                    'triple': { validate: () => true, message: '' },
+                    '15': { validate: (score) => score === 0 || score % 15 === 0, message: '0 o un múltiplo de 15 (15, 30, 45)' },
+                    '57': { validate: (score) => score === 0 || score === 57, message: '0 o exactamente 57' },
+                    '14': { validate: (score) => score === 0 || score % 14 === 0, message: '0 o un múltiplo de 14 (14, 28, 42)' },
+                    'bull': { validate: (score) => score === 0 || score === 25 || score === 50, message: '0, 25 o 50' }
+                }
+            };
+
+            return rules[currentLang][contractId] || { validate: () => true, message: '' };
+        }
+
+        function validateScore(score, contractId) {
+            const rule = getValidationRule(contractId);
+            return rule.validate(score);
+        }
+
+        function showValidationError(contractId) {
+            const rule = getValidationRule(contractId);
+            const contractName = getContractName(contractId);
+            const message = t('invalidScoreDetail')
+                .replace('{contract}', contractName)
+                .replace('{rule}', rule.message);
+            alert(message);
         }
 
         // Initialize
