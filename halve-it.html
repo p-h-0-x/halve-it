@@ -373,6 +373,12 @@
             display: none !important;
         }
 
+        .reset-game-section {
+            text-align: center;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
         /* Yahtzee Mode Styles */
         .hide-scores-btn {
             position: fixed;
@@ -552,7 +558,6 @@
             <div class="action-buttons">
                 <button class="btn-secondary" onclick="previousRound()" id="prevBtn" style="display:none;" data-i18n="previousRound">← Previous Round</button>
                 <button class="btn-success" onclick="submitRound()" data-i18n="submitRound">Submit Round</button>
-                <button class="btn-danger" onclick="resetGame()" data-i18n="resetGame">Reset Game</button>
             </div>
         </div>
 
@@ -577,7 +582,6 @@
             <div class="yahtzee-actions">
                 <button class="btn-secondary" onclick="previousYahtzeeTurn()" id="yahtzeePrevBtn" style="display:none;" data-i18n="previousTurn">← Previous Turn</button>
                 <button class="btn-success" onclick="submitYahtzeeChoice()" data-i18n="confirmChoice">Confirm Choice</button>
-                <button class="btn-danger" onclick="resetGame()" data-i18n="resetGame">Reset Game</button>
             </div>
         </div>
 
@@ -585,6 +589,11 @@
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
         </table>
+
+        <!-- Reset Game Button Section -->
+        <div class="reset-game-section">
+            <button class="btn-danger" onclick="resetGame()" data-i18n="resetGame">Reset Game</button>
+        </div>
 
         <div class="winner-section" id="winnerSection">
             <div class="trophy">🏆</div>
@@ -1425,6 +1434,16 @@
         }
 
         function resetGame() {
+            const confirmMessage = {
+                'en': 'Are you sure you want to reset the game? All progress will be lost.',
+                'fr': 'Êtes-vous sûr de vouloir recommencer ? Toute la progression sera perdue.',
+                'es': '¿Estás seguro de que quieres reiniciar el juego? Se perderá todo el progreso.'
+            };
+
+            if (!confirm(confirmMessage[currentLang])) {
+                return;
+            }
+
             currentRound = 0;
             currentPlayerIndex = 0;
             scores = {};
@@ -1432,14 +1451,14 @@
             selectedContract = null;
             selectedScratch = null;
             yahtzeeHistory = [];
-            
+
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('gameBoard').style.display = 'none';
             document.getElementById('winnerSection').style.display = 'none';
             document.getElementById('classicInputSection').classList.remove('hidden');
             document.getElementById('yahtzeeInputSection').classList.add('hidden');
             document.getElementById('hideScoresBtn').classList.add('hidden');
-            
+
             updatePlayerList();
         }
 
