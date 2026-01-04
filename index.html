@@ -306,7 +306,8 @@
         }
 
         .score-row input[type="number"] {
-            width: 80px;
+            flex: 1;
+            max-width: 120px;
             padding: 8px;
             border: none;
             border-radius: 5px;
@@ -377,6 +378,176 @@
             text-align: center;
             padding: 20px;
             margin-top: 20px;
+        }
+
+        /* Dart Input Styles */
+        .dart-input-btn {
+            background: rgba(50, 130, 184, 0.3);
+            border: 2px solid #3282b8;
+            padding: 8px 12px;
+            font-size: 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .dart-input-btn:hover {
+            background: rgba(50, 130, 184, 0.5);
+            transform: scale(1.1);
+        }
+
+        .dart-input-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .dart-input-modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dart-input-container {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .dart-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .dart-input-header h3 {
+            color: #e94560;
+            margin: 0;
+        }
+
+        .close-dart-input {
+            background: #d63031;
+            border: none;
+            color: white;
+            font-size: 24px;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dart-input-current {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .dart-input-current h4 {
+            color: #3282b8;
+            margin-bottom: 10px;
+        }
+
+        .darts-display {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .dart-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 15px;
+            border-radius: 8px;
+            min-width: 60px;
+            text-align: center;
+            color: #00b894;
+            font-weight: bold;
+        }
+
+        .dart-display.empty {
+            color: #636e72;
+        }
+
+        .dart-total {
+            font-size: 1.3em;
+            color: #f9d423;
+            margin-top: 10px;
+        }
+
+        .modifier-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .modifier-btn {
+            padding: 12px 20px;
+            border: 2px solid #3282b8;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .modifier-btn:hover {
+            background: rgba(50, 130, 184, 0.5);
+        }
+
+        .modifier-btn.active {
+            background: #3282b8;
+            border-color: #bbe1fa;
+        }
+
+        .number-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .number-btn {
+            padding: 15px 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .number-btn:hover {
+            background: rgba(233, 69, 96, 0.5);
+            border-color: #e94560;
+        }
+
+        .number-btn.bull {
+            grid-column: span 2;
+            background: rgba(233, 69, 96, 0.3);
+        }
+
+        .dart-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
         }
 
         /* Yahtzee Mode Styles */
@@ -568,6 +739,7 @@
                 <div class="score-row" style="justify-content: center;">
                     <label data-i18n="score">Score:</label>
                     <input type="number" id="yahtzeeScoreInput" min="0" max="180" placeholder="0-180">
+                    <button class="dart-input-btn" onclick="openDartInput('yahtzeeScoreInput')" title="Enter darts">🎯</button>
                 </div>
             </div>
             
@@ -602,6 +774,65 @@
             <br>
             <button class="btn-secondary" onclick="editLastRound()" id="editScoresBtn" data-i18n="editScores">← Edit Scores</button>
             <button class="btn-primary" onclick="resetGame()" data-i18n="playAgain">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Dart Input Modal -->
+    <div class="dart-input-modal" id="dartInputModal">
+        <div class="dart-input-container">
+            <div class="dart-input-header">
+                <h3>🎯 <span data-i18n="enterDarts">Enter Your Darts</span></h3>
+                <button class="close-dart-input" onclick="closeDartInput()">×</button>
+            </div>
+
+            <div class="dart-input-current">
+                <h4 data-i18n="dartsThrown">Darts Thrown:</h4>
+                <div class="darts-display">
+                    <div class="dart-display empty" id="dart1Display">-</div>
+                    <div class="dart-display empty" id="dart2Display">-</div>
+                    <div class="dart-display empty" id="dart3Display">-</div>
+                </div>
+                <div class="dart-total">
+                    <span data-i18n="total">Total</span>: <span id="dartTotalDisplay">0</span>
+                </div>
+            </div>
+
+            <div class="modifier-buttons">
+                <button class="modifier-btn active" id="singleBtn" onclick="setModifier('single')">Single</button>
+                <button class="modifier-btn" id="doubleBtn" onclick="setModifier('double')">Double</button>
+                <button class="modifier-btn" id="tripleBtn" onclick="setModifier('triple')">Triple</button>
+            </div>
+
+            <div class="number-grid">
+                <button class="number-btn" onclick="addDart(1)">1</button>
+                <button class="number-btn" onclick="addDart(2)">2</button>
+                <button class="number-btn" onclick="addDart(3)">3</button>
+                <button class="number-btn" onclick="addDart(4)">4</button>
+                <button class="number-btn" onclick="addDart(5)">5</button>
+                <button class="number-btn" onclick="addDart(6)">6</button>
+                <button class="number-btn" onclick="addDart(7)">7</button>
+                <button class="number-btn" onclick="addDart(8)">8</button>
+                <button class="number-btn" onclick="addDart(9)">9</button>
+                <button class="number-btn" onclick="addDart(10)">10</button>
+                <button class="number-btn" onclick="addDart(11)">11</button>
+                <button class="number-btn" onclick="addDart(12)">12</button>
+                <button class="number-btn" onclick="addDart(13)">13</button>
+                <button class="number-btn" onclick="addDart(14)">14</button>
+                <button class="number-btn" onclick="addDart(15)">15</button>
+                <button class="number-btn" onclick="addDart(16)">16</button>
+                <button class="number-btn" onclick="addDart(17)">17</button>
+                <button class="number-btn" onclick="addDart(18)">18</button>
+                <button class="number-btn" onclick="addDart(19)">19</button>
+                <button class="number-btn" onclick="addDart(20)">20</button>
+                <button class="number-btn bull" onclick="addDart(25)">BULL (25)</button>
+                <button class="number-btn" onclick="addDart(0)"><span data-i18n="miss">Miss</span></button>
+            </div>
+
+            <div class="dart-actions">
+                <button class="btn-secondary" onclick="clearLastDart()">← <span data-i18n="undo">Undo</span></button>
+                <button class="btn-secondary" onclick="clearAllDarts()"><span data-i18n="clear">Clear</span></button>
+                <button class="btn-success" onclick="confirmDarts()">✓ <span data-i18n="confirm">Confirm</span></button>
+            </div>
         </div>
     </div>
 
@@ -667,7 +898,15 @@
                 
                 // Alert
                 selectContractAlert: "Please select a contract to fill or scratch.",
-                
+
+                // Dart Input
+                enterDarts: "Enter Your Darts",
+                dartsThrown: "Darts Thrown:",
+                miss: "Miss",
+                undo: "Undo",
+                clear: "Clear",
+                confirm: "Confirm",
+
                 // Contracts
                 contracts: {
                     capital: { name: "Capital", desc: "First 3 darts - establish your starting score" },
@@ -736,7 +975,15 @@
                 
                 // Alert
                 selectContractAlert: "Veuillez sélectionner un contrat à remplir ou barrer.",
-                
+
+                // Dart Input
+                enterDarts: "Entrez Vos Fléchettes",
+                dartsThrown: "Fléchettes Lancées :",
+                miss: "Raté",
+                undo: "Annuler",
+                clear: "Effacer",
+                confirm: "Confirmer",
+
                 // Contracts
                 contracts: {
                     capital: { name: "Capital", desc: "3 premières fléchettes - établissez votre score de départ" },
@@ -805,7 +1052,15 @@
                 
                 // Alert
                 selectContractAlert: "Por favor, selecciona un contrato para completar o tachar.",
-                
+
+                // Dart Input
+                enterDarts: "Introduce Tus Dardos",
+                dartsThrown: "Dardos Lanzados:",
+                miss: "Fallo",
+                undo: "Deshacer",
+                clear: "Borrar",
+                confirm: "Confirmar",
+
                 // Contracts
                 contracts: {
                     capital: { name: "Capital", desc: "3 primeros dardos - establece tu puntuación inicial" },
@@ -843,6 +1098,11 @@
         let selectedScratch = null;
         let scores = {};
         let yahtzeeHistory = [];
+
+        // Dart input state
+        let dartInputTargetField = null;
+        let currentDarts = [];
+        let currentModifier = 'single';
 
         // ==================== LANGUAGE FUNCTIONS ====================
 
@@ -1029,18 +1289,20 @@
 
         function buildScoreInputs() {
             const container = document.getElementById('scoreInputs');
-            
+
             container.innerHTML = players.map(player => {
                 const playerData = scores[player];
                 const capitalDisplay = currentRound === 0 ? t('startingRound') : `${t('currentCapital')} ${playerData.capital}`;
-                
+                const inputId = `score-${player.replace(/\s/g, '_')}`;
+
                 return `
                     <div class="player-score-card">
                         <h4>${player}</h4>
                         <div class="current-capital">${capitalDisplay}</div>
                         <div class="score-row">
                             <label>${t('score')}</label>
-                            <input type="number" id="score-${player.replace(/\s/g, '_')}" min="0" max="180" placeholder="0-180">
+                            <input type="number" id="${inputId}" min="0" max="180" placeholder="0-180">
+                            <button class="dart-input-btn" onclick="openDartInput('${inputId}')" title="Enter darts">🎯</button>
                         </div>
                     </div>
                 `;
@@ -1460,6 +1722,126 @@
             document.getElementById('hideScoresBtn').classList.add('hidden');
 
             updatePlayerList();
+        }
+
+        // ==================== DART INPUT ====================
+
+        function openDartInput(inputFieldId) {
+            dartInputTargetField = inputFieldId;
+            currentDarts = [];
+            currentModifier = 'single';
+            updateDartDisplay();
+            setModifier('single');
+            document.getElementById('dartInputModal').classList.add('active');
+        }
+
+        function closeDartInput() {
+            document.getElementById('dartInputModal').classList.remove('active');
+            dartInputTargetField = null;
+        }
+
+        function setModifier(modifier) {
+            currentModifier = modifier;
+            document.getElementById('singleBtn').classList.remove('active');
+            document.getElementById('doubleBtn').classList.remove('active');
+            document.getElementById('tripleBtn').classList.remove('active');
+            document.getElementById(modifier + 'Btn').classList.add('active');
+        }
+
+        function addDart(number) {
+            if (currentDarts.length >= 3) return;
+
+            let score = number;
+            let displayText = '';
+
+            if (number === 25) {
+                // Bullseye: single=25, double=50
+                if (currentModifier === 'double') {
+                    score = 50;
+                    displayText = 'Bull×2';
+                } else {
+                    score = 25;
+                    displayText = 'Bull';
+                }
+            } else if (number === 0) {
+                score = 0;
+                displayText = 'Miss';
+            } else {
+                if (currentModifier === 'double') {
+                    score = number * 2;
+                    displayText = `D${number}`;
+                } else if (currentModifier === 'triple') {
+                    score = number * 3;
+                    displayText = `T${number}`;
+                } else {
+                    score = number;
+                    displayText = `${number}`;
+                }
+            }
+
+            currentDarts.push({ score, displayText });
+            updateDartDisplay();
+
+            // Reset to single after each dart
+            setModifier('single');
+        }
+
+        function clearLastDart() {
+            if (currentDarts.length > 0) {
+                currentDarts.pop();
+                updateDartDisplay();
+            }
+        }
+
+        function clearAllDarts() {
+            currentDarts = [];
+            updateDartDisplay();
+        }
+
+        function updateDartDisplay() {
+            const dart1 = document.getElementById('dart1Display');
+            const dart2 = document.getElementById('dart2Display');
+            const dart3 = document.getElementById('dart3Display');
+            const totalDisplay = document.getElementById('dartTotalDisplay');
+
+            // Update dart 1
+            if (currentDarts.length >= 1) {
+                dart1.textContent = currentDarts[0].displayText;
+                dart1.classList.remove('empty');
+            } else {
+                dart1.textContent = '-';
+                dart1.classList.add('empty');
+            }
+
+            // Update dart 2
+            if (currentDarts.length >= 2) {
+                dart2.textContent = currentDarts[1].displayText;
+                dart2.classList.remove('empty');
+            } else {
+                dart2.textContent = '-';
+                dart2.classList.add('empty');
+            }
+
+            // Update dart 3
+            if (currentDarts.length >= 3) {
+                dart3.textContent = currentDarts[2].displayText;
+                dart3.classList.remove('empty');
+            } else {
+                dart3.textContent = '-';
+                dart3.classList.add('empty');
+            }
+
+            // Calculate and update total
+            const total = currentDarts.reduce((sum, dart) => sum + dart.score, 0);
+            totalDisplay.textContent = total;
+        }
+
+        function confirmDarts() {
+            const total = currentDarts.reduce((sum, dart) => sum + dart.score, 0);
+            if (dartInputTargetField) {
+                document.getElementById(dartInputTargetField).value = total;
+            }
+            closeDartInput();
         }
 
         // Initialize
