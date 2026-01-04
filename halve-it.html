@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darts Halve-It Scorer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #e94560;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .setup-section {
+            max-width: 500px;
+            margin: 0 auto 30px;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .setup-section h2 {
+            margin-bottom: 15px;
+            color: #3282b8;
+        }
+
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn:hover {
+            background: rgba(50, 130, 184, 0.5);
+        }
+
+        .lang-btn.active {
+            background: #3282b8;
+            border-color: #bbe1fa;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mode-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .mode-option:hover {
+            background: rgba(0,0,0,0.3);
+        }
+
+        .mode-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .mode-label {
+            font-weight: 600;
+        }
+
+        .mode-description {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .player-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .player-input input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #e94560;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ff6b6b;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #00b894;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #00d9a5;
+        }
+
+        .btn-danger {
+            background: #d63031;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #636e72;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7d8a8f;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+
+        .player-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .player-tag {
+            background: #3282b8;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-tag button {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+
+        .game-board {
+            max-width: 900px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .current-round {
+            text-align: center;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .current-round h2 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .current-round p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .scores-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .scores-table th, .scores-table td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .scores-table th {
+            background: rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+
+        .scores-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .round-name-cell {
+            text-align: left !important;
+            font-weight: 600;
+            color: #bbe1fa;
+        }
+
+        .round-current {
+            background: rgba(233, 69, 96, 0.3) !important;
+        }
+
+        .score-success {
+            color: #00b894;
+            font-weight: bold;
+        }
+
+        .score-fail {
+            color: #ff6b6b;
+        }
+
+        .total-row {
+            background: rgba(0,0,0,0.4) !important;
+            font-size: 1.1em;
+        }
+
+        .total-row td {
+            font-weight: bold;
+            color: #f9d423;
+        }
+
+        .score-input-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .score-input-section h3 {
+            margin-bottom: 15px;
+            color: #3282b8;
+        }
+
+        .player-score-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .player-score-card {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .player-score-card h4 {
+            margin-bottom: 10px;
+            color: #bbe1fa;
+        }
+
+        .player-score-card .current-capital {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+
+        .score-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .score-row input[type="number"] {
+            width: 80px;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .winner-section {
+            display: none;
+            text-align: center;
+            background: linear-gradient(135deg, #f9d423, #ff4e50);
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .winner-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .winner-section .trophy {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        .rules-section {
+            max-width: 800px;
+            margin: 30px auto;
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .rules-section h3 {
+            color: #3282b8;
+            margin-bottom: 15px;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .rule-item {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .rule-item strong {
+            color: #e94560;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Yahtzee Mode Styles */
+        .hide-scores-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .hide-scores-btn:hover {
+            background: rgba(0,0,0,0.7);
+        }
+
+        .score-hidden {
+            filter: blur(8px);
+            user-select: none;
+        }
+
+        .current-player-banner {
+            text-align: center;
+            background: linear-gradient(135deg, #3282b8, #0f4c75);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .current-player-banner h3 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .contract-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .contract-btn {
+            padding: 12px 10px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.3);
+            color: white;
+        }
+
+        .contract-btn:hover:not(:disabled) {
+            background: rgba(50, 130, 184, 0.5);
+            border-color: #3282b8;
+        }
+
+        .contract-btn.selected {
+            background: #3282b8;
+            border-color: #bbe1fa;
+        }
+
+        .contract-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .contract-btn.scratched {
+            background: rgba(214, 48, 49, 0.3);
+        }
+
+        .scratch-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .scratch-section h4 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .yahtzee-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .cell-scratched {
+            color: #636e72;
+            text-decoration: line-through;
+        }
+
+        .cell-filled {
+            color: #00b894;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .scores-table {
+                font-size: 0.85em;
+            }
+            
+            .scores-table th, .scores-table td {
+                padding: 8px 5px;
+            }
+
+            .contract-selector {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🎯 Darts Halve-It</h1>
+
+    <!-- Setup Section -->
+    <div class="setup-section" id="setupSection">
+        <!-- Language Selector -->
+        <div class="language-selector">
+            <button class="lang-btn active" onclick="setLanguage('en')">🇬🇧 English</button>
+            <button class="lang-btn" onclick="setLanguage('fr')">🇫🇷 Français</button>
+            <button class="lang-btn" onclick="setLanguage('es')">🇪🇸 Español</button>
+        </div>
+
+        <h2 data-i18n="gameMode">Game Mode</h2>
+        <div class="mode-selector">
+            <label class="mode-option">
+                <input type="radio" name="gameMode" value="classic" checked onchange="updateModeDescription()">
+                <span class="mode-label" data-i18n="classic">Classic</span>
+            </label>
+            <label class="mode-option">
+                <input type="radio" name="gameMode" value="yahtzee" onchange="updateModeDescription()">
+                <span class="mode-label" data-i18n="freeChoice">Yahtzee Style</span>
+            </label>
+        </div>
+        <p class="mode-description" id="modeDescription" data-i18n="classicDesc">Play contracts in order. Hit the target to add score, miss to halve your capital.</p>
+        
+        <h2 style="margin-top: 20px;" data-i18n="addPlayers">Add Players</h2>
+        <div class="player-input">
+            <input type="text" id="playerNameInput" data-i18n-placeholder="enterPlayerName" placeholder="Enter player name" onkeypress="if(event.key==='Enter')addPlayer()">
+            <button class="btn-primary" onclick="addPlayer()" data-i18n="addPlayer">Add Player</button>
+        </div>
+        <div class="player-list" id="playerList"></div>
+        <br>
+        <button class="btn-success" onclick="startGame()" id="startBtn" style="display:none;" data-i18n="startGame">Start Game</button>
+    </div>
+
+    <!-- Game Board -->
+    <div class="game-board" id="gameBoard">
+        <!-- Hide Scores Button (Yahtzee mode only) -->
+        <button class="hide-scores-btn hidden" id="hideScoresBtn" onclick="toggleScoreVisibility()">👁️</button>
+
+        <!-- Classic Mode: Current Round Display -->
+        <div class="current-round" id="classicRoundDisplay">
+            <h2 id="currentRoundName">Capital</h2>
+            <p id="currentRoundDesc">First 3 darts - establish your starting score</p>
+        </div>
+
+        <!-- Yahtzee Mode: Current Player Display -->
+        <div class="current-player-banner hidden" id="yahtzeePlayerDisplay">
+            <h3 id="currentPlayerName">Player 1's Turn</h3>
+            <p data-i18n="chooseContract">Choose a contract to fill or scratch</p>
+        </div>
+
+        <!-- Classic Mode: Score Input -->
+        <div class="score-input-section" id="classicInputSection">
+            <h3 data-i18n="enterScores">Enter Scores for Current Round</h3>
+            <div class="player-score-inputs" id="scoreInputs"></div>
+            <div class="action-buttons">
+                <button class="btn-secondary" onclick="previousRound()" id="prevBtn" style="display:none;" data-i18n="previousRound">← Previous Round</button>
+                <button class="btn-success" onclick="submitRound()" data-i18n="submitRound">Submit Round</button>
+                <button class="btn-danger" onclick="resetGame()" data-i18n="resetGame">Reset Game</button>
+            </div>
+        </div>
+
+        <!-- Yahtzee Mode: Score Input -->
+        <div class="score-input-section hidden" id="yahtzeeInputSection">
+            <h3 data-i18n="enterYourScore">Enter Your Score</h3>
+            <div class="player-score-card" style="max-width: 300px; margin: 0 auto 20px;">
+                <div class="score-row" style="justify-content: center;">
+                    <label data-i18n="score">Score:</label>
+                    <input type="number" id="yahtzeeScoreInput" min="0" max="180" placeholder="0-180">
+                </div>
+            </div>
+            
+            <h4 style="color: #3282b8; margin-bottom: 10px;" data-i18n="selectContractFill">Select Contract to Fill:</h4>
+            <div class="contract-selector" id="contractSelector"></div>
+            
+            <div class="scratch-section">
+                <h4 data-i18n="scratchContract">Or Scratch a Contract (score 0):</h4>
+                <div class="contract-selector" id="scratchSelector"></div>
+            </div>
+
+            <div class="yahtzee-actions">
+                <button class="btn-secondary" onclick="previousYahtzeeTurn()" id="yahtzeePrevBtn" style="display:none;" data-i18n="previousTurn">← Previous Turn</button>
+                <button class="btn-success" onclick="submitYahtzeeChoice()" data-i18n="confirmChoice">Confirm Choice</button>
+                <button class="btn-danger" onclick="resetGame()" data-i18n="resetGame">Reset Game</button>
+            </div>
+        </div>
+
+        <table class="scores-table">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+
+        <div class="winner-section" id="winnerSection">
+            <div class="trophy">🏆</div>
+            <h2 id="winnerName">Winner!</h2>
+            <p id="winnerScore"></p>
+            <br>
+            <button class="btn-secondary" onclick="editLastRound()" id="editScoresBtn" data-i18n="editScores">← Edit Scores</button>
+            <button class="btn-primary" onclick="resetGame()" data-i18n="playAgain">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Rules Section -->
+    <div class="rules-section">
+        <h3 data-i18n="gameRules">📋 Game Rules</h3>
+        <p style="margin-bottom: 15px;" data-i18n="rulesClassic"><strong>Classic:</strong> Hit the contract target to add your score to your capital. Miss it and your capital is halved!</p>
+        <p style="margin-bottom: 15px;" data-i18n="rulesFreeChoice"><strong>Yahtzee Style:</strong> Choose where to register your score each turn. Scratch contracts you can't fill (score 0).</p>
+        <div class="rules-grid" id="rulesGrid">
+            <!-- Rules will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // ==================== TRANSLATIONS ====================
+        const translations = {
+            en: {
+                // Setup
+                gameMode: "Game Mode",
+                classic: "Classic",
+                freeChoice: "Yahtzee Style",
+                classicDesc: "Play contracts in order. Hit the target to add score, miss to halve your capital.",
+                freeChoiceDesc: "Choose where to register your score. Fill or scratch contracts freely.",
+                addPlayers: "Add Players",
+                enterPlayerName: "Enter player name",
+                addPlayer: "Add Player",
+                startGame: "Start Game",
+                
+                // Game
+                enterScores: "Enter Scores for Current Round",
+                enterYourScore: "Enter Your Score",
+                score: "Score:",
+                currentCapital: "Current capital:",
+                startingRound: "Starting round",
+                previousRound: "← Previous Round",
+                previousTurn: "← Previous Turn",
+                submitRound: "Submit Round",
+                confirmChoice: "Confirm Choice",
+                resetGame: "Reset Game",
+                chooseContract: "Choose a contract to fill or scratch",
+                selectContractFill: "Select Contract to Fill:",
+                scratchContract: "Or Scratch a Contract (score 0):",
+                playerTurn: "'s Turn",
+                
+                // Table
+                round: "Round",
+                contract: "Contract",
+                total: "TOTAL",
+                
+                // Winner
+                itsATie: "It's a tie!",
+                tiedWith: "tied with",
+                points: "points",
+                wins: "Wins!",
+                finalScore: "Final Score:",
+                editScores: "← Edit Scores",
+                playAgain: "Play Again",
+                
+                // Rules
+                gameRules: "📋 Game Rules",
+                rulesClassic: "<strong>Classic:</strong> Hit the contract target to add your score to your capital. Miss it and your capital is halved!",
+                rulesFreeChoice: "<strong>Yahtzee Style:</strong> Choose where to register your score each turn. Scratch contracts you can't fill (score 0).",
+                
+                // Alert
+                selectContractAlert: "Please select a contract to fill or scratch.",
+                
+                // Contracts
+                contracts: {
+                    capital: { name: "Capital", desc: "First 3 darts - establish your starting score" },
+                    "20": { name: "20", desc: "Hit the 20 segment" },
+                    side: { name: "Side", desc: "Hit 3 adjacent segments (e.g., 5-20-1). Bullseye touches all." },
+                    "19": { name: "19", desc: "Hit the 19 segment" },
+                    "3row": { name: "3 in a Row", desc: "Hit 3 consecutive numbers (e.g., 14-15-16)" },
+                    "18": { name: "18", desc: "Hit the 18 segment" },
+                    color: { name: "Color", desc: "Hit 3 different colors (black, white, green, red)" },
+                    "17": { name: "17", desc: "Hit the 17 segment" },
+                    double: { name: "Double", desc: "Hit any double" },
+                    "16": { name: "16", desc: "Hit the 16 segment" },
+                    triple: { name: "Triple", desc: "Hit any triple" },
+                    "15": { name: "15", desc: "Hit the 15 segment" },
+                    "57": { name: "57", desc: "Score exactly 57 with 3 darts" },
+                    "14": { name: "14", desc: "Hit the 14 segment" },
+                    bull: { name: "Bull", desc: "Hit the bullseye (single 25 or double 50)" }
+                }
+            },
+            fr: {
+                // Setup
+                gameMode: "Mode de Jeu",
+                classic: "Classique",
+                freeChoice: "Yahtzee Style",
+                classicDesc: "Jouez les contrats dans l'ordre. Réussissez pour ajouter le score, ratez pour diviser votre capital par deux.",
+                freeChoiceDesc: "Choisissez où enregistrer votre score. Remplissez ou barrez les contrats librement.",
+                addPlayers: "Ajouter des Joueurs",
+                enterPlayerName: "Nom du joueur",
+                addPlayer: "Ajouter",
+                startGame: "Commencer",
+                
+                // Game
+                enterScores: "Entrez les Scores du Tour",
+                enterYourScore: "Entrez Votre Score",
+                score: "Score :",
+                currentCapital: "Capital actuel :",
+                startingRound: "Tour de départ",
+                previousRound: "← Tour Précédent",
+                previousTurn: "← Tour Précédent",
+                submitRound: "Valider",
+                confirmChoice: "Confirmer",
+                resetGame: "Recommencer",
+                chooseContract: "Choisissez un contrat à remplir ou barrer",
+                selectContractFill: "Sélectionnez un Contrat à Remplir :",
+                scratchContract: "Ou Barrez un Contrat (score 0) :",
+                playerTurn: " - À votre tour",
+                
+                // Table
+                round: "Tour",
+                contract: "Contrat",
+                total: "TOTAL",
+                
+                // Winner
+                itsATie: "Égalité !",
+                tiedWith: "à égalité avec",
+                points: "points",
+                wins: "Gagne !",
+                finalScore: "Score Final :",
+                editScores: "← Modifier",
+                playAgain: "Rejouer",
+                
+                // Rules
+                gameRules: "📋 Règles du Jeu",
+                rulesClassic: "<strong>Classique :</strong> Réussissez le contrat pour ajouter votre score au capital. Ratez et votre capital est divisé par deux !",
+                rulesFreeChoice: "<strong>Yahtzee Style :</strong> Choisissez où enregistrer votre score à chaque tour. Barrez les contrats impossibles (score 0).",
+                
+                // Alert
+                selectContractAlert: "Veuillez sélectionner un contrat à remplir ou barrer.",
+                
+                // Contracts
+                contracts: {
+                    capital: { name: "Capital", desc: "3 premières fléchettes - établissez votre score de départ" },
+                    "20": { name: "20", desc: "Touchez le segment 20" },
+                    side: { name: "Côté", desc: "Touchez 3 segments adjacents (ex: 5-20-1). Le bull touche tous." },
+                    "19": { name: "19", desc: "Touchez le segment 19" },
+                    "3row": { name: "Suite", desc: "Touchez 3 numéros consécutifs (ex: 14-15-16)" },
+                    "18": { name: "18", desc: "Touchez le segment 18" },
+                    color: { name: "Couleur", desc: "Touchez 3 couleurs différentes (noir, blanc, vert, rouge)" },
+                    "17": { name: "17", desc: "Touchez le segment 17" },
+                    double: { name: "Double", desc: "Touchez n'importe quel double" },
+                    "16": { name: "16", desc: "Touchez le segment 16" },
+                    triple: { name: "Triple", desc: "Touchez n'importe quel triple" },
+                    "15": { name: "15", desc: "Touchez le segment 15" },
+                    "57": { name: "57", desc: "Marquez exactement 57 avec 3 fléchettes" },
+                    "14": { name: "14", desc: "Touchez le segment 14" },
+                    bull: { name: "Bull", desc: "Touchez le centre (simple 25 ou double 50)" }
+                }
+            },
+            es: {
+                // Setup
+                gameMode: "Modo de Juego",
+                classic: "Clásico",
+                freeChoice: "Yahtzee Style",
+                classicDesc: "Juega los contratos en orden. Acierta para sumar puntos, falla para dividir tu capital a la mitad.",
+                freeChoiceDesc: "Elige dónde registrar tu puntuación. Completa o tacha contratos libremente.",
+                addPlayers: "Añadir Jugadores",
+                enterPlayerName: "Nombre del jugador",
+                addPlayer: "Añadir",
+                startGame: "Comenzar",
+                
+                // Game
+                enterScores: "Introduce las Puntuaciones de la Ronda",
+                enterYourScore: "Introduce Tu Puntuación",
+                score: "Puntos:",
+                currentCapital: "Capital actual:",
+                startingRound: "Ronda inicial",
+                previousRound: "← Ronda Anterior",
+                previousTurn: "← Turno Anterior",
+                submitRound: "Enviar",
+                confirmChoice: "Confirmar",
+                resetGame: "Reiniciar",
+                chooseContract: "Elige un contrato para completar o tachar",
+                selectContractFill: "Selecciona un Contrato para Completar:",
+                scratchContract: "O Tacha un Contrato (puntuación 0):",
+                playerTurn: " - Tu turno",
+                
+                // Table
+                round: "Ronda",
+                contract: "Contrato",
+                total: "TOTAL",
+                
+                // Winner
+                itsATie: "¡Empate!",
+                tiedWith: "empatados con",
+                points: "puntos",
+                wins: "¡Gana!",
+                finalScore: "Puntuación Final:",
+                editScores: "← Editar",
+                playAgain: "Jugar de Nuevo",
+                
+                // Rules
+                gameRules: "📋 Reglas del Juego",
+                rulesClassic: "<strong>Clásico:</strong> Acierta el contrato para sumar tu puntuación al capital. ¡Falla y tu capital se divide a la mitad!",
+                rulesFreeChoice: "<strong>Yahtzee Style:</strong> Elige dónde registrar tu puntuación cada turno. Tacha los contratos que no puedas completar (puntuación 0).",
+                
+                // Alert
+                selectContractAlert: "Por favor, selecciona un contrato para completar o tachar.",
+                
+                // Contracts
+                contracts: {
+                    capital: { name: "Capital", desc: "3 primeros dardos - establece tu puntuación inicial" },
+                    "20": { name: "20", desc: "Acierta el segmento 20" },
+                    side: { name: "Lado", desc: "Acierta 3 segmentos adyacentes (ej: 5-20-1). El bull toca todos." },
+                    "19": { name: "19", desc: "Acierta el segmento 19" },
+                    "3row": { name: "Escalera", desc: "Acierta 3 números consecutivos (ej: 14-15-16)" },
+                    "18": { name: "18", desc: "Acierta el segmento 18" },
+                    color: { name: "Color", desc: "Acierta 3 colores diferentes (negro, blanco, verde, rojo)" },
+                    "17": { name: "17", desc: "Acierta el segmento 17" },
+                    double: { name: "Doble", desc: "Acierta cualquier doble" },
+                    "16": { name: "16", desc: "Acierta el segmento 16" },
+                    triple: { name: "Triple", desc: "Acierta cualquier triple" },
+                    "15": { name: "15", desc: "Acierta el segmento 15" },
+                    "57": { name: "57", desc: "Marca exactamente 57 con 3 dardos" },
+                    "14": { name: "14", desc: "Acierta el segmento 14" },
+                    bull: { name: "Bull", desc: "Acierta la diana (simple 25 o doble 50)" }
+                }
+            }
+        };
+
+        // Contract IDs in order
+        const CONTRACT_IDS = ['capital', '20', 'side', '19', '3row', '18', 'color', '17', 'double', '16', 'triple', '15', '57', '14', 'bull'];
+
+        // Current language
+        let currentLang = 'en';
+
+        // Game state
+        let players = [];
+        let gameMode = 'classic';
+        let currentRound = 0;
+        let currentPlayerIndex = 0;
+        let scoresHidden = false;
+        let selectedContract = null;
+        let selectedScratch = null;
+        let scores = {};
+        let yahtzeeHistory = [];
+
+        // ==================== LANGUAGE FUNCTIONS ====================
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            
+            // Update language button states
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            applyTranslations();
+            buildRulesGrid();
+            updateModeDescription();
+        }
+
+        function t(key) {
+            return translations[currentLang][key] || translations['en'][key] || key;
+        }
+
+        function getContractName(id) {
+            return translations[currentLang].contracts[id]?.name || id;
+        }
+
+        function getContractDesc(id) {
+            return translations[currentLang].contracts[id]?.desc || '';
+        }
+
+        function applyTranslations() {
+            // Apply text translations
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[currentLang][key]) {
+                    if (key === 'rulesClassic' || key === 'rulesFreeChoice') {
+                        el.innerHTML = translations[currentLang][key];
+                    } else {
+                        el.textContent = translations[currentLang][key];
+                    }
+                }
+            });
+            
+            // Apply placeholder translations
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[currentLang][key]) {
+                    el.placeholder = translations[currentLang][key];
+                }
+            });
+        }
+
+        function buildRulesGrid() {
+            const grid = document.getElementById('rulesGrid');
+            grid.innerHTML = CONTRACT_IDS.map(id => `
+                <div class="rule-item"><strong>${getContractName(id)}:</strong> ${getContractDesc(id)}</div>
+            `).join('');
+        }
+
+        // ==================== SETUP FUNCTIONS ====================
+
+        function updateModeDescription() {
+            const mode = document.querySelector('input[name="gameMode"]:checked').value;
+            const desc = document.getElementById('modeDescription');
+            desc.textContent = mode === 'classic' ? t('classicDesc') : t('freeChoiceDesc');
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('playerNameInput');
+            const name = input.value.trim();
+            
+            if (name && !players.includes(name)) {
+                players.push(name);
+                updatePlayerList();
+                input.value = '';
+            }
+            input.focus();
+        }
+
+        function removePlayer(name) {
+            players = players.filter(p => p !== name);
+            updatePlayerList();
+        }
+
+        function updatePlayerList() {
+            const list = document.getElementById('playerList');
+            list.innerHTML = players.map(p => `
+                <div class="player-tag">
+                    ${p}
+                    <button onclick="removePlayer('${p}')" class="btn-small">×</button>
+                </div>
+            `).join('');
+            
+            document.getElementById('startBtn').style.display = players.length >= 1 ? 'block' : 'none';
+        }
+
+        function startGame() {
+            gameMode = document.querySelector('input[name="gameMode"]:checked').value;
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('gameBoard').style.display = 'block';
+            currentRound = 0;
+            currentPlayerIndex = 0;
+            
+            if (gameMode === 'classic') {
+                players.forEach(p => {
+                    scores[p] = { capital: 0, rounds: [] };
+                });
+                document.getElementById('classicRoundDisplay').classList.remove('hidden');
+                document.getElementById('classicInputSection').classList.remove('hidden');
+                document.getElementById('yahtzeePlayerDisplay').classList.add('hidden');
+                document.getElementById('yahtzeeInputSection').classList.add('hidden');
+                document.getElementById('hideScoresBtn').classList.add('hidden');
+                buildClassicTable();
+                updateRoundDisplay();
+                buildScoreInputs();
+                updatePrevButton();
+            } else {
+                yahtzeeHistory = [];
+                players.forEach(p => {
+                    scores[p] = { 
+                        contracts: {},
+                        total: 0
+                    };
+                    CONTRACT_IDS.forEach(id => {
+                        scores[p].contracts[id] = { score: null, scratched: false };
+                    });
+                });
+                document.getElementById('classicRoundDisplay').classList.add('hidden');
+                document.getElementById('classicInputSection').classList.add('hidden');
+                document.getElementById('yahtzeePlayerDisplay').classList.remove('hidden');
+                document.getElementById('yahtzeeInputSection').classList.remove('hidden');
+                document.getElementById('hideScoresBtn').classList.remove('hidden');
+                buildYahtzeeTable();
+                updateYahtzeeDisplay();
+                updateYahtzeePrevButton();
+            }
+        }
+
+        // ==================== CLASSIC MODE ====================
+        
+        function buildClassicTable() {
+            const head = document.getElementById('tableHead');
+            const body = document.getElementById('tableBody');
+            
+            let headerHTML = `<tr><th>${t('round')}</th>`;
+            players.forEach(player => {
+                headerHTML += `<th>${player}</th>`;
+            });
+            headerHTML += '</tr>';
+            head.innerHTML = headerHTML;
+            
+            let bodyHTML = '';
+            CONTRACT_IDS.forEach((id, i) => {
+                bodyHTML += `<tr id="row-${i}" class="${i === currentRound ? 'round-current' : ''}">
+                    <td class="round-name-cell">${getContractName(id)}</td>`;
+                players.forEach(player => {
+                    const playerKey = player.replace(/\s/g, '_');
+                    bodyHTML += `<td id="cell-${playerKey}-${i}">-</td>`;
+                });
+                bodyHTML += '</tr>';
+            });
+            
+            bodyHTML += `<tr class="total-row"><td class="round-name-cell">${t('total')}</td>`;
+            players.forEach(player => {
+                const playerKey = player.replace(/\s/g, '_');
+                bodyHTML += `<td id="total-${playerKey}">0</td>`;
+            });
+            bodyHTML += '</tr>';
+            
+            body.innerHTML = bodyHTML;
+        }
+
+        function updateRoundDisplay() {
+            const contractId = CONTRACT_IDS[currentRound];
+            document.getElementById('currentRoundName').textContent = getContractName(contractId);
+            document.getElementById('currentRoundDesc').textContent = getContractDesc(contractId);
+            
+            CONTRACT_IDS.forEach((id, i) => {
+                const row = document.getElementById(`row-${i}`);
+                if (row) {
+                    row.classList.toggle('round-current', i === currentRound);
+                }
+            });
+        }
+
+        function buildScoreInputs() {
+            const container = document.getElementById('scoreInputs');
+            
+            container.innerHTML = players.map(player => {
+                const playerData = scores[player];
+                const capitalDisplay = currentRound === 0 ? t('startingRound') : `${t('currentCapital')} ${playerData.capital}`;
+                
+                return `
+                    <div class="player-score-card">
+                        <h4>${player}</h4>
+                        <div class="current-capital">${capitalDisplay}</div>
+                        <div class="score-row">
+                            <label>${t('score')}</label>
+                            <input type="number" id="score-${player.replace(/\s/g, '_')}" min="0" max="180" placeholder="0-180">
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function editLastRound() {
+            document.getElementById('winnerSection').style.display = 'none';
+            
+            if (gameMode === 'classic') {
+                document.getElementById('classicInputSection').classList.remove('hidden');
+                previousRound();
+            } else {
+                document.getElementById('yahtzeeInputSection').classList.remove('hidden');
+                previousYahtzeeTurn();
+            }
+        }
+
+        function previousRound() {
+            if (currentRound === 0) return;
+            
+            currentRound--;
+            
+            players.forEach(player => {
+                const playerKey = player.replace(/\s/g, '_');
+                scores[player].rounds.pop();
+                
+                if (scores[player].rounds.length > 0) {
+                    scores[player].capital = scores[player].rounds[scores[player].rounds.length - 1].capitalAfter;
+                } else {
+                    scores[player].capital = 0;
+                }
+                
+                const cell = document.getElementById(`cell-${playerKey}-${currentRound}`);
+                cell.textContent = '-';
+                cell.className = '';
+                
+                document.getElementById(`total-${playerKey}`).textContent = scores[player].capital;
+            });
+            
+            updateRoundDisplay();
+            buildScoreInputs();
+            updatePrevButton();
+        }
+
+        function updatePrevButton() {
+            document.getElementById('prevBtn').style.display = currentRound > 0 ? 'inline-block' : 'none';
+        }
+
+        function submitRound() {
+            players.forEach(player => {
+                const playerKey = player.replace(/\s/g, '_');
+                const scoreInput = document.getElementById(`score-${playerKey}`);
+                const score = parseInt(scoreInput.value) || 0;
+                
+                if (currentRound === 0) {
+                    scores[player].capital = score;
+                    scores[player].rounds.push({
+                        score: score,
+                        success: true,
+                        capitalAfter: score
+                    });
+                    
+                    const cell = document.getElementById(`cell-${playerKey}-${currentRound}`);
+                    cell.textContent = score;
+                    cell.className = 'score-success';
+                } else {
+                    const success = score > 0;
+                    let newCapital;
+                    
+                    if (success) {
+                        newCapital = scores[player].capital + score;
+                    } else {
+                        newCapital = Math.ceil(scores[player].capital / 2);
+                    }
+                    
+                    scores[player].rounds.push({
+                        score: score,
+                        success: success,
+                        capitalAfter: newCapital
+                    });
+                    
+                    const cell = document.getElementById(`cell-${playerKey}-${currentRound}`);
+                    if (success) {
+                        cell.textContent = `+${score}`;
+                        cell.className = 'score-success';
+                    } else {
+                        cell.textContent = `÷2`;
+                        cell.className = 'score-fail';
+                    }
+                    
+                    scores[player].capital = newCapital;
+                }
+                
+                document.getElementById(`total-${playerKey}`).textContent = scores[player].capital;
+            });
+            
+            currentRound++;
+            
+            if (currentRound >= CONTRACT_IDS.length) {
+                showWinner();
+            } else {
+                updateRoundDisplay();
+                buildScoreInputs();
+                updatePrevButton();
+            }
+        }
+
+        // ==================== YAHTZEE MODE ====================
+
+        function buildYahtzeeTable() {
+            const head = document.getElementById('tableHead');
+            const body = document.getElementById('tableBody');
+            
+            let headerHTML = `<tr><th>${t('contract')}</th>`;
+            players.forEach(player => {
+                headerHTML += `<th>${player}</th>`;
+            });
+            headerHTML += '</tr>';
+            head.innerHTML = headerHTML;
+            
+            let bodyHTML = '';
+            CONTRACT_IDS.forEach((id) => {
+                bodyHTML += `<tr id="yrow-${id}">
+                    <td class="round-name-cell">${getContractName(id)}</td>`;
+                players.forEach(player => {
+                    const playerKey = player.replace(/\s/g, '_');
+                    bodyHTML += `<td id="ycell-${playerKey}-${id}" class="score-cell">-</td>`;
+                });
+                bodyHTML += '</tr>';
+            });
+            
+            bodyHTML += `<tr class="total-row"><td class="round-name-cell">${t('total')}</td>`;
+            players.forEach(player => {
+                const playerKey = player.replace(/\s/g, '_');
+                bodyHTML += `<td id="ytotal-${playerKey}">0</td>`;
+            });
+            bodyHTML += '</tr>';
+            
+            body.innerHTML = bodyHTML;
+        }
+
+        function updateYahtzeeDisplay() {
+            const currentPlayer = players[currentPlayerIndex];
+            document.getElementById('currentPlayerName').textContent = `${currentPlayer}${t('playerTurn')}`;
+            document.getElementById('yahtzeeScoreInput').value = '';
+            selectedContract = null;
+            selectedScratch = null;
+            
+            buildContractSelectors();
+            updateYahtzeePrevButton();
+        }
+
+        function buildContractSelectors() {
+            const currentPlayer = players[currentPlayerIndex];
+            const playerContracts = scores[currentPlayer].contracts;
+            
+            const fillSelector = document.getElementById('contractSelector');
+            const scratchSelector = document.getElementById('scratchSelector');
+            
+            let fillHTML = '';
+            let scratchHTML = '';
+            
+            CONTRACT_IDS.forEach(id => {
+                const contractData = playerContracts[id];
+                const isUsed = contractData.score !== null || contractData.scratched;
+                const name = getContractName(id);
+                
+                if (isUsed) {
+                    const status = contractData.scratched ? '✗' : `${contractData.score}`;
+                    fillHTML += `<button class="contract-btn" disabled>${name}<br><small>${status}</small></button>`;
+                    scratchHTML += `<button class="contract-btn" disabled>${name}</button>`;
+                } else {
+                    fillHTML += `<button class="contract-btn" id="fill-${id}" onclick="selectContract('${id}')">${name}</button>`;
+                    scratchHTML += `<button class="contract-btn" id="scratch-${id}" onclick="selectScratch('${id}')">${name}</button>`;
+                }
+            });
+            
+            fillSelector.innerHTML = fillHTML;
+            scratchSelector.innerHTML = scratchHTML;
+        }
+
+        function selectContract(contractId) {
+            selectedScratch = null;
+            selectedContract = contractId;
+            
+            document.querySelectorAll('#contractSelector .contract-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelectorAll('#scratchSelector .contract-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            const btn = document.getElementById(`fill-${contractId}`);
+            if (btn) btn.classList.add('selected');
+        }
+
+        function selectScratch(contractId) {
+            selectedContract = null;
+            selectedScratch = contractId;
+            
+            document.querySelectorAll('#contractSelector .contract-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            document.querySelectorAll('#scratchSelector .contract-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            const btn = document.getElementById(`scratch-${contractId}`);
+            if (btn) btn.classList.add('selected');
+        }
+
+        function submitYahtzeeChoice() {
+            const currentPlayer = players[currentPlayerIndex];
+            const playerKey = currentPlayer.replace(/\s/g, '_');
+            const score = parseInt(document.getElementById('yahtzeeScoreInput').value) || 0;
+            
+            if (!selectedContract && !selectedScratch) {
+                alert(t('selectContractAlert'));
+                return;
+            }
+            
+            yahtzeeHistory.push({
+                playerIndex: currentPlayerIndex,
+                player: currentPlayer,
+                contractId: selectedContract || selectedScratch,
+                wasScratched: !!selectedScratch,
+                score: selectedContract ? score : 0
+            });
+            
+            if (selectedContract) {
+                scores[currentPlayer].contracts[selectedContract].score = score;
+                scores[currentPlayer].total += score;
+                
+                const cell = document.getElementById(`ycell-${playerKey}-${selectedContract}`);
+                cell.textContent = score;
+                cell.className = 'score-cell cell-filled';
+            } else {
+                scores[currentPlayer].contracts[selectedScratch].scratched = true;
+                
+                const cell = document.getElementById(`ycell-${playerKey}-${selectedScratch}`);
+                cell.textContent = '✗';
+                cell.className = 'score-cell cell-scratched';
+            }
+            
+            const totalCell = document.getElementById(`ytotal-${playerKey}`);
+            if (scoresHidden) {
+                totalCell.textContent = '???';
+            } else {
+                totalCell.textContent = scores[currentPlayer].total;
+            }
+            
+            updateScoreVisibility();
+            updateYahtzeePrevButton();
+            moveToNextPlayer();
+        }
+
+        function moveToNextPlayer() {
+            let nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            let checkedPlayers = 0;
+            
+            while (checkedPlayers < players.length) {
+                const player = players[nextPlayerIndex];
+                const hasAvailable = CONTRACT_IDS.some(id => {
+                    const data = scores[player].contracts[id];
+                    return data.score === null && !data.scratched;
+                });
+                
+                if (hasAvailable) {
+                    currentPlayerIndex = nextPlayerIndex;
+                    updateYahtzeeDisplay();
+                    return;
+                }
+                
+                nextPlayerIndex = (nextPlayerIndex + 1) % players.length;
+                checkedPlayers++;
+            }
+            
+            showWinner();
+        }
+
+        function updateYahtzeePrevButton() {
+            document.getElementById('yahtzeePrevBtn').style.display = yahtzeeHistory.length > 0 ? 'inline-block' : 'none';
+        }
+
+        function previousYahtzeeTurn() {
+            if (yahtzeeHistory.length === 0) return;
+            
+            const lastMove = yahtzeeHistory.pop();
+            const player = lastMove.player;
+            const playerKey = player.replace(/\s/g, '_');
+            const contractId = lastMove.contractId;
+            
+            if (lastMove.wasScratched) {
+                scores[player].contracts[contractId].scratched = false;
+            } else {
+                scores[player].contracts[contractId].score = null;
+                scores[player].total -= lastMove.score;
+            }
+            
+            const cell = document.getElementById(`ycell-${playerKey}-${contractId}`);
+            cell.textContent = '-';
+            cell.className = 'score-cell';
+            cell.classList.remove('score-hidden');
+            
+            const totalCell = document.getElementById(`ytotal-${playerKey}`);
+            if (scoresHidden) {
+                totalCell.textContent = '???';
+            } else {
+                totalCell.textContent = scores[player].total;
+            }
+            
+            currentPlayerIndex = lastMove.playerIndex;
+            updateYahtzeeDisplay();
+            updateYahtzeePrevButton();
+        }
+
+        function toggleScoreVisibility() {
+            scoresHidden = !scoresHidden;
+            document.getElementById('hideScoresBtn').textContent = scoresHidden ? '👁️‍🗨️' : '👁️';
+            updateScoreVisibility();
+        }
+
+        function updateScoreVisibility() {
+            if (gameMode !== 'yahtzee') return;
+            
+            players.forEach(player => {
+                const playerKey = player.replace(/\s/g, '_');
+                
+                CONTRACT_IDS.forEach(id => {
+                    const cell = document.getElementById(`ycell-${playerKey}-${id}`);
+                    if (cell) {
+                        const data = scores[player].contracts[id];
+                        if (data.score !== null || data.scratched) {
+                            cell.classList.toggle('score-hidden', scoresHidden);
+                        }
+                    }
+                });
+                
+                const totalCell = document.getElementById(`ytotal-${playerKey}`);
+                if (totalCell) {
+                    if (scoresHidden) {
+                        totalCell.textContent = '???';
+                        totalCell.classList.add('score-hidden');
+                    } else {
+                        totalCell.textContent = scores[player].total;
+                        totalCell.classList.remove('score-hidden');
+                    }
+                }
+            });
+        }
+
+        // ==================== COMMON ====================
+
+        function showWinner() {
+            if (gameMode === 'classic') {
+                document.getElementById('classicInputSection').classList.add('hidden');
+                document.getElementById('editScoresBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('yahtzeeInputSection').classList.add('hidden');
+                document.getElementById('editScoresBtn').style.display = yahtzeeHistory.length > 0 ? 'inline-block' : 'none';
+                scoresHidden = false;
+                document.getElementById('hideScoresBtn').textContent = '👁️';
+                updateScoreVisibility();
+            }
+            
+            let highScore = -Infinity;
+            
+            players.forEach(player => {
+                const playerScore = gameMode === 'classic' ? scores[player].capital : scores[player].total;
+                if (playerScore > highScore) {
+                    highScore = playerScore;
+                }
+            });
+            
+            const winners = players.filter(p => {
+                const s = gameMode === 'classic' ? scores[p].capital : scores[p].total;
+                return s === highScore;
+            });
+            
+            const winnerSection = document.getElementById('winnerSection');
+            winnerSection.style.display = 'block';
+            
+            if (winners.length > 1) {
+                document.getElementById('winnerName').textContent = t('itsATie');
+                document.getElementById('winnerScore').textContent = `${winners.join(' & ')} ${t('tiedWith')} ${highScore} ${t('points')}!`;
+            } else {
+                document.getElementById('winnerName').textContent = `🎉 ${winners[0]} ${t('wins')} 🎉`;
+                document.getElementById('winnerScore').textContent = `${t('finalScore')} ${highScore} ${t('points')}`;
+            }
+        }
+
+        function resetGame() {
+            currentRound = 0;
+            currentPlayerIndex = 0;
+            scores = {};
+            scoresHidden = false;
+            selectedContract = null;
+            selectedScratch = null;
+            yahtzeeHistory = [];
+            
+            document.getElementById('setupSection').classList.remove('hidden');
+            document.getElementById('gameBoard').style.display = 'none';
+            document.getElementById('winnerSection').style.display = 'none';
+            document.getElementById('classicInputSection').classList.remove('hidden');
+            document.getElementById('yahtzeeInputSection').classList.add('hidden');
+            document.getElementById('hideScoresBtn').classList.add('hidden');
+            
+            updatePlayerList();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            applyTranslations();
+            buildRulesGrid();
+        });
+    </script>
+</body>
+</html>
