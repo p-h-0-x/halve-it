@@ -1162,8 +1162,8 @@
                 yahtzeeHistory = gameState.yahtzeeHistory || [];
                 scoresHidden = gameState.scoresHidden || false;
 
-                // Apply language
-                setLanguage(currentLang);
+                // Apply language (pass true to prevent saving during load)
+                setLanguage(currentLang, true);
 
                 // Restore UI state
                 if (gameState.isGameStarted) {
@@ -1263,6 +1263,11 @@
                     }
                 } else {
                     // Still in setup phase
+                    // Restore game mode selection
+                    const modeRadio = document.querySelector(`input[name="gameMode"][value="${gameMode}"]`);
+                    if (modeRadio) {
+                        modeRadio.checked = true;
+                    }
                     updatePlayerList();
                 }
 
@@ -1283,19 +1288,24 @@
 
         // ==================== LANGUAGE FUNCTIONS ====================
 
-        function setLanguage(lang) {
+        function setLanguage(lang, fromLoad = false) {
             currentLang = lang;
 
             // Update language button states
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
+                if (btn.onclick && btn.onclick.toString().includes(`'${lang}'`)) {
+                    btn.classList.add('active');
+                }
             });
-            event.target.classList.add('active');
 
             applyTranslations();
             buildRulesGrid();
             updateModeDescription();
-            saveGameState();
+
+            if (!fromLoad) {
+                saveGameState();
+            }
         }
 
         function t(key) {
