@@ -1110,20 +1110,192 @@
         let currentDarts = [];
         let currentModifier = 'single';
 
+        // ==================== LOCAL STORAGE FUNCTIONS ====================
+
+        const STORAGE_KEY = 'halveItGameState';
+
+        function saveGameState() {
+            const gameState = {
+                // Setup state
+                players: players,
+                gameMode: gameMode,
+                currentLang: currentLang,
+
+                // Game state
+                currentRound: currentRound,
+                currentPlayerIndex: currentPlayerIndex,
+                scores: scores,
+                yahtzeeHistory: yahtzeeHistory,
+                scoresHidden: scoresHidden,
+
+                // UI state
+                isGameStarted: document.getElementById('gameBoard').style.display !== 'none',
+                isWinnerShown: document.getElementById('winnerSection').style.display === 'block',
+
+                // Timestamp for debugging
+                savedAt: new Date().toISOString()
+            };
+
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+            } catch (e) {
+                console.error('Failed to save game state:', e);
+            }
+        }
+
+        function loadGameState() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (!saved) return false;
+
+                const gameState = JSON.parse(saved);
+
+                // Restore setup state
+                players = gameState.players || [];
+                gameMode = gameState.gameMode || 'classic';
+                currentLang = gameState.currentLang || 'en';
+
+                // Restore game state
+                currentRound = gameState.currentRound || 0;
+                currentPlayerIndex = gameState.currentPlayerIndex || 0;
+                scores = gameState.scores || {};
+                yahtzeeHistory = gameState.yahtzeeHistory || [];
+                scoresHidden = gameState.scoresHidden || false;
+
+                // Apply language
+                setLanguage(currentLang);
+
+                // Restore UI state
+                if (gameState.isGameStarted) {
+                    // Hide setup, show game board
+                    document.getElementById('setupSection').classList.add('hidden');
+                    document.getElementById('gameBoard').style.display = 'block';
+
+                    if (gameMode === 'classic') {
+                        document.getElementById('classicRoundDisplay').classList.remove('hidden');
+                        document.getElementById('classicInputSection').classList.remove('hidden');
+                        document.getElementById('yahtzeePlayerDisplay').classList.add('hidden');
+                        document.getElementById('yahtzeeInputSection').classList.add('hidden');
+                        document.getElementById('hideScoresBtn').classList.add('hidden');
+
+                        buildClassicTable();
+                        updateRoundDisplay();
+                        buildScoreInputs();
+                        updatePrevButton();
+
+                        // Restore scores in the table
+                        players.forEach(player => {
+                            const playerKey = player.replace(/\s/g, '_');
+                            const playerData = scores[player];
+
+                            if (playerData && playerData.rounds) {
+                                playerData.rounds.forEach((round, i) => {
+                                    const cell = document.getElementById(`cell-${playerKey}-${i}`);
+                                    if (cell) {
+                                        if (i === 0) {
+                                            cell.textContent = round.score;
+                                            cell.className = 'score-success';
+                                        } else {
+                                            if (round.success) {
+                                                cell.textContent = `+${round.score}`;
+                                                cell.className = 'score-success';
+                                            } else {
+                                                cell.textContent = `÷2`;
+                                                cell.className = 'score-fail';
+                                            }
+                                        }
+                                    }
+                                });
+
+                                document.getElementById(`total-${playerKey}`).textContent = playerData.capital;
+                            }
+                        });
+
+                        if (gameState.isWinnerShown) {
+                            document.getElementById('classicInputSection').classList.add('hidden');
+                            showWinner();
+                        }
+                    } else {
+                        document.getElementById('classicRoundDisplay').classList.add('hidden');
+                        document.getElementById('classicInputSection').classList.add('hidden');
+                        document.getElementById('yahtzeePlayerDisplay').classList.remove('hidden');
+                        document.getElementById('yahtzeeInputSection').classList.remove('hidden');
+                        document.getElementById('hideScoresBtn').classList.remove('hidden');
+
+                        buildYahtzeeTable();
+                        updateYahtzeeDisplay();
+                        updateYahtzeePrevButton();
+
+                        // Restore scores in the table
+                        players.forEach(player => {
+                            const playerKey = player.replace(/\s/g, '_');
+                            const playerData = scores[player];
+
+                            if (playerData && playerData.contracts) {
+                                CONTRACT_IDS.forEach(id => {
+                                    const contractData = playerData.contracts[id];
+                                    const cell = document.getElementById(`ycell-${playerKey}-${id}`);
+
+                                    if (cell && contractData) {
+                                        if (contractData.scratched) {
+                                            cell.textContent = '✗';
+                                            cell.className = 'score-cell cell-scratched';
+                                        } else if (contractData.score !== null) {
+                                            cell.textContent = contractData.score;
+                                            cell.className = 'score-cell cell-filled';
+                                        }
+                                    }
+                                });
+
+                                const totalCell = document.getElementById(`ytotal-${playerKey}`);
+                                if (totalCell) {
+                                    totalCell.textContent = scoresHidden ? '???' : playerData.total;
+                                }
+                            }
+                        });
+
+                        updateScoreVisibility();
+
+                        if (gameState.isWinnerShown) {
+                            document.getElementById('yahtzeeInputSection').classList.add('hidden');
+                            showWinner();
+                        }
+                    }
+                } else {
+                    // Still in setup phase
+                    updatePlayerList();
+                }
+
+                return true;
+            } catch (e) {
+                console.error('Failed to load game state:', e);
+                return false;
+            }
+        }
+
+        function clearGameState() {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+            } catch (e) {
+                console.error('Failed to clear game state:', e);
+            }
+        }
+
         // ==================== LANGUAGE FUNCTIONS ====================
 
         function setLanguage(lang) {
             currentLang = lang;
-            
+
             // Update language button states
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
-            
+
             applyTranslations();
             buildRulesGrid();
             updateModeDescription();
+            saveGameState();
         }
 
         function t(key) {
@@ -1178,11 +1350,12 @@
         function addPlayer() {
             const input = document.getElementById('playerNameInput');
             const name = input.value.trim();
-            
+
             if (name && !players.includes(name)) {
                 players.push(name);
                 updatePlayerList();
                 input.value = '';
+                saveGameState();
             }
             input.focus();
         }
@@ -1190,6 +1363,7 @@
         function removePlayer(name) {
             players = players.filter(p => p !== name);
             updatePlayerList();
+            saveGameState();
         }
 
         function updatePlayerList() {
@@ -1210,7 +1384,7 @@
             document.getElementById('gameBoard').style.display = 'block';
             currentRound = 0;
             currentPlayerIndex = 0;
-            
+
             if (gameMode === 'classic') {
                 players.forEach(p => {
                     scores[p] = { capital: 0, rounds: [] };
@@ -1227,7 +1401,7 @@
             } else {
                 yahtzeeHistory = [];
                 players.forEach(p => {
-                    scores[p] = { 
+                    scores[p] = {
                         contracts: {},
                         total: 0
                     };
@@ -1244,6 +1418,7 @@
                 updateYahtzeeDisplay();
                 updateYahtzeePrevButton();
             }
+            saveGameState();
         }
 
         // ==================== CLASSIC MODE ====================
@@ -1352,6 +1527,7 @@
             updateRoundDisplay();
             buildScoreInputs();
             updatePrevButton();
+            saveGameState();
         }
 
         function updatePrevButton() {
@@ -1423,7 +1599,7 @@
             });
             
             currentRound++;
-            
+
             if (currentRound >= CONTRACT_IDS.length) {
                 showWinner();
             } else {
@@ -1431,6 +1607,7 @@
                 buildScoreInputs();
                 updatePrevButton();
             }
+            saveGameState();
         }
 
         // ==================== YAHTZEE MODE ====================
@@ -1587,6 +1764,7 @@
             updateScoreVisibility();
             updateYahtzeePrevButton();
             moveToNextPlayer();
+            saveGameState();
         }
 
         function moveToNextPlayer() {
@@ -1647,12 +1825,14 @@
             currentPlayerIndex = lastMove.playerIndex;
             updateYahtzeeDisplay();
             updateYahtzeePrevButton();
+            saveGameState();
         }
 
         function toggleScoreVisibility() {
             scoresHidden = !scoresHidden;
             document.getElementById('hideScoresBtn').textContent = scoresHidden ? '👁️‍🗨️' : '👁️';
             updateScoreVisibility();
+            saveGameState();
         }
 
         function updateScoreVisibility() {
@@ -1751,6 +1931,7 @@
             document.getElementById('hideScoresBtn').classList.add('hidden');
 
             updatePlayerList();
+            clearGameState();
         }
 
         // ==================== DART INPUT ====================
@@ -1951,6 +2132,12 @@
         document.addEventListener('DOMContentLoaded', () => {
             applyTranslations();
             buildRulesGrid();
+
+            // Try to load saved game state
+            const loaded = loadGameState();
+            if (loaded) {
+                console.log('Game state restored from localStorage');
+            }
         });
     </script>
 </body>
