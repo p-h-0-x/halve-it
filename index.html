@@ -1672,15 +1672,23 @@
                     // Capital: Use total score from darts
                     score = playerDarts.reduce((sum, d) => sum + d.score, 0);
                 } else {
-                    // Other contracts: Calculate score for hitting target number
-                    const targetNumber = parseInt(contractId);
-                    if (isNaN(targetNumber)) {
-                        // For non-numeric contracts (side, 3row, color, double, triple, 57, bull)
-                        // Just use total for now (manual validation still applies)
-                        score = playerDarts.reduce((sum, d) => sum + d.score, 0);
+                    // Check if darts meet contract requirements
+                    const meetsRequirements = checkContractRequirements(playerDarts, contractId);
+
+                    if (!meetsRequirements) {
+                        // If requirements not met, score is 0 (capital will be halved)
+                        score = 0;
                     } else {
-                        // For numeric contracts (20, 19, 18, 17, 16, 15, 14)
-                        score = calculateClassicScore(playerDarts, targetNumber);
+                        // Requirements met, calculate score
+                        const targetNumber = parseInt(contractId);
+                        if (isNaN(targetNumber)) {
+                            // For non-numeric contracts (side, 3row, color, double, triple, 57, bull)
+                            // Use total score
+                            score = playerDarts.reduce((sum, d) => sum + d.score, 0);
+                        } else {
+                            // For numeric contracts (20, 19, 18, 17, 16, 15, 14)
+                            score = calculateClassicScore(playerDarts, targetNumber);
+                        }
                     }
                 }
 
@@ -1859,6 +1867,11 @@
                     let classes = 'contract-btn';
                     if (isScratchMode) {
                         classes += ' scratch-mode';
+                    }
+                    // Check if this contract is currently selected
+                    const isSelected = (selectedContract === id) || (selectedScratch === id);
+                    if (isSelected) {
+                        classes += ' selected';
                     }
                     // Highlight valid contracts with a green border
                     let style = '';
@@ -2445,11 +2458,73 @@
         function calculateContractScore(darts, contractId) {
             if (!darts || darts.length === 0) return 0;
 
-            const total = darts.reduce((sum, d) => sum + d.score, 0);
+            // For numeric contracts (20, 19, 18, 17, 16, 15, 14), only count darts that hit that number
+            const numericContract = parseInt(contractId);
+            if (!isNaN(numericContract)) {
+                let score = 0;
+                for (let dart of darts) {
+                    if (dart.number === numericContract) {
+                        score += dart.score;
+                    }
+                }
+                return score;
+            }
 
-            // For most contracts, return the total
-            // Some contracts might have special scoring, but for now total works
+            // For other contracts, return the total
+            const total = darts.reduce((sum, d) => sum + d.score, 0);
             return total;
+        }
+
+        // Check if darts meet the contract requirements (for Classic mode)
+        function checkContractRequirements(darts, contractId) {
+            if (!darts || darts.length === 0) return false;
+
+            const numbers = darts.map(d => d.number);
+            const modifiers = darts.map(d => d.modifier);
+
+            switch (contractId) {
+                case 'capital':
+                    return true; // Capital always succeeds if darts are entered
+
+                case 'side':
+                    // Must hit 3 adjacent segments
+                    return areAdjacent(numbers[0], numbers[1], numbers[2]);
+
+                case '3row':
+                    // Must hit 3 consecutive numbers
+                    return areConsecutive(numbers[0], numbers[1], numbers[2]);
+
+                case 'color':
+                    // Must hit 3 different colors
+                    const colors = darts.map(d => getDartColor(d)).filter(c => c !== null);
+                    const uniqueColors = new Set(colors);
+                    return uniqueColors.size >= 3;
+
+                case 'double':
+                    // Must hit at least one double
+                    return modifiers.includes('double');
+
+                case 'triple':
+                    // Must hit at least one triple
+                    return modifiers.includes('triple');
+
+                case '57':
+                    // Must score exactly 57
+                    const total = darts.reduce((sum, d) => sum + d.score, 0);
+                    return total === 57;
+
+                case 'bull':
+                    // Must hit bullseye
+                    return numbers.includes(25);
+
+                default:
+                    // For numeric contracts, check if at least one dart hit the number
+                    const targetNumber = parseInt(contractId);
+                    if (!isNaN(targetNumber)) {
+                        return numbers.includes(targetNumber);
+                    }
+                    return false;
+            }
         }
 
         // ==================== SCORE VALIDATION ====================
