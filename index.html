@@ -2371,11 +2371,13 @@
         const DARTBOARD_SEQUENCE = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
 
         // Check if 3 numbers are adjacent on the dartboard
-        function areAdjacent(num1, num2, num3) {
-            // Bull (25) is adjacent to everything
-            if (num1 === 25 || num2 === 25 || num3 === 25) return true;
+        function areAdjacent(dart1, dart2, dart3) {
+            // Only single bull (not double bull) is adjacent to everything
+            const isSingleBull = (dart) => dart.number === 25 && dart.modifier === 'single';
 
-            const nums = [num1, num2, num3].filter(n => n !== 0 && n !== 25);
+            if (isSingleBull(dart1) || isSingleBull(dart2) || isSingleBull(dart3)) return true;
+
+            const nums = [dart1.number, dart2.number, dart3.number].filter(n => n !== 0 && n !== 25);
             if (nums.length < 3) return false;
 
             for (let i = 0; i < DARTBOARD_SEQUENCE.length; i++) {
@@ -2416,7 +2418,7 @@
             });
 
             // Side: 3 adjacent segments
-            if (areAdjacent(numbers[0], numbers[1], numbers[2])) {
+            if (areAdjacent(darts[0], darts[1], darts[2])) {
                 validContracts.push('side');
             }
 
@@ -2505,7 +2507,7 @@
 
                 case 'side':
                     // Must hit 3 adjacent segments
-                    return areAdjacent(numbers[0], numbers[1], numbers[2]);
+                    return areAdjacent(darts[0], darts[1], darts[2]);
 
                 case '3row':
                     // Must hit 3 consecutive numbers
