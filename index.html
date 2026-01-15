@@ -786,12 +786,13 @@
 
         <!-- Yahtzee Mode: Score Input -->
         <div class="score-input-section hidden" id="yahtzeeInputSection">
-            <h3 data-i18n="enterYourScore">Enter Your Score</h3>
-            <div class="player-score-card" style="max-width: 300px; margin: 0 auto 20px;">
-                <div class="score-row" style="justify-content: center;">
-                    <label data-i18n="score">Score:</label>
-                    <input type="number" id="yahtzeeScoreInput" min="0" max="180" placeholder="0-180">
-                    <button class="dart-input-btn" onclick="openDartInput('yahtzeeScoreInput')" title="Enter darts">🎯</button>
+            <h3 data-i18n="enterYourScore">Enter Your Darts</h3>
+            <div class="player-score-card" style="max-width: 400px; margin: 0 auto 20px;">
+                <div class="score-row" style="flex-direction: column; align-items: stretch;">
+                    <div id="yahtzeeDartsDisplay" style="margin-bottom: 10px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 5px; text-align: center; min-height: 40px;">
+                        <span style="color: #636e72;">No darts entered</span>
+                    </div>
+                    <button class="dart-input-btn" onclick="openDartInputYahtzee()" title="Enter darts" style="width: 100%;">🎯 <span data-i18n="enterDarts">Enter Your Darts</span></button>
                 </div>
             </div>
 
@@ -1175,6 +1176,7 @@
         let dartInputTargetField = null;
         let currentDarts = [];
         let currentModifier = 'single';
+        let storedDarts = {}; // Store darts for each player: { playerKey: [dart1, dart2, dart3] }
 
         // ==================== LOCAL STORAGE FUNCTIONS ====================
 
@@ -1193,6 +1195,7 @@
                 scores: scores,
                 yahtzeeHistory: yahtzeeHistory,
                 scoresHidden: scoresHidden,
+                storedDarts: storedDarts,
 
                 // UI state
                 isGameStarted: document.getElementById('gameBoard').style.display !== 'none',
@@ -1227,6 +1230,7 @@
                 scores = gameState.scores || {};
                 yahtzeeHistory = gameState.yahtzeeHistory || [];
                 scoresHidden = gameState.scoresHidden || false;
+                storedDarts = gameState.storedDarts || {};
 
                 // Apply language (pass true to prevent saving during load)
                 setLanguage(currentLang, true);
@@ -1289,8 +1293,23 @@
                         document.getElementById('hideScoresBtn').classList.remove('hidden');
 
                         buildYahtzeeTable();
-                        updateYahtzeeDisplay();
+
+                        // Update display without clearing darts (since we just restored them)
+                        const currentPlayer = players[currentPlayerIndex];
+                        document.getElementById('currentPlayerName').textContent = `${currentPlayer}${t('playerTurn')}`;
+                        selectedContract = null;
+                        selectedScratch = null;
+                        isScratchMode = false;
+
+                        // Reset toggle buttons
+                        document.getElementById('fillModeBtn').classList.add('active');
+                        document.getElementById('fillModeBtn').classList.remove('scratch-active');
+                        document.getElementById('scratchModeBtn').classList.remove('scratch-active');
+                        document.getElementById('scratchModeBtn').classList.remove('active');
+
+                        buildContractSelectors();
                         updateYahtzeePrevButton();
+                        updateYahtzeeDartsDisplay();
 
                         // Restore scores in the table
                         players.forEach(player => {
@@ -1460,6 +1479,7 @@
             document.getElementById('gameBoard').style.display = 'block';
             currentRound = 0;
             currentPlayerIndex = 0;
+            storedDarts = {};
 
             if (gameMode === 'classic') {
                 players.forEach(p => {
@@ -1552,14 +1572,24 @@
                 const capitalDisplay = currentRound === 0 ? t('startingRound') : `${t('currentCapital')} ${playerData.capital}`;
                 const inputId = `score-${player.replace(/\s/g, '_')}`;
 
+                // Check if player has entered darts
+                const playerDarts = storedDarts[inputId];
+                let dartsDisplay = '';
+                if (playerDarts && playerDarts.length > 0) {
+                    dartsDisplay = playerDarts.map(d => d.displayText).join(', ');
+                } else {
+                    dartsDisplay = '<span style="color: #636e72;">No darts entered</span>';
+                }
+
                 return `
                     <div class="player-score-card">
                         <h4>${player}</h4>
                         <div class="current-capital">${capitalDisplay}</div>
-                        <div class="score-row">
-                            <label>${t('score')}</label>
-                            <input type="number" id="${inputId}" min="0" max="180" placeholder="0-180">
-                            <button class="dart-input-btn" onclick="openDartInput('${inputId}')" title="Enter darts">🎯</button>
+                        <div class="score-row" style="flex-direction: column; align-items: stretch;">
+                            <div style="margin-bottom: 10px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 5px; text-align: center;">
+                                ${dartsDisplay}
+                            </div>
+                            <button class="dart-input-btn" onclick="openDartInputClassic('${inputId}')" title="Enter darts" style="width: 100%;">🎯 ${t('enterDarts')}</button>
                         </div>
                     </div>
                 `;
@@ -1580,26 +1610,32 @@
 
         function previousRound() {
             if (currentRound === 0) return;
-            
+
             currentRound--;
-            
+
             players.forEach(player => {
                 const playerKey = player.replace(/\s/g, '_');
-                scores[player].rounds.pop();
-                
+                const lastRound = scores[player].rounds.pop();
+
+                // Restore darts from the last round
+                const inputId = `score-${playerKey}`;
+                if (lastRound && lastRound.darts) {
+                    storedDarts[inputId] = [...lastRound.darts];
+                }
+
                 if (scores[player].rounds.length > 0) {
                     scores[player].capital = scores[player].rounds[scores[player].rounds.length - 1].capitalAfter;
                 } else {
                     scores[player].capital = 0;
                 }
-                
+
                 const cell = document.getElementById(`cell-${playerKey}-${currentRound}`);
                 cell.textContent = '-';
                 cell.className = '';
-                
+
                 document.getElementById(`total-${playerKey}`).textContent = scores[player].capital;
             });
-            
+
             updateRoundDisplay();
             buildScoreInputs();
             updatePrevButton();
@@ -1613,52 +1649,76 @@
         function submitRound() {
             const contractId = CONTRACT_IDS[currentRound];
 
-            // Validate all scores first
+            // Check if all players have entered darts
             for (let player of players) {
                 const playerKey = player.replace(/\s/g, '_');
-                const scoreInput = document.getElementById(`score-${playerKey}`);
-                const score = parseInt(scoreInput.value) || 0;
+                const inputId = `score-${playerKey}`;
+                const playerDarts = storedDarts[inputId];
 
-                if (!validateScore(score, contractId)) {
-                    showValidationError(contractId);
-                    scoreInput.focus();
+                if (!playerDarts || playerDarts.length === 0) {
+                    alert(`${player} has not entered darts yet!`);
                     return;
                 }
             }
 
-            // All scores are valid, proceed with submission
+            // Calculate scores from darts
             players.forEach(player => {
                 const playerKey = player.replace(/\s/g, '_');
-                const scoreInput = document.getElementById(`score-${playerKey}`);
-                const score = parseInt(scoreInput.value) || 0;
-                
+                const inputId = `score-${playerKey}`;
+                const playerDarts = storedDarts[inputId];
+
+                let score;
+                if (currentRound === 0) {
+                    // Capital: Use total score from darts
+                    score = playerDarts.reduce((sum, d) => sum + d.score, 0);
+                } else {
+                    // Other contracts: Calculate score for hitting target number
+                    const targetNumber = parseInt(contractId);
+                    if (isNaN(targetNumber)) {
+                        // For non-numeric contracts (side, 3row, color, double, triple, 57, bull)
+                        // Just use total for now (manual validation still applies)
+                        score = playerDarts.reduce((sum, d) => sum + d.score, 0);
+                    } else {
+                        // For numeric contracts (20, 19, 18, 17, 16, 15, 14)
+                        score = calculateClassicScore(playerDarts, targetNumber);
+                    }
+                }
+
+                // Validate score
+                if (!validateScore(score, contractId)) {
+                    showValidationError(contractId);
+                    return;
+                }
+
                 if (currentRound === 0) {
                     scores[player].capital = score;
                     scores[player].rounds.push({
                         score: score,
                         success: true,
-                        capitalAfter: score
+                        capitalAfter: score,
+                        darts: [...playerDarts]
                     });
-                    
+
                     const cell = document.getElementById(`cell-${playerKey}-${currentRound}`);
                     cell.textContent = score;
                     cell.className = 'score-success';
                 } else {
                     const success = score > 0;
                     let newCapital;
-                    
+
                     if (success) {
                         newCapital = scores[player].capital + score;
                     } else {
                         newCapital = Math.ceil(scores[player].capital / 2);
                     }
-                    
+
                     scores[player].rounds.push({
                         score: score,
                         success: success,
-                        capitalAfter: newCapital
+                        capitalAfter: newCapital,
+                        darts: [...playerDarts]
                     });
-                    
+
                     const cell = document.getElementById(`cell-${playerKey}-${currentRound}`);
                     if (success) {
                         cell.textContent = `+${score}`;
@@ -1667,13 +1727,20 @@
                         cell.textContent = `÷2`;
                         cell.className = 'score-fail';
                     }
-                    
+
                     scores[player].capital = newCapital;
                 }
-                
+
                 document.getElementById(`total-${playerKey}`).textContent = scores[player].capital;
             });
-            
+
+            // Clear stored darts for next round
+            players.forEach(player => {
+                const playerKey = player.replace(/\s/g, '_');
+                const inputId = `score-${playerKey}`;
+                delete storedDarts[inputId];
+            });
+
             currentRound++;
 
             if (currentRound >= CONTRACT_IDS.length) {
@@ -1723,10 +1790,13 @@
         function updateYahtzeeDisplay() {
             const currentPlayer = players[currentPlayerIndex];
             document.getElementById('currentPlayerName').textContent = `${currentPlayer}${t('playerTurn')}`;
-            document.getElementById('yahtzeeScoreInput').value = '';
             selectedContract = null;
             selectedScratch = null;
             isScratchMode = false;
+
+            // Clear darts for new player
+            delete storedDarts['yahtzeeCurrentDarts'];
+            updateYahtzeeDartsDisplay();
 
             // Reset toggle buttons
             document.getElementById('fillModeBtn').classList.add('active');
@@ -1769,20 +1839,33 @@
 
             const contractSelector = document.getElementById('contractSelector');
 
+            // Get valid contracts based on entered darts
+            const darts = storedDarts['yahtzeeCurrentDarts'];
+            const validContracts = darts ? getValidContracts(darts) : [];
+
             let html = '';
 
             CONTRACT_IDS.forEach(id => {
                 const contractData = playerContracts[id];
                 const isUsed = contractData.score !== null || contractData.scratched;
                 const name = getContractName(id);
+                const isValid = validContracts.includes(id);
 
                 if (isUsed) {
                     const status = contractData.scratched ? '✗' : `${contractData.score}`;
                     html += `<button class="contract-btn" disabled>${name}<br><small>${status}</small></button>`;
                 } else {
                     // Apply scratch-mode class if in scratch mode
-                    const scratchClass = isScratchMode ? ' scratch-mode' : '';
-                    html += `<button class="contract-btn${scratchClass}" id="contract-${id}" onclick="selectContractUnified('${id}')">${name}</button>`;
+                    let classes = 'contract-btn';
+                    if (isScratchMode) {
+                        classes += ' scratch-mode';
+                    }
+                    // Highlight valid contracts with a green border
+                    let style = '';
+                    if (isValid && darts) {
+                        style = ' style="border-color: #00b894; border-width: 3px; background: rgba(0, 184, 148, 0.2);"';
+                    }
+                    html += `<button class="${classes}" id="contract-${id}" onclick="selectContractUnified('${id}')"${style}>${name}${isValid && darts ? ' ✓' : ''}</button>`;
                 }
             });
 
@@ -1811,50 +1894,62 @@
         function submitYahtzeeChoice() {
             const currentPlayer = players[currentPlayerIndex];
             const playerKey = currentPlayer.replace(/\s/g, '_');
-            const score = parseInt(document.getElementById('yahtzeeScoreInput').value) || 0;
 
             if (!selectedContract && !selectedScratch) {
                 alert(t('selectContractAlert'));
                 return;
             }
 
-            // Validate score for selected contract
-            if (selectedContract && !validateScore(score, selectedContract)) {
-                showValidationError(selectedContract);
-                document.getElementById('yahtzeeScoreInput').focus();
+            // Check if darts have been entered (only required for fill mode)
+            const darts = storedDarts['yahtzeeCurrentDarts'];
+            if (selectedContract && (!darts || darts.length === 0)) {
+                alert('Please enter your darts first!');
                 return;
             }
-            
+
+            // Calculate score from darts
+            let score = 0;
+            if (selectedContract) {
+                score = calculateContractScore(darts, selectedContract);
+
+                // Validate score for selected contract
+                if (!validateScore(score, selectedContract)) {
+                    showValidationError(selectedContract);
+                    return;
+                }
+            }
+
             yahtzeeHistory.push({
                 playerIndex: currentPlayerIndex,
                 player: currentPlayer,
                 contractId: selectedContract || selectedScratch,
                 wasScratched: !!selectedScratch,
-                score: selectedContract ? score : 0
+                score: selectedContract ? score : 0,
+                darts: darts ? [...darts] : []
             });
-            
+
             if (selectedContract) {
                 scores[currentPlayer].contracts[selectedContract].score = score;
                 scores[currentPlayer].total += score;
-                
+
                 const cell = document.getElementById(`ycell-${playerKey}-${selectedContract}`);
                 cell.textContent = score;
                 cell.className = 'score-cell cell-filled';
             } else {
                 scores[currentPlayer].contracts[selectedScratch].scratched = true;
-                
+
                 const cell = document.getElementById(`ycell-${playerKey}-${selectedScratch}`);
                 cell.textContent = '✗';
                 cell.className = 'score-cell cell-scratched';
             }
-            
+
             const totalCell = document.getElementById(`ytotal-${playerKey}`);
             if (scoresHidden) {
                 totalCell.textContent = '???';
             } else {
                 totalCell.textContent = scores[currentPlayer].total;
             }
-            
+
             updateScoreVisibility();
             updateYahtzeePrevButton();
             moveToNextPlayer();
@@ -1891,33 +1986,55 @@
 
         function previousYahtzeeTurn() {
             if (yahtzeeHistory.length === 0) return;
-            
+
             const lastMove = yahtzeeHistory.pop();
             const player = lastMove.player;
             const playerKey = player.replace(/\s/g, '_');
             const contractId = lastMove.contractId;
-            
+
             if (lastMove.wasScratched) {
                 scores[player].contracts[contractId].scratched = false;
             } else {
                 scores[player].contracts[contractId].score = null;
                 scores[player].total -= lastMove.score;
             }
-            
+
             const cell = document.getElementById(`ycell-${playerKey}-${contractId}`);
             cell.textContent = '-';
             cell.className = 'score-cell';
             cell.classList.remove('score-hidden');
-            
+
             const totalCell = document.getElementById(`ytotal-${playerKey}`);
             if (scoresHidden) {
                 totalCell.textContent = '???';
             } else {
                 totalCell.textContent = scores[player].total;
             }
-            
+
             currentPlayerIndex = lastMove.playerIndex;
-            updateYahtzeeDisplay();
+
+            // Restore darts from the last move
+            if (lastMove.darts && lastMove.darts.length > 0) {
+                storedDarts['yahtzeeCurrentDarts'] = [...lastMove.darts];
+                updateYahtzeeDartsDisplay();
+            } else {
+                delete storedDarts['yahtzeeCurrentDarts'];
+                updateYahtzeeDartsDisplay();
+            }
+
+            // Update display
+            selectedContract = null;
+            selectedScratch = null;
+            isScratchMode = false;
+
+            // Reset toggle buttons
+            document.getElementById('fillModeBtn').classList.add('active');
+            document.getElementById('fillModeBtn').classList.remove('scratch-active');
+            document.getElementById('scratchModeBtn').classList.remove('scratch-active');
+            document.getElementById('scratchModeBtn').classList.remove('active');
+
+            document.getElementById('currentPlayerName').textContent = `${player}${t('playerTurn')}`;
+            buildContractSelectors();
             updateYahtzeePrevButton();
             saveGameState();
         }
@@ -2017,6 +2134,7 @@
             selectedScratch = null;
             isScratchMode = false;
             yahtzeeHistory = [];
+            storedDarts = {};
 
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('gameBoard').style.display = 'none';
@@ -2034,6 +2152,26 @@
         function openDartInput(inputFieldId) {
             dartInputTargetField = inputFieldId;
             currentDarts = [];
+            currentModifier = 'single';
+            updateDartDisplay();
+            setModifier('single');
+            document.getElementById('dartInputModal').classList.add('active');
+        }
+
+        function openDartInputClassic(inputFieldId) {
+            dartInputTargetField = inputFieldId;
+            // Load existing darts if any
+            currentDarts = storedDarts[inputFieldId] ? [...storedDarts[inputFieldId]] : [];
+            currentModifier = 'single';
+            updateDartDisplay();
+            setModifier('single');
+            document.getElementById('dartInputModal').classList.add('active');
+        }
+
+        function openDartInputYahtzee() {
+            dartInputTargetField = 'yahtzeeCurrentDarts';
+            // Load existing darts if any
+            currentDarts = storedDarts['yahtzeeCurrentDarts'] ? [...storedDarts['yahtzeeCurrentDarts']] : [];
             currentModifier = 'single';
             updateDartDisplay();
             setModifier('single');
@@ -2058,6 +2196,7 @@
 
             let score = number;
             let displayText = '';
+            let modifier = currentModifier;
 
             if (number === 25) {
                 // Bullseye: single=25, double=50
@@ -2067,10 +2206,12 @@
                 } else {
                     score = 25;
                     displayText = 'Bull';
+                    modifier = 'single';
                 }
             } else if (number === 0) {
                 score = 0;
                 displayText = 'Miss';
+                modifier = 'miss';
             } else {
                 if (currentModifier === 'double') {
                     score = number * 2;
@@ -2084,7 +2225,7 @@
                 }
             }
 
-            currentDarts.push({ score, displayText });
+            currentDarts.push({ number, modifier, score, displayText });
             updateDartDisplay();
 
             // Reset to single after each dart
@@ -2144,9 +2285,171 @@
         function confirmDarts() {
             const total = currentDarts.reduce((sum, dart) => sum + dart.score, 0);
             if (dartInputTargetField) {
-                document.getElementById(dartInputTargetField).value = total;
+                // Store the darts for this input field
+                storedDarts[dartInputTargetField] = [...currentDarts];
+
+                // Update the input value if it exists
+                const inputField = document.getElementById(dartInputTargetField);
+                if (inputField) {
+                    inputField.value = total;
+                }
+
+                // Rebuild score inputs if in Classic mode
+                if (gameMode === 'classic' && document.getElementById('classicInputSection').classList.contains('hidden') === false) {
+                    buildScoreInputs();
+                }
+
+                // Update Yahtzee darts display and highlight valid contracts
+                if (gameMode === 'yahtzee' && dartInputTargetField === 'yahtzeeCurrentDarts') {
+                    updateYahtzeeDartsDisplay();
+                    buildContractSelectors();
+                }
             }
             closeDartInput();
+        }
+
+        function updateYahtzeeDartsDisplay() {
+            const display = document.getElementById('yahtzeeDartsDisplay');
+            const darts = storedDarts['yahtzeeCurrentDarts'];
+
+            if (darts && darts.length > 0) {
+                const dartsText = darts.map(d => d.displayText).join(', ');
+                const total = darts.reduce((sum, d) => sum + d.score, 0);
+                display.innerHTML = `<div style="color: #00b894; font-weight: bold;">${dartsText}</div><div style="color: #f9d423; margin-top: 5px;">Total: ${total}</div>`;
+            } else {
+                display.innerHTML = '<span style="color: #636e72;">No darts entered</span>';
+            }
+        }
+
+        // ==================== DART ANALYSIS ====================
+
+        // For Classic mode: Calculate score for hitting a specific number
+        function calculateClassicScore(darts, targetNumber) {
+            if (!darts || darts.length === 0) return 0;
+
+            let score = 0;
+            for (let dart of darts) {
+                if (dart.number === targetNumber) {
+                    score += dart.score;
+                }
+            }
+            return score;
+        }
+
+        // Dartboard color map (standard dartboard)
+        const DART_COLORS = {
+            20: 'black', 1: 'white', 18: 'black', 4: 'white', 13: 'black', 6: 'white',
+            10: 'black', 15: 'white', 2: 'black', 17: 'white', 3: 'black', 19: 'white',
+            7: 'black', 16: 'white', 8: 'black', 11: 'white', 14: 'black', 9: 'white',
+            12: 'black', 5: 'white', 25: 'green', 50: 'red'
+        };
+
+        // Get the color of a dart (bull is green for 25, red for 50)
+        function getDartColor(dart) {
+            if (dart.number === 25) {
+                return dart.modifier === 'double' ? 'red' : 'green';
+            }
+            return DART_COLORS[dart.number] || null;
+        }
+
+        // Dartboard arrangement (clockwise from top)
+        const DARTBOARD_SEQUENCE = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+
+        // Check if 3 numbers are adjacent on the dartboard
+        function areAdjacent(num1, num2, num3) {
+            // Bull (25) is adjacent to everything
+            if (num1 === 25 || num2 === 25 || num3 === 25) return true;
+
+            const nums = [num1, num2, num3].filter(n => n !== 0 && n !== 25);
+            if (nums.length < 3) return false;
+
+            for (let i = 0; i < DARTBOARD_SEQUENCE.length; i++) {
+                const current = DARTBOARD_SEQUENCE[i];
+                const next1 = DARTBOARD_SEQUENCE[(i + 1) % DARTBOARD_SEQUENCE.length];
+                const next2 = DARTBOARD_SEQUENCE[(i + 2) % DARTBOARD_SEQUENCE.length];
+
+                if (nums.includes(current) && nums.includes(next1) && nums.includes(next2)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Check if 3 numbers are consecutive (e.g., 14-15-16)
+        function areConsecutive(num1, num2, num3) {
+            const nums = [num1, num2, num3].filter(n => n !== 0 && n !== 25).sort((a, b) => a - b);
+            if (nums.length < 3) return false;
+            return nums[1] === nums[0] + 1 && nums[2] === nums[1] + 1;
+        }
+
+        // For Yahtzee mode: Determine which contracts are valid for given darts
+        function getValidContracts(darts) {
+            if (!darts || darts.length === 0) return [];
+
+            const validContracts = [];
+            const numbers = darts.map(d => d.number);
+            const modifiers = darts.map(d => d.modifier);
+
+            // Capital: Always valid
+            validContracts.push('capital');
+
+            // Number contracts (20, 19, 18, 17, 16, 15, 14): Valid if any dart hit that number
+            [20, 19, 18, 17, 16, 15, 14].forEach(num => {
+                if (numbers.includes(num)) {
+                    validContracts.push(num.toString());
+                }
+            });
+
+            // Side: 3 adjacent segments
+            if (areAdjacent(numbers[0], numbers[1], numbers[2])) {
+                validContracts.push('side');
+            }
+
+            // 3 in a Row: 3 consecutive numbers
+            if (areConsecutive(numbers[0], numbers[1], numbers[2])) {
+                validContracts.push('3row');
+            }
+
+            // Color: 3 different colors
+            const colors = darts.map(d => getDartColor(d)).filter(c => c !== null);
+            const uniqueColors = new Set(colors);
+            if (uniqueColors.size >= 3) {
+                validContracts.push('color');
+            }
+
+            // Double: Any double hit
+            if (modifiers.includes('double')) {
+                validContracts.push('double');
+            }
+
+            // Triple: Any triple hit
+            if (modifiers.includes('triple')) {
+                validContracts.push('triple');
+            }
+
+            // 57: Exactly 57 points
+            const total = darts.reduce((sum, d) => sum + d.score, 0);
+            if (total === 57) {
+                validContracts.push('57');
+            }
+
+            // Bull: Bullseye hit (25 or 50)
+            if (numbers.includes(25)) {
+                validContracts.push('bull');
+            }
+
+            return validContracts;
+        }
+
+        // Calculate score for a specific contract given the darts
+        function calculateContractScore(darts, contractId) {
+            if (!darts || darts.length === 0) return 0;
+
+            const total = darts.reduce((sum, d) => sum + d.score, 0);
+
+            // For most contracts, return the total
+            // Some contracts might have special scoring, but for now total works
+            return total;
         }
 
         // ==================== SCORE VALIDATION ====================
