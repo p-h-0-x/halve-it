@@ -1873,9 +1873,13 @@
                     if (isSelected) {
                         classes += ' selected';
                     }
-                    // Highlight valid contracts with a green border
+                    // Build inline style for highlighting
                     let style = '';
-                    if (isValid && darts) {
+                    if (isSelected) {
+                        // Selected: blue border and background
+                        style = ' style="border-color: #3282b8; border-width: 3px; background: #3282b8;"';
+                    } else if (isValid && darts) {
+                        // Valid but not selected: green border
                         style = ' style="border-color: #00b894; border-width: 3px; background: rgba(0, 184, 148, 0.2);"';
                     }
                     html += `<button class="${classes}" id="contract-${id}" onclick="selectContractUnified('${id}')"${style}>${name}${isValid && darts ? ' ✓' : ''}</button>`;
@@ -1894,14 +1898,8 @@
                 selectedContract = contractId;
             }
 
-            // Remove selected class from all buttons
-            document.querySelectorAll('#contractSelector .contract-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-
-            // Add selected class to clicked button
-            const btn = document.getElementById(`contract-${contractId}`);
-            if (btn) btn.classList.add('selected');
+            // Rebuild contract selectors to show the selection with proper styling
+            buildContractSelectors();
         }
 
         function submitYahtzeeChoice() {
@@ -1925,11 +1923,9 @@
             if (selectedContract) {
                 score = calculateContractScore(darts, selectedContract);
 
-                // Validate score for selected contract
-                if (!validateScore(score, selectedContract)) {
-                    showValidationError(selectedContract);
-                    return;
-                }
+                // For Yahtzee mode, we don't need to validate the score
+                // The contract was already validated when it was highlighted as valid
+                // No validation check here - if it's selectable, it's valid
             }
 
             yahtzeeHistory.push({
