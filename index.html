@@ -1918,14 +1918,20 @@
                 return;
             }
 
+            // Validate that the selected contract is valid for the entered darts
+            if (selectedContract) {
+                const validContracts = getValidContracts(darts);
+                if (!validContracts.includes(selectedContract)) {
+                    const contractName = getContractName(selectedContract);
+                    alert(`The selected contract "${contractName}" is not valid for your darts. Please select a valid contract (highlighted in green with ✓).`);
+                    return;
+                }
+            }
+
             // Calculate score from darts
             let score = 0;
             if (selectedContract) {
                 score = calculateContractScore(darts, selectedContract);
-
-                // For Yahtzee mode, we don't need to validate the score
-                // The contract was already validated when it was highlighted as valid
-                // No validation check here - if it's selectable, it's valid
             }
 
             yahtzeeHistory.push({
