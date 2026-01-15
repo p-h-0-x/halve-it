@@ -2472,9 +2472,24 @@
                 return score;
             }
 
-            // For other contracts, return the total
-            const total = darts.reduce((sum, d) => sum + d.score, 0);
-            return total;
+            // Special handling for specific contracts
+            switch (contractId) {
+                case 'double':
+                    // Only count darts that are doubles
+                    return darts.filter(d => d.modifier === 'double').reduce((sum, d) => sum + d.score, 0);
+
+                case 'triple':
+                    // Only count darts that are triples
+                    return darts.filter(d => d.modifier === 'triple').reduce((sum, d) => sum + d.score, 0);
+
+                case 'bull':
+                    // Only count darts that hit the bull (number 25)
+                    return darts.filter(d => d.number === 25).reduce((sum, d) => sum + d.score, 0);
+
+                default:
+                    // For other contracts (capital, side, 3row, color, 57), return the total
+                    return darts.reduce((sum, d) => sum + d.score, 0);
+            }
         }
 
         // Check if darts meet the contract requirements (for Classic mode)
