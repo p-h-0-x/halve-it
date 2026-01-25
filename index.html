@@ -1659,6 +1659,10 @@
                     alert(`${player} has not entered darts yet!`);
                     return;
                 }
+                if (playerDarts.length < 3) {
+                    alert(`${player} must enter exactly 3 darts!`);
+                    return;
+                }
             }
 
             // Calculate scores from darts
@@ -1915,6 +1919,10 @@
             const darts = storedDarts['yahtzeeCurrentDarts'];
             if (selectedContract && (!darts || darts.length === 0)) {
                 alert('Please enter your darts first!');
+                return;
+            }
+            if (selectedContract && darts && darts.length < 3) {
+                alert('You must enter exactly 3 darts!');
                 return;
             }
 
@@ -2413,8 +2421,15 @@
 
         // Check if 3 numbers are consecutive (e.g., 14-15-16)
         function areConsecutive(num1, num2, num3) {
-            const nums = [num1, num2, num3].filter(n => n !== 0 && n !== 25).sort((a, b) => a - b);
+            // Filter out invalid values: undefined, NaN, 0 (miss), 25 (bull)
+            const nums = [num1, num2, num3]
+                .filter(n => typeof n === 'number' && !isNaN(n) && n !== 0 && n !== 25)
+                .sort((a, b) => a - b);
+
+            // Need exactly 3 valid numbers
             if (nums.length < 3) return false;
+
+            // Check for consecutive sequence
             return nums[1] === nums[0] + 1 && nums[2] === nums[1] + 1;
         }
 
