@@ -2351,20 +2351,39 @@
             return score;
         }
 
-        // Dartboard color map (standard dartboard)
-        const DART_COLORS = {
+        // Dartboard color map for SINGLE sections (standard dartboard - alternating black/white)
+        const DART_SINGLE_COLORS = {
             20: 'black', 1: 'white', 18: 'black', 4: 'white', 13: 'black', 6: 'white',
             10: 'black', 15: 'white', 2: 'black', 17: 'white', 3: 'black', 19: 'white',
             7: 'black', 16: 'white', 8: 'black', 11: 'white', 14: 'black', 9: 'white',
-            12: 'black', 5: 'white', 25: 'green', 50: 'red'
+            12: 'black', 5: 'white'
         };
 
-        // Get the color of a dart (bull is green for 25, red for 50)
+        // Dartboard color map for DOUBLE/TRIPLE rings (standard dartboard - alternating red/green)
+        const DART_RING_COLORS = {
+            20: 'red', 1: 'green', 18: 'red', 4: 'green', 13: 'red', 6: 'green',
+            10: 'red', 15: 'green', 2: 'red', 17: 'green', 3: 'red', 19: 'green',
+            7: 'red', 16: 'green', 8: 'red', 11: 'green', 14: 'red', 9: 'green',
+            12: 'red', 5: 'green'
+        };
+
+        // Get the color of a dart based on what was actually hit
+        // - Singles: black or white (segment color)
+        // - Doubles/Triples: red or green (ring color)
+        // - Bull: green (single), red (double)
         function getDartColor(dart) {
             if (dart.number === 25) {
                 return dart.modifier === 'double' ? 'red' : 'green';
             }
-            return DART_COLORS[dart.number] || null;
+            if (dart.number === 0) {
+                return null; // Miss
+            }
+            // Doubles and triples use ring colors (red/green)
+            if (dart.modifier === 'double' || dart.modifier === 'triple') {
+                return DART_RING_COLORS[dart.number] || null;
+            }
+            // Singles use segment colors (black/white)
+            return DART_SINGLE_COLORS[dart.number] || null;
         }
 
         // Dartboard arrangement (clockwise from top)
