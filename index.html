@@ -1659,6 +1659,10 @@
                     alert(`${player} has not entered darts yet!`);
                     return;
                 }
+                if (playerDarts.length < 3) {
+                    alert(`${player} must enter exactly 3 darts!`);
+                    return;
+                }
             }
 
             // Calculate scores from darts
@@ -1680,13 +1684,23 @@
                         score = 0;
                     } else {
                         // Requirements met, calculate score
-                        const targetNumber = parseInt(contractId);
-                        if (isNaN(targetNumber)) {
-                            // For non-numeric contracts (side, 3row, color, double, triple, 57, bull)
-                            // Use total score
-                            score = playerDarts.reduce((sum, d) => sum + d.score, 0);
+                        // Check for non-numeric contracts first (can't use parseInt because '3row' parses to 3)
+                        const nonNumericContracts = ['capital', 'side', '3row', 'color', 'double', 'triple', '57', 'bull'];
+                        if (nonNumericContracts.includes(contractId)) {
+                            // For special contracts, use appropriate scoring
+                            if (contractId === 'double') {
+                                score = playerDarts.filter(d => d.modifier === 'double').reduce((sum, d) => sum + d.score, 0);
+                            } else if (contractId === 'triple') {
+                                score = playerDarts.filter(d => d.modifier === 'triple').reduce((sum, d) => sum + d.score, 0);
+                            } else if (contractId === 'bull') {
+                                score = playerDarts.filter(d => d.number === 25).reduce((sum, d) => sum + d.score, 0);
+                            } else {
+                                // For capital, side, 3row, color, 57: use total score
+                                score = playerDarts.reduce((sum, d) => sum + d.score, 0);
+                            }
                         } else {
                             // For numeric contracts (20, 19, 18, 17, 16, 15, 14)
+                            const targetNumber = parseInt(contractId);
                             score = calculateClassicScore(playerDarts, targetNumber);
                         }
                     }
@@ -1915,6 +1929,10 @@
             const darts = storedDarts['yahtzeeCurrentDarts'];
             if (selectedContract && (!darts || darts.length === 0)) {
                 alert('Please enter your darts first!');
+                return;
+            }
+            if (selectedContract && darts && darts.length < 3) {
+                alert('You must enter exactly 3 darts!');
                 return;
             }
 
@@ -2413,8 +2431,15 @@
 
         // Check if 3 numbers are consecutive (e.g., 14-15-16)
         function areConsecutive(num1, num2, num3) {
-            const nums = [num1, num2, num3].filter(n => n !== 0 && n !== 25).sort((a, b) => a - b);
+            // Filter out invalid values: undefined, NaN, 0 (miss), 25 (bull)
+            const nums = [num1, num2, num3]
+                .filter(n => typeof n === 'number' && !isNaN(n) && n !== 0 && n !== 25)
+                .sort((a, b) => a - b);
+
+            // Need exactly 3 valid numbers
             if (nums.length < 3) return false;
+
+            // Check for consecutive sequence
             return nums[1] === nums[0] + 1 && nums[2] === nums[1] + 1;
         }
 
