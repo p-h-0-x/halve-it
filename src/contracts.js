@@ -261,48 +261,6 @@ function checkContractRequirements(darts, contractId) {
 }
 
 /**
- * Score validation rules for manual score entry
- */
-const VALIDATION_RULES = {
-    'capital': { validate: () => true, message: '' },
-    '20': { validate: (score) => score === 0 || score % 20 === 0, message: '0 or a multiple of 20 (20, 40, 60)' },
-    'side': { validate: () => true, message: '' },
-    '19': { validate: (score) => score === 0 || score % 19 === 0, message: '0 or a multiple of 19 (19, 38, 57)' },
-    '3row': { validate: () => true, message: '' },
-    '18': { validate: (score) => score === 0 || score % 18 === 0, message: '0 or a multiple of 18 (18, 36, 54)' },
-    'color': { validate: () => true, message: '' },
-    '17': { validate: (score) => score === 0 || score % 17 === 0, message: '0 or a multiple of 17 (17, 34, 51)' },
-    'double': { validate: (score) => score === 0 || score % 2 === 0, message: '0 or an even number (any double)' },
-    '16': { validate: (score) => score === 0 || score % 16 === 0, message: '0 or a multiple of 16 (16, 32, 48)' },
-    'triple': { validate: () => true, message: '' },
-    '15': { validate: (score) => score === 0 || score % 15 === 0, message: '0 or a multiple of 15 (15, 30, 45)' },
-    '57': { validate: (score) => score === 0 || score === 57, message: '0 or exactly 57' },
-    '14': { validate: (score) => score === 0 || score % 14 === 0, message: '0 or a multiple of 14 (14, 28, 42)' },
-    'bull': { validate: (score) => score === 0 || score === 25 || score === 50 || score === 75 || score === 100, message: '0, 25, 50, 75, or 100' }
-};
-
-/**
- * Validate a score for a specific contract
- * @param {number} score - The score to validate
- * @param {string} contractId - Contract identifier
- * @returns {boolean} True if the score is valid for the contract
- */
-function validateScore(score, contractId) {
-    const rule = VALIDATION_RULES[contractId];
-    if (!rule) return true;
-    return rule.validate(score);
-}
-
-/**
- * Get validation rule for a contract
- * @param {string} contractId - Contract identifier
- * @returns {Object} Validation rule object with validate function and message
- */
-function getValidationRule(contractId) {
-    return VALIDATION_RULES[contractId] || { validate: () => true, message: '' };
-}
-
-/**
  * Create a dart object
  * @param {number} number - The number hit (1-20, 25 for bull, 0 for miss)
  * @param {string} modifier - 'single', 'double', or 'triple'
@@ -328,14 +286,11 @@ module.exports = {
     DART_SINGLE_COLORS,
     DART_RING_COLORS,
     DARTBOARD_SEQUENCE,
-    VALIDATION_RULES,
     getDartColor,
     areAdjacent,
     areConsecutive,
     getValidContracts,
     calculateContractScore,
     checkContractRequirements,
-    validateScore,
-    getValidationRule,
     createDart
 };

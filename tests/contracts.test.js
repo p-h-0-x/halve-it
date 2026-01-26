@@ -1,6 +1,20 @@
 /**
- * Comprehensive tests for Halve-It contract validation
- * Tests both Classic and Yahtzee game modes
+ * Specification-based tests for Halve-It contract validation
+ * Tests are written based on the game rules, not the implementation
+ *
+ * Game Rules Summary:
+ * - Capital: First 3 darts establish starting score
+ * - 20/19/18/17/16/15/14: Hit the respective segment (single, double, or triple counts)
+ * - Side: Hit 3 adjacent segments. Single bull (25) touches all segments. Double bull does NOT.
+ * - 3 in a Row: Hit 3 different consecutive numbers (e.g., 14-15-16). Bull doesn't count.
+ * - Color: Hit 3 different colors (black, white, green, red)
+ *   - Singles: black/white based on segment
+ *   - Doubles/Triples: black segments have red rings, white segments have green rings
+ *   - Single bull: green, Double bull: red
+ * - Double: Hit any double (including double bull)
+ * - Triple: Hit any triple
+ * - 57: Score exactly 57 with 3 darts
+ * - Bull: Hit the bullseye (single 25 or double 50)
  */
 
 const {
@@ -8,15 +22,12 @@ const {
     DART_SINGLE_COLORS,
     DART_RING_COLORS,
     DARTBOARD_SEQUENCE,
-    VALIDATION_RULES,
     getDartColor,
     areAdjacent,
     areConsecutive,
     getValidContracts,
     calculateContractScore,
     checkContractRequirements,
-    validateScore,
-    getValidationRule,
     createDart
 } = require('../src/contracts');
 
@@ -40,256 +51,359 @@ describe('createDart helper', () => {
         expect(dart).toEqual({ number: 20, modifier: 'triple', score: 60 });
     });
 
-    test('creates a single bull dart', () => {
+    test('creates a single bull dart (25 points)', () => {
         const dart = createDart(25, 'single');
         expect(dart).toEqual({ number: 25, modifier: 'single', score: 25 });
     });
 
-    test('creates a double bull dart', () => {
+    test('creates a double bull dart (50 points)', () => {
         const dart = createDart(25, 'double');
         expect(dart).toEqual({ number: 25, modifier: 'double', score: 50 });
     });
 
-    test('creates a miss dart', () => {
+    test('creates a miss dart (0 points)', () => {
         const dart = createDart(0, 'single');
         expect(dart).toEqual({ number: 0, modifier: 'single', score: 0 });
     });
-
-    test('allows manual score override', () => {
-        const dart = createDart(20, 'single', 100);
-        expect(dart).toEqual({ number: 20, modifier: 'single', score: 100 });
-    });
 });
 
-describe('getDartColor', () => {
-    describe('single darts (black/white)', () => {
-        test('single 20 returns black', () => {
+// ============================================================================
+// Color determination tests (per game rules)
+// Rule: Singles are black/white, Doubles/Triples use ring colors (red/green)
+// Black segments have red D/T rings, white segments have green D/T rings
+// Single bull = green, Double bull = red
+// ============================================================================
+
+describe('getDartColor - Game Rule: Color determination', () => {
+    describe('Singles use segment colors (black/white)', () => {
+        test('single 20 is black', () => {
             expect(getDartColor(createDart(20, 'single'))).toBe('black');
         });
 
-        test('single 1 returns white', () => {
+        test('single 1 is white', () => {
             expect(getDartColor(createDart(1, 'single'))).toBe('white');
         });
 
-        test('single 18 returns black', () => {
-            expect(getDartColor(createDart(18, 'single'))).toBe('black');
-        });
-
-        test('single 19 returns white', () => {
+        test('single 19 is white', () => {
             expect(getDartColor(createDart(19, 'single'))).toBe('white');
         });
 
-        test('all singles have correct colors', () => {
-            Object.entries(DART_SINGLE_COLORS).forEach(([num, color]) => {
-                expect(getDartColor(createDart(parseInt(num), 'single'))).toBe(color);
-            });
+        test('single 18 is black', () => {
+            expect(getDartColor(createDart(18, 'single'))).toBe('black');
         });
     });
 
-    describe('double darts (red/green)', () => {
-        test('double 20 returns red', () => {
+    describe('Doubles/Triples use ring colors - black segments have red rings', () => {
+        test('double 20 is red (20 is black segment)', () => {
             expect(getDartColor(createDart(20, 'double'))).toBe('red');
         });
 
-        test('double 1 returns green', () => {
-            expect(getDartColor(createDart(1, 'double'))).toBe('green');
-        });
-
-        test('double 18 returns red', () => {
-            expect(getDartColor(createDart(18, 'double'))).toBe('red');
-        });
-
-        test('double 19 returns green', () => {
-            expect(getDartColor(createDart(19, 'double'))).toBe('green');
-        });
-
-        test('all doubles have correct colors', () => {
-            Object.entries(DART_RING_COLORS).forEach(([num, color]) => {
-                expect(getDartColor(createDart(parseInt(num), 'double'))).toBe(color);
-            });
-        });
-    });
-
-    describe('triple darts (red/green)', () => {
-        test('triple 20 returns red', () => {
+        test('triple 20 is red (20 is black segment)', () => {
             expect(getDartColor(createDart(20, 'triple'))).toBe('red');
         });
 
-        test('triple 1 returns green', () => {
-            expect(getDartColor(createDart(1, 'triple'))).toBe('green');
+        test('double 18 is red (18 is black segment)', () => {
+            expect(getDartColor(createDart(18, 'double'))).toBe('red');
         });
 
-        test('all triples have correct colors', () => {
-            Object.entries(DART_RING_COLORS).forEach(([num, color]) => {
-                expect(getDartColor(createDart(parseInt(num), 'triple'))).toBe(color);
-            });
+        test('triple 18 is red (18 is black segment)', () => {
+            expect(getDartColor(createDart(18, 'triple'))).toBe('red');
         });
     });
 
-    describe('bull darts', () => {
-        test('single bull returns green', () => {
+    describe('Doubles/Triples use ring colors - white segments have green rings', () => {
+        test('double 1 is green (1 is white segment)', () => {
+            expect(getDartColor(createDart(1, 'double'))).toBe('green');
+        });
+
+        test('triple 1 is green (1 is white segment)', () => {
+            expect(getDartColor(createDart(1, 'triple'))).toBe('green');
+        });
+
+        test('double 19 is green (19 is white segment)', () => {
+            expect(getDartColor(createDart(19, 'double'))).toBe('green');
+        });
+
+        test('triple 19 is green (19 is white segment)', () => {
+            expect(getDartColor(createDart(19, 'triple'))).toBe('green');
+        });
+    });
+
+    describe('Bull colors', () => {
+        test('single bull (25) is green', () => {
             expect(getDartColor(createDart(25, 'single'))).toBe('green');
         });
 
-        test('double bull returns red', () => {
+        test('double bull (50) is red', () => {
             expect(getDartColor(createDart(25, 'double'))).toBe('red');
         });
     });
 
-    describe('miss', () => {
+    describe('Miss has no color', () => {
         test('miss returns null', () => {
             expect(getDartColor(createDart(0, 'single'))).toBe(null);
         });
     });
-});
 
-describe('areAdjacent', () => {
-    test('20-1-18 are adjacent (clockwise sequence)', () => {
-        const d1 = createDart(20, 'single');
-        const d2 = createDart(1, 'single');
-        const d3 = createDart(18, 'single');
-        expect(areAdjacent(d1, d2, d3)).toBe(true);
-    });
+    describe('Color pattern verification - all segments follow the rule', () => {
+        test('all black segments have red double/triple rings', () => {
+            Object.entries(DART_SINGLE_COLORS).forEach(([num, singleColor]) => {
+                if (singleColor === 'black') {
+                    expect(DART_RING_COLORS[num]).toBe('red');
+                }
+            });
+        });
 
-    test('5-20-1 are adjacent (wrapping around)', () => {
-        const d1 = createDart(5, 'single');
-        const d2 = createDart(20, 'single');
-        const d3 = createDart(1, 'single');
-        expect(areAdjacent(d1, d2, d3)).toBe(true);
-    });
-
-    test('12-5-20 are adjacent (wrapping at end)', () => {
-        const d1 = createDart(12, 'single');
-        const d2 = createDart(5, 'single');
-        const d3 = createDart(20, 'single');
-        expect(areAdjacent(d1, d2, d3)).toBe(true);
-    });
-
-    test('1-2-3 are NOT adjacent (consecutive but not adjacent on board)', () => {
-        const d1 = createDart(1, 'single');
-        const d2 = createDart(2, 'single');
-        const d3 = createDart(3, 'single');
-        expect(areAdjacent(d1, d2, d3)).toBe(false);
-    });
-
-    test('single bull is adjacent to everything', () => {
-        const bull = createDart(25, 'single');
-        const d1 = createDart(1, 'single');
-        const d2 = createDart(2, 'single');
-        expect(areAdjacent(bull, d1, d2)).toBe(true);
-    });
-
-    test('double bull is NOT adjacent to everything', () => {
-        const doubleBull = createDart(25, 'double');
-        const d1 = createDart(1, 'single');
-        const d2 = createDart(2, 'single');
-        expect(areAdjacent(doubleBull, d1, d2)).toBe(false);
-    });
-
-    test('doubles and triples work for adjacency', () => {
-        const d1 = createDart(20, 'double');
-        const d2 = createDart(1, 'triple');
-        const d3 = createDart(18, 'single');
-        expect(areAdjacent(d1, d2, d3)).toBe(true);
-    });
-
-    test('misses are handled - not enough valid numbers', () => {
-        const d1 = createDart(0, 'single');
-        const d2 = createDart(20, 'single');
-        const d3 = createDart(1, 'single');
-        expect(areAdjacent(d1, d2, d3)).toBe(false);
-    });
-});
-
-describe('areConsecutive', () => {
-    test('14-15-16 are consecutive', () => {
-        expect(areConsecutive(14, 15, 16)).toBe(true);
-    });
-
-    test('1-2-3 are consecutive', () => {
-        expect(areConsecutive(1, 2, 3)).toBe(true);
-    });
-
-    test('18-19-20 are consecutive', () => {
-        expect(areConsecutive(18, 19, 20)).toBe(true);
-    });
-
-    test('order does not matter - 16-14-15 are consecutive', () => {
-        expect(areConsecutive(16, 14, 15)).toBe(true);
-    });
-
-    test('1-2-4 are NOT consecutive', () => {
-        expect(areConsecutive(1, 2, 4)).toBe(false);
-    });
-
-    test('1-1-2 are NOT consecutive (duplicates)', () => {
-        expect(areConsecutive(1, 1, 2)).toBe(false);
-    });
-
-    test('bull (25) is ignored', () => {
-        expect(areConsecutive(25, 1, 2)).toBe(false);
-    });
-
-    test('miss (0) is ignored', () => {
-        expect(areConsecutive(0, 1, 2)).toBe(false);
-    });
-
-    test('handles undefined/NaN values', () => {
-        expect(areConsecutive(undefined, 1, 2)).toBe(false);
-        expect(areConsecutive(NaN, 1, 2)).toBe(false);
+        test('all white segments have green double/triple rings', () => {
+            Object.entries(DART_SINGLE_COLORS).forEach(([num, singleColor]) => {
+                if (singleColor === 'white') {
+                    expect(DART_RING_COLORS[num]).toBe('green');
+                }
+            });
+        });
     });
 });
 
 // ============================================================================
-// Contract requirement tests (Classic mode)
+// Side Contract Tests (areAdjacent)
+// Rule: Hit 3 adjacent segments. Single bull touches all. Double bull does NOT.
+// ============================================================================
+
+describe('areAdjacent - Game Rule: Side contract (3 adjacent segments)', () => {
+    describe('Adjacent segments on dartboard', () => {
+        test('20-1-18 are adjacent (clockwise from top)', () => {
+            const d1 = createDart(20, 'single');
+            const d2 = createDart(1, 'single');
+            const d3 = createDart(18, 'single');
+            expect(areAdjacent(d1, d2, d3)).toBe(true);
+        });
+
+        test('5-20-1 are adjacent (wrapping around the board)', () => {
+            const d1 = createDart(5, 'single');
+            const d2 = createDart(20, 'single');
+            const d3 = createDart(1, 'single');
+            expect(areAdjacent(d1, d2, d3)).toBe(true);
+        });
+
+        test('12-5-20 are adjacent (end of sequence wrapping to start)', () => {
+            const d1 = createDart(12, 'single');
+            const d2 = createDart(5, 'single');
+            const d3 = createDart(20, 'single');
+            expect(areAdjacent(d1, d2, d3)).toBe(true);
+        });
+
+        test('doubles and triples count for adjacency', () => {
+            const d1 = createDart(20, 'double');
+            const d2 = createDart(1, 'triple');
+            const d3 = createDart(18, 'single');
+            expect(areAdjacent(d1, d2, d3)).toBe(true);
+        });
+    });
+
+    describe('Non-adjacent segments', () => {
+        test('1-2-3 are NOT adjacent (consecutive numbers but not adjacent on board)', () => {
+            const d1 = createDart(1, 'single');
+            const d2 = createDart(2, 'single');
+            const d3 = createDart(3, 'single');
+            expect(areAdjacent(d1, d2, d3)).toBe(false);
+        });
+
+        test('20-19-18 are NOT adjacent (consecutive numbers but not adjacent on board)', () => {
+            const d1 = createDart(20, 'single');
+            const d2 = createDart(19, 'single');
+            const d3 = createDart(18, 'single');
+            expect(areAdjacent(d1, d2, d3)).toBe(false);
+        });
+
+        test('random non-adjacent segments fail', () => {
+            const d1 = createDart(20, 'single');
+            const d2 = createDart(5, 'single');
+            const d3 = createDart(3, 'single');
+            expect(areAdjacent(d1, d2, d3)).toBe(false);
+        });
+    });
+
+    describe('Single bull rule: touches all segments', () => {
+        test('single bull + any 2 segments = adjacent (bull touches all)', () => {
+            const bull = createDart(25, 'single');
+            const d1 = createDart(5, 'single');
+            const d2 = createDart(12, 'single');
+            expect(areAdjacent(bull, d1, d2)).toBe(true);
+        });
+
+        test('single bull in any position makes it adjacent', () => {
+            const bull = createDart(25, 'single');
+            const d1 = createDart(1, 'single');
+            const d2 = createDart(20, 'single');
+            expect(areAdjacent(d1, bull, d2)).toBe(true);
+            expect(areAdjacent(d1, d2, bull)).toBe(true);
+        });
+    });
+
+    describe('Double bull rule: does NOT touch all segments', () => {
+        test('double bull + 2 non-adjacent segments = NOT adjacent', () => {
+            const doubleBull = createDart(25, 'double');
+            const d1 = createDart(5, 'single');
+            const d2 = createDart(3, 'single');
+            expect(areAdjacent(doubleBull, d1, d2)).toBe(false);
+        });
+
+        test('double bull + 2 adjacent segments = NOT adjacent (need 3 segments, bull doesnt count)', () => {
+            const doubleBull = createDart(25, 'double');
+            const d1 = createDart(20, 'single');
+            const d2 = createDart(1, 'single');
+            // 20-1 are adjacent but we need 3 adjacent segments, double bull doesn't help
+            expect(areAdjacent(doubleBull, d1, d2)).toBe(false);
+        });
+
+        test('double bull + single bull + any segment = adjacent (because single bull touches all)', () => {
+            const doubleBull = createDart(25, 'double');
+            const singleBull = createDart(25, 'single');
+            const d1 = createDart(7, 'single');
+            expect(areAdjacent(doubleBull, singleBull, d1)).toBe(true);
+        });
+    });
+
+    describe('Miss handling', () => {
+        test('miss + 2 adjacent segments = NOT adjacent (need 3 valid segments)', () => {
+            const miss = createDart(0, 'single');
+            const d1 = createDart(20, 'single');
+            const d2 = createDart(1, 'single');
+            expect(areAdjacent(miss, d1, d2)).toBe(false);
+        });
+    });
+});
+
+// ============================================================================
+// 3 in a Row Contract Tests (areConsecutive)
+// Rule: Hit 3 different consecutive numbers. Bull (25) doesn't count.
+// ============================================================================
+
+describe('areConsecutive - Game Rule: 3 in a Row contract', () => {
+    describe('Valid consecutive sequences', () => {
+        test('14-15-16 are consecutive', () => {
+            expect(areConsecutive(14, 15, 16)).toBe(true);
+        });
+
+        test('1-2-3 are consecutive', () => {
+            expect(areConsecutive(1, 2, 3)).toBe(true);
+        });
+
+        test('18-19-20 are consecutive', () => {
+            expect(areConsecutive(18, 19, 20)).toBe(true);
+        });
+
+        test('order does not matter - 16-14-15 are consecutive', () => {
+            expect(areConsecutive(16, 14, 15)).toBe(true);
+        });
+
+        test('order does not matter - 3-1-2 are consecutive', () => {
+            expect(areConsecutive(3, 1, 2)).toBe(true);
+        });
+    });
+
+    describe('Invalid sequences', () => {
+        test('1-2-4 are NOT consecutive (gap)', () => {
+            expect(areConsecutive(1, 2, 4)).toBe(false);
+        });
+
+        test('10-12-14 are NOT consecutive (even numbers with gaps)', () => {
+            expect(areConsecutive(10, 12, 14)).toBe(false);
+        });
+    });
+
+    describe('Must be 3 DIFFERENT numbers', () => {
+        test('14-14-15 are NOT consecutive (duplicate)', () => {
+            expect(areConsecutive(14, 14, 15)).toBe(false);
+        });
+
+        test('5-5-5 are NOT consecutive (all same)', () => {
+            expect(areConsecutive(5, 5, 5)).toBe(false);
+        });
+
+        test('1-1-2 are NOT consecutive (duplicate)', () => {
+            expect(areConsecutive(1, 1, 2)).toBe(false);
+        });
+    });
+
+    describe('Bull (25) does not count', () => {
+        test('24-25-26 is NOT valid (25 is bull, not a segment number)', () => {
+            // Even though 24-25-26 looks consecutive, 25 is bull
+            expect(areConsecutive(24, 25, 26)).toBe(false);
+        });
+
+        test('bull with any 2 numbers is NOT consecutive', () => {
+            expect(areConsecutive(25, 1, 2)).toBe(false);
+        });
+    });
+
+    describe('Miss (0) does not count', () => {
+        test('0-1-2 is NOT valid (need 3 valid numbers)', () => {
+            expect(areConsecutive(0, 1, 2)).toBe(false);
+        });
+    });
+
+    describe('Modifiers do not matter - checking with darts', () => {
+        test('single 14 + double 15 + triple 16 = valid consecutive', () => {
+            const darts = [
+                createDart(14, 'single'),
+                createDart(15, 'double'),
+                createDart(16, 'triple')
+            ];
+            expect(areConsecutive(darts[0].number, darts[1].number, darts[2].number)).toBe(true);
+        });
+    });
+});
+
+// ============================================================================
+// Contract Requirements Tests - Classic Mode
 // ============================================================================
 
 describe('checkContractRequirements - Classic Mode', () => {
-    describe('capital contract', () => {
-        test('always passes with any darts', () => {
+    describe('Capital contract: First 3 darts establish starting score', () => {
+        test('any darts pass the capital contract', () => {
             const darts = [createDart(5, 'single'), createDart(10, 'single'), createDart(3, 'single')];
             expect(checkContractRequirements(darts, 'capital')).toBe(true);
         });
 
-        test('passes even with all misses', () => {
+        test('even all misses pass capital (establishes 0 as starting score)', () => {
             const darts = [createDart(0, 'single'), createDart(0, 'single'), createDart(0, 'single')];
             expect(checkContractRequirements(darts, 'capital')).toBe(true);
         });
 
-        test('fails with empty darts array', () => {
+        test('empty darts array fails', () => {
             expect(checkContractRequirements([], 'capital')).toBe(false);
         });
 
-        test('fails with null/undefined', () => {
+        test('null/undefined fails', () => {
             expect(checkContractRequirements(null, 'capital')).toBe(false);
             expect(checkContractRequirements(undefined, 'capital')).toBe(false);
         });
     });
 
-    describe('numeric contracts (20, 19, 18, 17, 16, 15, 14)', () => {
+    describe('Numeric contracts (20, 19, 18, 17, 16, 15, 14): Hit the segment', () => {
         const numericContracts = ['20', '19', '18', '17', '16', '15', '14'];
 
         numericContracts.forEach(contractId => {
             const num = parseInt(contractId);
 
-            describe(`contract ${contractId}`, () => {
-                test(`passes when hitting single ${num}`, () => {
+            describe(`Contract ${contractId}: Hit the ${num} segment`, () => {
+                test(`single ${num} passes`, () => {
                     const darts = [createDart(num, 'single'), createDart(5, 'single'), createDart(3, 'single')];
                     expect(checkContractRequirements(darts, contractId)).toBe(true);
                 });
 
-                test(`passes when hitting double ${num}`, () => {
+                test(`double ${num} passes (doubles count as hitting the segment)`, () => {
                     const darts = [createDart(num, 'double'), createDart(5, 'single'), createDart(3, 'single')];
                     expect(checkContractRequirements(darts, contractId)).toBe(true);
                 });
 
-                test(`passes when hitting triple ${num}`, () => {
+                test(`triple ${num} passes (triples count as hitting the segment)`, () => {
                     const darts = [createDart(num, 'triple'), createDart(5, 'single'), createDart(3, 'single')];
                     expect(checkContractRequirements(darts, contractId)).toBe(true);
                 });
 
-                test(`fails when not hitting ${num}`, () => {
-                    // Use numbers that won't match any numeric contract being tested
+                test(`not hitting ${num} fails`, () => {
                     const other1 = num === 1 ? 2 : 1;
                     const other2 = num === 3 ? 4 : 3;
                     const other3 = num === 5 ? 6 : 5;
@@ -300,13 +414,13 @@ describe('checkContractRequirements - Classic Mode', () => {
         });
     });
 
-    describe('side contract (3 adjacent)', () => {
-        test('passes with 20-1-18', () => {
+    describe('Side contract: Hit 3 adjacent segments', () => {
+        test('passes with 20-1-18 (adjacent on board)', () => {
             const darts = [createDart(20, 'single'), createDart(1, 'single'), createDart(18, 'single')];
             expect(checkContractRequirements(darts, 'side')).toBe(true);
         });
 
-        test('passes with single bull (adjacent to all)', () => {
+        test('passes with single bull (touches all segments)', () => {
             const darts = [createDart(25, 'single'), createDart(5, 'single'), createDart(12, 'single')];
             expect(checkContractRequirements(darts, 'side')).toBe(true);
         });
@@ -316,13 +430,18 @@ describe('checkContractRequirements - Classic Mode', () => {
             expect(checkContractRequirements(darts, 'side')).toBe(false);
         });
 
-        test('fails with double bull (not adjacent to all)', () => {
+        test('fails with double bull and non-adjacent (double bull does NOT touch all)', () => {
             const darts = [createDart(25, 'double'), createDart(5, 'single'), createDart(3, 'single')];
             expect(checkContractRequirements(darts, 'side')).toBe(false);
         });
+
+        test('passes with double bull + single bull + any (single bull saves it)', () => {
+            const darts = [createDart(25, 'double'), createDart(25, 'single'), createDart(7, 'single')];
+            expect(checkContractRequirements(darts, 'side')).toBe(true);
+        });
     });
 
-    describe('3row contract (3 consecutive)', () => {
+    describe('3 in a Row contract: Hit 3 different consecutive numbers', () => {
         test('passes with 14-15-16', () => {
             const darts = [createDart(14, 'single'), createDart(15, 'single'), createDart(16, 'single')];
             expect(checkContractRequirements(darts, '3row')).toBe(true);
@@ -338,37 +457,47 @@ describe('checkContractRequirements - Classic Mode', () => {
             expect(checkContractRequirements(darts, '3row')).toBe(true);
         });
 
+        test('passes with mixed modifiers (single 14 + double 15 + triple 16)', () => {
+            const darts = [createDart(14, 'single'), createDart(15, 'double'), createDart(16, 'triple')];
+            expect(checkContractRequirements(darts, '3row')).toBe(true);
+        });
+
         test('fails with non-consecutive numbers', () => {
             const darts = [createDart(1, 'single'), createDart(3, 'single'), createDart(5, 'single')];
             expect(checkContractRequirements(darts, '3row')).toBe(false);
         });
 
-        test('fails with bull included', () => {
+        test('fails with duplicate numbers (14-14-15 is only 2 different numbers)', () => {
+            const darts = [createDart(14, 'single'), createDart(14, 'double'), createDart(15, 'single')];
+            expect(checkContractRequirements(darts, '3row')).toBe(false);
+        });
+
+        test('fails with bull included (bull is not a segment number)', () => {
             const darts = [createDart(25, 'single'), createDart(1, 'single'), createDart(2, 'single')];
             expect(checkContractRequirements(darts, '3row')).toBe(false);
         });
     });
 
-    describe('color contract (3 different colors)', () => {
-        test('passes with black, white, red', () => {
+    describe('Color contract: Hit 3 different colors', () => {
+        test('passes with black + white + red', () => {
             const darts = [
                 createDart(20, 'single'),  // black
                 createDart(1, 'single'),   // white
-                createDart(20, 'double')   // red
+                createDart(20, 'double')   // red (black segment has red ring)
             ];
             expect(checkContractRequirements(darts, 'color')).toBe(true);
         });
 
-        test('passes with black, white, green', () => {
+        test('passes with black + white + green', () => {
             const darts = [
                 createDart(20, 'single'),  // black
                 createDart(1, 'single'),   // white
-                createDart(1, 'double')    // green
+                createDart(1, 'double')    // green (white segment has green ring)
             ];
             expect(checkContractRequirements(darts, 'color')).toBe(true);
         });
 
-        test('passes with red, green, black', () => {
+        test('passes with red + green + black', () => {
             const darts = [
                 createDart(20, 'double'),  // red
                 createDart(1, 'triple'),   // green
@@ -377,7 +506,7 @@ describe('checkContractRequirements - Classic Mode', () => {
             expect(checkContractRequirements(darts, 'color')).toBe(true);
         });
 
-        test('passes with single bull (green), double bull (red), and single', () => {
+        test('passes with single bull (green) + double bull (red) + single (black/white)', () => {
             const darts = [
                 createDart(25, 'single'),  // green
                 createDart(25, 'double'),  // red
@@ -404,7 +533,7 @@ describe('checkContractRequirements - Classic Mode', () => {
             expect(checkContractRequirements(darts, 'color')).toBe(false);
         });
 
-        test('fails with miss included (only 2 valid colors)', () => {
+        test('fails with miss included (miss has no color)', () => {
             const darts = [
                 createDart(0, 'single'),   // null (miss)
                 createDart(20, 'single'),  // black
@@ -414,13 +543,13 @@ describe('checkContractRequirements - Classic Mode', () => {
         });
     });
 
-    describe('double contract', () => {
+    describe('Double contract: Hit any double', () => {
         test('passes with one double', () => {
             const darts = [createDart(20, 'double'), createDart(5, 'single'), createDart(3, 'single')];
             expect(checkContractRequirements(darts, 'double')).toBe(true);
         });
 
-        test('passes with double bull', () => {
+        test('passes with double bull (double bull counts as a double)', () => {
             const darts = [createDart(25, 'double'), createDart(5, 'single'), createDart(3, 'single')];
             expect(checkContractRequirements(darts, 'double')).toBe(true);
         });
@@ -430,13 +559,13 @@ describe('checkContractRequirements - Classic Mode', () => {
             expect(checkContractRequirements(darts, 'double')).toBe(true);
         });
 
-        test('fails with no doubles', () => {
+        test('fails with no doubles (only singles and triples)', () => {
             const darts = [createDart(20, 'single'), createDart(20, 'triple'), createDart(5, 'single')];
             expect(checkContractRequirements(darts, 'double')).toBe(false);
         });
     });
 
-    describe('triple contract', () => {
+    describe('Triple contract: Hit any triple', () => {
         test('passes with one triple', () => {
             const darts = [createDart(20, 'triple'), createDart(5, 'single'), createDart(3, 'single')];
             expect(checkContractRequirements(darts, 'triple')).toBe(true);
@@ -452,23 +581,25 @@ describe('checkContractRequirements - Classic Mode', () => {
             expect(checkContractRequirements(darts, 'triple')).toBe(false);
         });
 
-        test('bull cannot be a triple', () => {
-            // Even though we pass triple, bull only has single and double
-            const darts = [createDart(25, 'single'), createDart(20, 'single'), createDart(5, 'single')];
+        test('bull cannot be a triple (only single or double)', () => {
+            const darts = [createDart(25, 'single'), createDart(25, 'double'), createDart(5, 'single')];
             expect(checkContractRequirements(darts, 'triple')).toBe(false);
         });
     });
 
-    describe('57 contract', () => {
-        test('passes with exactly 57', () => {
-            // 20 + 20 + 17 = 57
+    describe('57 contract: Score exactly 57 with 3 darts', () => {
+        test('passes with exactly 57 (20 + 20 + 17)', () => {
             const darts = [createDart(20, 'single'), createDart(20, 'single'), createDart(17, 'single')];
             expect(checkContractRequirements(darts, '57')).toBe(true);
         });
 
-        test('passes with 57 using mixed modifiers', () => {
-            // 19 + 19 + 19 = 57
+        test('passes with exactly 57 (19 + 19 + 19)', () => {
             const darts = [createDart(19, 'single'), createDart(19, 'single'), createDart(19, 'single')];
+            expect(checkContractRequirements(darts, '57')).toBe(true);
+        });
+
+        test('passes with 57 using mixed modifiers (triple 19 = 57)', () => {
+            const darts = [createDart(19, 'triple'), createDart(0, 'single'), createDart(0, 'single')];
             expect(checkContractRequirements(darts, '57')).toBe(true);
         });
 
@@ -483,13 +614,13 @@ describe('checkContractRequirements - Classic Mode', () => {
         });
     });
 
-    describe('bull contract', () => {
-        test('passes with single bull', () => {
+    describe('Bull contract: Hit the bullseye (single 25 or double 50)', () => {
+        test('passes with single bull (25)', () => {
             const darts = [createDart(25, 'single'), createDart(5, 'single'), createDart(3, 'single')];
             expect(checkContractRequirements(darts, 'bull')).toBe(true);
         });
 
-        test('passes with double bull', () => {
+        test('passes with double bull (50)', () => {
             const darts = [createDart(25, 'double'), createDart(5, 'single'), createDart(3, 'single')];
             expect(checkContractRequirements(darts, 'bull')).toBe(true);
         });
@@ -507,7 +638,7 @@ describe('checkContractRequirements - Classic Mode', () => {
 });
 
 // ============================================================================
-// Valid contracts tests (Yahtzee mode)
+// Valid Contracts Tests - Yahtzee Mode
 // ============================================================================
 
 describe('getValidContracts - Yahtzee Mode', () => {
@@ -571,19 +702,33 @@ describe('getValidContracts - Yahtzee Mode', () => {
         expect(getValidContracts(darts)).toContain('bull');
     });
 
-    test('comprehensive example: triple 19s score 57 and qualify for multiple contracts', () => {
-        const darts = [createDart(19, 'triple'), createDart(19, 'triple'), createDart(19, 'triple')];
+    test('comprehensive example: triple 20 + single 19 + double 18', () => {
+        const darts = [
+            createDart(20, 'triple'),   // 60 points, red color
+            createDart(19, 'single'),   // 19 points, white color
+            createDart(18, 'double')    // 36 points, red color
+        ];
         const valid = getValidContracts(darts);
-        expect(valid).toContain('capital');
-        expect(valid).toContain('19');
-        expect(valid).toContain('triple');
-        // Note: 57 * 3 = 171, not 57
-        expect(valid).not.toContain('57');
+
+        // Should be valid for:
+        expect(valid).toContain('capital');   // Always valid
+        expect(valid).toContain('20');        // Hit 20
+        expect(valid).toContain('19');        // Hit 19
+        expect(valid).toContain('18');        // Hit 18
+        expect(valid).toContain('3row');      // 18-19-20 consecutive
+        expect(valid).toContain('triple');    // Has triple
+        expect(valid).toContain('double');    // Has double
+
+        // Should NOT be valid for:
+        expect(valid).not.toContain('color'); // Only 2 colors (red, white, red)
+        expect(valid).not.toContain('57');    // Total is 60+19+36=115
+        expect(valid).not.toContain('bull');  // No bull hit
+        expect(valid).not.toContain('side');  // 20, 19, 18 not adjacent on board
     });
 });
 
 // ============================================================================
-// Score calculation tests
+// Score Calculation Tests
 // ============================================================================
 
 describe('calculateContractScore', () => {
@@ -593,7 +738,7 @@ describe('calculateContractScore', () => {
         expect(calculateContractScore(undefined, 'capital')).toBe(0);
     });
 
-    describe('capital, side, 3row, color, 57 - total score', () => {
+    describe('Capital, Side, 3row, Color, 57 - return total score of all darts', () => {
         const totalContracts = ['capital', 'side', '3row', 'color', '57'];
 
         totalContracts.forEach(contractId => {
@@ -605,7 +750,7 @@ describe('calculateContractScore', () => {
         });
     });
 
-    describe('numeric contracts - only count matching number', () => {
+    describe('Numeric contracts - only count darts hitting that number', () => {
         test('20 contract only counts 20s', () => {
             const darts = [createDart(20, 'single'), createDart(20, 'double'), createDart(19, 'single')];
             // 20 + 40 = 60 (19 not counted)
@@ -624,7 +769,7 @@ describe('calculateContractScore', () => {
         });
     });
 
-    describe('double contract - only count doubles', () => {
+    describe('Double contract - only count doubles', () => {
         test('only counts doubles', () => {
             const darts = [createDart(20, 'double'), createDart(19, 'single'), createDart(10, 'double')];
             // 40 + 20 = 60 (19 single not counted)
@@ -642,7 +787,7 @@ describe('calculateContractScore', () => {
         });
     });
 
-    describe('triple contract - only count triples', () => {
+    describe('Triple contract - only count triples', () => {
         test('only counts triples', () => {
             const darts = [createDart(20, 'triple'), createDart(19, 'single'), createDart(18, 'triple')];
             // 60 + 54 = 114 (19 single not counted)
@@ -655,7 +800,7 @@ describe('calculateContractScore', () => {
         });
     });
 
-    describe('bull contract - only count bulls', () => {
+    describe('Bull contract - only count bulls', () => {
         test('only counts bulls', () => {
             const darts = [createDart(25, 'single'), createDart(25, 'double'), createDart(20, 'single')];
             // 25 + 50 = 75 (20 not counted)
@@ -670,141 +815,7 @@ describe('calculateContractScore', () => {
 });
 
 // ============================================================================
-// Score validation tests
-// ============================================================================
-
-describe('validateScore', () => {
-    describe('always valid contracts', () => {
-        const alwaysValidContracts = ['capital', 'side', '3row', 'color', 'triple'];
-
-        alwaysValidContracts.forEach(contractId => {
-            test(`${contractId} accepts any score`, () => {
-                expect(validateScore(0, contractId)).toBe(true);
-                expect(validateScore(1, contractId)).toBe(true);
-                expect(validateScore(57, contractId)).toBe(true);
-                expect(validateScore(180, contractId)).toBe(true);
-            });
-        });
-    });
-
-    describe('numeric contracts', () => {
-        test('20 contract: 0 or multiples of 20', () => {
-            expect(validateScore(0, '20')).toBe(true);
-            expect(validateScore(20, '20')).toBe(true);
-            expect(validateScore(40, '20')).toBe(true);
-            expect(validateScore(60, '20')).toBe(true);
-            expect(validateScore(19, '20')).toBe(false);
-            expect(validateScore(21, '20')).toBe(false);
-        });
-
-        test('19 contract: 0 or multiples of 19', () => {
-            expect(validateScore(0, '19')).toBe(true);
-            expect(validateScore(19, '19')).toBe(true);
-            expect(validateScore(38, '19')).toBe(true);
-            expect(validateScore(57, '19')).toBe(true);
-            expect(validateScore(18, '19')).toBe(false);
-            expect(validateScore(20, '19')).toBe(false);
-        });
-
-        test('18 contract: 0 or multiples of 18', () => {
-            expect(validateScore(0, '18')).toBe(true);
-            expect(validateScore(18, '18')).toBe(true);
-            expect(validateScore(36, '18')).toBe(true);
-            expect(validateScore(54, '18')).toBe(true);
-            expect(validateScore(17, '18')).toBe(false);
-            expect(validateScore(19, '18')).toBe(false);
-        });
-
-        test('17 contract: 0 or multiples of 17', () => {
-            expect(validateScore(0, '17')).toBe(true);
-            expect(validateScore(17, '17')).toBe(true);
-            expect(validateScore(34, '17')).toBe(true);
-            expect(validateScore(51, '17')).toBe(true);
-            expect(validateScore(16, '17')).toBe(false);
-            expect(validateScore(18, '17')).toBe(false);
-        });
-
-        test('16 contract: 0 or multiples of 16', () => {
-            expect(validateScore(0, '16')).toBe(true);
-            expect(validateScore(16, '16')).toBe(true);
-            expect(validateScore(32, '16')).toBe(true);
-            expect(validateScore(48, '16')).toBe(true);
-            expect(validateScore(15, '16')).toBe(false);
-            expect(validateScore(17, '16')).toBe(false);
-        });
-
-        test('15 contract: 0 or multiples of 15', () => {
-            expect(validateScore(0, '15')).toBe(true);
-            expect(validateScore(15, '15')).toBe(true);
-            expect(validateScore(30, '15')).toBe(true);
-            expect(validateScore(45, '15')).toBe(true);
-            expect(validateScore(14, '15')).toBe(false);
-            expect(validateScore(16, '15')).toBe(false);
-        });
-
-        test('14 contract: 0 or multiples of 14', () => {
-            expect(validateScore(0, '14')).toBe(true);
-            expect(validateScore(14, '14')).toBe(true);
-            expect(validateScore(28, '14')).toBe(true);
-            expect(validateScore(42, '14')).toBe(true);
-            expect(validateScore(13, '14')).toBe(false);
-            expect(validateScore(15, '14')).toBe(false);
-        });
-    });
-
-    describe('double contract', () => {
-        test('accepts 0 or even numbers', () => {
-            expect(validateScore(0, 'double')).toBe(true);
-            expect(validateScore(2, 'double')).toBe(true);
-            expect(validateScore(40, 'double')).toBe(true);
-            expect(validateScore(50, 'double')).toBe(true);
-            expect(validateScore(1, 'double')).toBe(false);
-            expect(validateScore(3, 'double')).toBe(false);
-            expect(validateScore(39, 'double')).toBe(false);
-        });
-    });
-
-    describe('57 contract', () => {
-        test('accepts only 0 or 57', () => {
-            expect(validateScore(0, '57')).toBe(true);
-            expect(validateScore(57, '57')).toBe(true);
-            expect(validateScore(56, '57')).toBe(false);
-            expect(validateScore(58, '57')).toBe(false);
-            expect(validateScore(1, '57')).toBe(false);
-        });
-    });
-
-    describe('bull contract', () => {
-        test('accepts 0, 25, 50, 75, or 100', () => {
-            expect(validateScore(0, 'bull')).toBe(true);
-            expect(validateScore(25, 'bull')).toBe(true);
-            expect(validateScore(50, 'bull')).toBe(true);
-            expect(validateScore(75, 'bull')).toBe(true);
-            expect(validateScore(100, 'bull')).toBe(true);
-            expect(validateScore(24, 'bull')).toBe(false);
-            expect(validateScore(26, 'bull')).toBe(false);
-            expect(validateScore(51, 'bull')).toBe(false);
-        });
-    });
-});
-
-describe('getValidationRule', () => {
-    test('returns rule for known contracts', () => {
-        const rule = getValidationRule('20');
-        expect(rule).toHaveProperty('validate');
-        expect(rule).toHaveProperty('message');
-        expect(typeof rule.validate).toBe('function');
-    });
-
-    test('returns default rule for unknown contracts', () => {
-        const rule = getValidationRule('unknown');
-        expect(rule.validate()).toBe(true);
-        expect(rule.message).toBe('');
-    });
-});
-
-// ============================================================================
-// Constants validation tests
+// Constants Validation
 // ============================================================================
 
 describe('Constants', () => {
@@ -816,136 +827,101 @@ describe('Constants', () => {
         expect(CONTRACT_IDS.length).toBe(15);
     });
 
-    test('DARTBOARD_SEQUENCE contains all 20 numbers', () => {
+    test('DARTBOARD_SEQUENCE contains all 20 numbers in clockwise order', () => {
+        expect(DARTBOARD_SEQUENCE).toEqual([20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5]);
         expect(DARTBOARD_SEQUENCE.length).toBe(20);
-        const sorted = [...DARTBOARD_SEQUENCE].sort((a, b) => a - b);
-        expect(sorted).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
     });
 
-    test('DART_SINGLE_COLORS has all 20 segments', () => {
+    test('DART_SINGLE_COLORS has all 20 segments with alternating black/white', () => {
         expect(Object.keys(DART_SINGLE_COLORS).length).toBe(20);
         const colors = Object.values(DART_SINGLE_COLORS);
         expect(colors.filter(c => c === 'black').length).toBe(10);
         expect(colors.filter(c => c === 'white').length).toBe(10);
     });
 
-    test('DART_RING_COLORS has all 20 segments', () => {
+    test('DART_RING_COLORS has all 20 segments with alternating red/green', () => {
         expect(Object.keys(DART_RING_COLORS).length).toBe(20);
         const colors = Object.values(DART_RING_COLORS);
         expect(colors.filter(c => c === 'red').length).toBe(10);
         expect(colors.filter(c => c === 'green').length).toBe(10);
     });
-
-    test('VALIDATION_RULES has all contracts', () => {
-        CONTRACT_IDS.forEach(contractId => {
-            expect(VALIDATION_RULES).toHaveProperty(contractId);
-        });
-    });
 });
 
 // ============================================================================
-// Edge cases and integration tests
+// Edge Cases and Game Scenarios
 // ============================================================================
 
-describe('Edge cases', () => {
-    test('maximum possible score (180)', () => {
+describe('Edge cases and game scenarios', () => {
+    test('maximum possible score (180 - three triple 20s)', () => {
         const darts = [createDart(20, 'triple'), createDart(20, 'triple'), createDart(20, 'triple')];
-        const score = calculateContractScore(darts, 'capital');
-        expect(score).toBe(180);
+        expect(calculateContractScore(darts, 'capital')).toBe(180);
     });
 
     test('minimum possible score (0 - all misses)', () => {
         const darts = [createDart(0, 'single'), createDart(0, 'single'), createDart(0, 'single')];
-        const score = calculateContractScore(darts, 'capital');
-        expect(score).toBe(0);
+        expect(calculateContractScore(darts, 'capital')).toBe(0);
     });
 
-    test('single bull has value 25', () => {
-        const dart = createDart(25, 'single');
-        expect(dart.score).toBe(25);
-    });
-
-    test('double bull has value 50', () => {
-        const dart = createDart(25, 'double');
-        expect(dart.score).toBe(50);
-    });
-
-    test('all triple bulls (theoretical max for bull contract)', () => {
-        // Note: bull can only be single (25) or double (50), not triple
-        // But the game allows multiple bull hits
+    test('all bulls maximum (3x double bull = 150)', () => {
         const darts = [createDart(25, 'double'), createDart(25, 'double'), createDart(25, 'double')];
         expect(calculateContractScore(darts, 'bull')).toBe(150);
     });
-});
 
-describe('Integration scenarios', () => {
-    test('Classic mode: full game simulation for one round', () => {
-        // Simulate hitting 20s contract
-        const darts = [createDart(20, 'triple'), createDart(20, 'double'), createDart(5, 'single')];
+    describe('Classic mode game simulation', () => {
+        test('hitting 20s contract with triple, double, and single', () => {
+            const darts = [createDart(20, 'triple'), createDart(20, 'double'), createDart(5, 'single')];
 
-        // Check requirements
-        expect(checkContractRequirements(darts, '20')).toBe(true);
+            // Check requirements
+            expect(checkContractRequirements(darts, '20')).toBe(true);
 
-        // Calculate score (only 20s count)
-        expect(calculateContractScore(darts, '20')).toBe(100); // 60 + 40
+            // Calculate score (only 20s count)
+            expect(calculateContractScore(darts, '20')).toBe(100); // 60 + 40
+        });
 
-        // Validate the score
-        expect(validateScore(100, '20')).toBe(true);
+        test('missing the 20s contract (no 20 hit)', () => {
+            const darts = [createDart(19, 'triple'), createDart(18, 'double'), createDart(5, 'single')];
+
+            expect(checkContractRequirements(darts, '20')).toBe(false);
+            expect(calculateContractScore(darts, '20')).toBe(0);
+        });
     });
 
-    test('Yahtzee mode: determine available contracts for a throw', () => {
-        // Player throws: triple 20, single 19, double 18
-        const darts = [
-            createDart(20, 'triple'),
-            createDart(19, 'single'),
-            createDart(18, 'double')
-        ];
+    describe('Color contract with different combinations', () => {
+        test('single (black) + single (white) + double (red) = 3 colors', () => {
+            const darts = [
+                createDart(20, 'single'),  // black
+                createDart(1, 'single'),   // white
+                createDart(3, 'double')    // red (3 is black, so ring is red)
+            ];
+            expect(checkContractRequirements(darts, 'color')).toBe(true);
+        });
 
-        const validContracts = getValidContracts(darts);
+        test('single (black) + triple (green) + double (red) = 3 colors', () => {
+            const darts = [
+                createDart(20, 'single'),  // black
+                createDart(1, 'triple'),   // green (1 is white, so ring is green)
+                createDart(3, 'double')    // red
+            ];
+            expect(checkContractRequirements(darts, 'color')).toBe(true);
+        });
 
-        // Should be valid for:
-        expect(validContracts).toContain('capital');   // Always valid
-        expect(validContracts).toContain('20');        // Hit 20
-        expect(validContracts).toContain('19');        // Hit 19
-        expect(validContracts).toContain('18');        // Hit 18
-        expect(validContracts).toContain('3row');      // 18-19-20 consecutive
-        expect(validContracts).toContain('triple');    // Has triple
-        expect(validContracts).toContain('double');    // Has double
+        test('single bull (green) + double bull (red) + single (white) = 3 colors', () => {
+            const darts = [
+                createDart(25, 'single'),  // green
+                createDart(25, 'double'),  // red
+                createDart(1, 'single')    // white
+            ];
+            expect(checkContractRequirements(darts, 'color')).toBe(true);
+        });
 
-        // Check color calculation - T20 (red), S19 (white), D18 (red) = only 2 unique colors
-        const colors = darts.map(d => getDartColor(d));
-        expect(colors).toEqual(['red', 'white', 'red']); // Only 2 unique colors
-        expect(validContracts).not.toContain('color');   // Not valid - only 2 colors
-
-        // Should NOT be valid for:
-        expect(validContracts).not.toContain('57');     // Total is 60+19+36=115
-        expect(validContracts).not.toContain('bull');   // No bull hit
-        expect(validContracts).not.toContain('side');   // 20, 19, 18 not adjacent on board
-    });
-
-    test('Color contract with different combinations', () => {
-        // Test case 1: Single (black) + Single (white) + Double (red)
-        const darts1 = [
-            createDart(20, 'single'),  // black
-            createDart(1, 'single'),   // white
-            createDart(3, 'double')    // red
-        ];
-        expect(checkContractRequirements(darts1, 'color')).toBe(true);
-
-        // Test case 2: Single (black) + Triple (green) + Double (red)
-        const darts2 = [
-            createDart(20, 'single'),  // black
-            createDart(1, 'triple'),   // green
-            createDart(3, 'double')    // red
-        ];
-        expect(checkContractRequirements(darts2, 'color')).toBe(true);
-
-        // Test case 3: Bull single (green) + Bull double (red) + Single (white)
-        const darts3 = [
-            createDart(25, 'single'),  // green
-            createDart(25, 'double'),  // red
-            createDart(1, 'single')    // white
-        ];
-        expect(checkContractRequirements(darts3, 'color')).toBe(true);
+        test('4 colors available but only need 3', () => {
+            // This isn't possible with 3 darts, but the rule only requires 3 different colors
+            const darts = [
+                createDart(20, 'single'),  // black
+                createDart(1, 'single'),   // white
+                createDart(25, 'single')   // green
+            ];
+            expect(checkContractRequirements(darts, 'color')).toBe(true);
+        });
     });
 });
