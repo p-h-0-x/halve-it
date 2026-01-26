@@ -1684,13 +1684,23 @@
                         score = 0;
                     } else {
                         // Requirements met, calculate score
-                        const targetNumber = parseInt(contractId);
-                        if (isNaN(targetNumber)) {
-                            // For non-numeric contracts (side, 3row, color, double, triple, 57, bull)
-                            // Use total score
-                            score = playerDarts.reduce((sum, d) => sum + d.score, 0);
+                        // Check for non-numeric contracts first (can't use parseInt because '3row' parses to 3)
+                        const nonNumericContracts = ['capital', 'side', '3row', 'color', 'double', 'triple', '57', 'bull'];
+                        if (nonNumericContracts.includes(contractId)) {
+                            // For special contracts, use appropriate scoring
+                            if (contractId === 'double') {
+                                score = playerDarts.filter(d => d.modifier === 'double').reduce((sum, d) => sum + d.score, 0);
+                            } else if (contractId === 'triple') {
+                                score = playerDarts.filter(d => d.modifier === 'triple').reduce((sum, d) => sum + d.score, 0);
+                            } else if (contractId === 'bull') {
+                                score = playerDarts.filter(d => d.number === 25).reduce((sum, d) => sum + d.score, 0);
+                            } else {
+                                // For capital, side, 3row, color, 57: use total score
+                                score = playerDarts.reduce((sum, d) => sum + d.score, 0);
+                            }
                         } else {
                             // For numeric contracts (20, 19, 18, 17, 16, 15, 14)
+                            const targetNumber = parseInt(contractId);
                             score = calculateClassicScore(playerDarts, targetNumber);
                         }
                     }
