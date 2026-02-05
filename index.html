@@ -2506,12 +2506,15 @@
         function calculateContractScore(darts, contractId) {
             if (!darts || darts.length === 0) return 0;
 
-            // For numeric contracts (20, 19, 18, 17, 16, 15, 14), only count darts that hit that number
-            const numericContract = parseInt(contractId);
-            if (!isNaN(numericContract)) {
+            // Define which contracts are truly numeric (target a specific board number)
+            const numericContracts = ['20', '19', '18', '17', '16', '15', '14'];
+
+            // For numeric contracts, only count darts that hit that number
+            if (numericContracts.includes(contractId)) {
+                const targetNumber = parseInt(contractId);
                 let score = 0;
                 for (let dart of darts) {
-                    if (dart.number === numericContract) {
+                    if (dart.number === targetNumber) {
                         score += dart.score;
                     }
                 }
