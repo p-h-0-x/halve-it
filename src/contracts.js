@@ -281,16 +281,19 @@ function createDart(number, modifier = 'single', score = null) {
     return { number, modifier, score };
 }
 
-module.exports = {
-    CONTRACT_IDS,
-    DART_SINGLE_COLORS,
-    DART_RING_COLORS,
-    DARTBOARD_SEQUENCE,
-    getDartColor,
-    areAdjacent,
-    areConsecutive,
-    getValidContracts,
-    calculateContractScore,
-    checkContractRequirements,
-    createDart
-};
+// Export for Node.js (tests) while keeping browser globals
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        CONTRACT_IDS,
+        DART_SINGLE_COLORS,
+        DART_RING_COLORS,
+        DARTBOARD_SEQUENCE,
+        getDartColor,
+        areAdjacent,
+        areConsecutive,
+        getValidContracts,
+        calculateContractScore,
+        checkContractRequirements,
+        createDart
+    };
+}
