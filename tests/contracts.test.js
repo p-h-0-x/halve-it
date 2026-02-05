@@ -750,6 +750,31 @@ describe('calculateContractScore', () => {
         });
     });
 
+    describe('57 contract - must not be treated as numeric (regression test)', () => {
+        test('57 returns total of all darts, not darts hitting number 57', () => {
+            // This test catches the bug where parseInt('57') causes the 57 contract
+            // to be treated as a numeric contract looking for darts hitting board number 57
+            const darts = [createDart(20, 'single'), createDart(20, 'single'), createDart(17, 'single')];
+            // Total = 57, and ALL darts should be counted (not just darts hitting 57)
+            expect(calculateContractScore(darts, '57')).toBe(57);
+        });
+
+        test('57 returns total even when total is not 57', () => {
+            const darts = [createDart(20, 'triple'), createDart(19, 'single'), createDart(18, 'single')];
+            // Total = 60 + 19 + 18 = 97 (score calculation is independent of requirement check)
+            expect(calculateContractScore(darts, '57')).toBe(97);
+        });
+    });
+
+    describe('3row contract - must not be treated as numeric (regression test)', () => {
+        test('3row returns total of all darts, not darts hitting number 3', () => {
+            // parseInt('3row') returns 3, which could cause 3row to be treated as numeric
+            const darts = [createDart(14, 'single'), createDart(15, 'single'), createDart(16, 'single')];
+            // Total = 14 + 15 + 16 = 45 (all darts should count)
+            expect(calculateContractScore(darts, '3row')).toBe(45);
+        });
+    });
+
     describe('Numeric contracts - only count darts hitting that number', () => {
         test('20 contract only counts 20s', () => {
             const darts = [createDart(20, 'single'), createDart(20, 'double'), createDart(19, 'single')];
