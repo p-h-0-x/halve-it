@@ -783,10 +783,43 @@
         }
 
         .killer-number-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .killer-number-selection-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            margin-bottom: 15px;
+        }
+
+        .killer-player-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .killer-player-row-label {
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #bbe1fa;
+            min-width: 70px;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .killer-player-row-label.is-self {
+            color: #6c5ce7;
+        }
+
+        .killer-player-row-buttons {
+            display: flex;
+            gap: 6px;
+            flex: 1;
         }
 
         .killer-num-btn {
@@ -799,6 +832,16 @@
             background: rgba(0,0,0,0.3);
             color: white;
             transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        .killer-num-btn.own-number {
+            border-color: #6c5ce7;
+            background: rgba(108, 92, 231, 0.25);
+        }
+
+        .killer-num-btn.adj-number {
+            border-color: rgba(255,255,255,0.25);
         }
 
         .killer-num-btn:hover {
@@ -816,12 +859,14 @@
             text-decoration: line-through;
         }
 
-        .killer-num-btn.bull-btn {
-            grid-column: span 3;
+        .killer-miss-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 4px;
         }
 
         .killer-num-btn.miss-btn {
-            grid-column: span 2;
+            flex: 1;
         }
 
         .killer-actions {
@@ -989,7 +1034,12 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .killer-number-grid {
+            .killer-player-row-label {
+                min-width: 55px;
+                font-size: 0.75em;
+            }
+
+            .killer-number-selection-grid {
                 grid-template-columns: repeat(4, 1fr);
             }
 
@@ -2573,24 +2623,42 @@
         function buildKillerNumberGrid() {
             const grid = document.getElementById('killerNumberGrid');
             const takenNumbers = Object.values(killerNumbers);
-            let html = '';
+            let html = '<div class="killer-number-selection-grid">';
             for (let i = 1; i <= 20; i++) {
                 const taken = takenNumbers.includes(i);
                 const cls = taken ? 'killer-num-btn taken' : 'killer-num-btn';
                 const onclick = taken ? '' : `onclick="selectKillerNumber(${i})"`;
                 html += `<button class="${cls}" ${onclick}>${i}</button>`;
             }
+            html += '</div>';
             grid.innerHTML = html;
         }
 
         function buildKillerPlayGrid() {
             const grid = document.getElementById('killerNumberGrid');
+            const currentPlayer = players[currentPlayerIndex];
             let html = '';
-            for (let i = 1; i <= 20; i++) {
-                html += `<button class="killer-num-btn" onclick="addKillerDart(${i})">${i}</button>`;
+
+            for (const player of players) {
+                if (killerEliminated[player]) continue;
+                const num = killerNumbers[player];
+                const adj = getAdjacentNumbers(num);
+                const isSelf = player === currentPlayer;
+                const labelClass = 'killer-player-row-label' + (isSelf ? ' is-self' : '');
+
+                html += `<div class="killer-player-row">`;
+                html += `<div class="${labelClass}">${player}</div>`;
+                html += `<div class="killer-player-row-buttons">`;
+                html += `<button class="killer-num-btn adj-number" onclick="addKillerDart(${adj[0]})">${adj[0]}</button>`;
+                html += `<button class="killer-num-btn own-number" onclick="addKillerDart(${num})">${num}</button>`;
+                html += `<button class="killer-num-btn adj-number" onclick="addKillerDart(${adj[1]})">${adj[1]}</button>`;
+                html += `</div>`;
+                html += `</div>`;
             }
-            html += `<button class="killer-num-btn bull-btn" onclick="addKillerDart(25)">BULL (25)</button>`;
+
+            html += `<div class="killer-miss-row">`;
             html += `<button class="killer-num-btn miss-btn" onclick="addKillerDart(0)"><span data-i18n="miss">${t('miss')}</span></button>`;
+            html += `</div>`;
             grid.innerHTML = html;
         }
 
