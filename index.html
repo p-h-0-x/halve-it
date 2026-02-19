@@ -2800,6 +2800,7 @@
                 if (dart.number === 0 || dart.number === 25) continue;
 
                 const multiplier = getMultiplier(dart.modifier);
+                const wasKillerBeforeDart = isThrowerKiller;
 
                 let livesGained = 0;
                 if (dart.number === throwerNum) {
@@ -2815,7 +2816,7 @@
                     isThrowerKiller = true;
                 }
 
-                if (isThrowerKiller) {
+                if (wasKillerBeforeDart) {
                     for (const otherPlayer of players) {
                         if (otherPlayer === thrower || killerEliminated[otherPlayer]) continue;
                         const otherNum = killerNumbers[otherPlayer];
