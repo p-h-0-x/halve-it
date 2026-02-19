@@ -881,16 +881,16 @@
 
         .killer-lives-bar {
             width: 100%;
-            height: 8px;
+            height: 14px;
             background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+            border-radius: 7px;
             overflow: hidden;
             margin: 6px 0 4px;
         }
 
         .killer-lives-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 7px;
             transition: width 0.4s ease, background 0.4s ease;
             background: #00b894;
         }
@@ -1101,6 +1101,9 @@
             <p id="killerBannerSub"></p>
         </div>
 
+        <!-- Killer Mode: Scoreboard -->
+        <div class="killer-scoreboard hidden" id="killerScoreboard"></div>
+
         <!-- Killer Mode: Dartboard + Input -->
         <div class="killer-dartboard-section hidden" id="killerDartboardSection">
             <div class="killer-darts-display" id="killerDartsDisplay">
@@ -1126,9 +1129,6 @@
 
         <!-- Killer Mode: Turn Summary -->
         <div class="killer-turn-summary hidden" id="killerTurnSummary"></div>
-
-        <!-- Killer Mode: Scoreboard -->
-        <div class="killer-scoreboard hidden" id="killerScoreboard"></div>
 
         <!-- Killer Mode: Previous Turn -->
         <div class="killer-actions hidden" id="killerPrevSection">
