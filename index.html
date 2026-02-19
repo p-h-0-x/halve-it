@@ -2636,7 +2636,7 @@
                 if (isK && !elim) cardClass += ' is-killer';
                 if (elim) cardClass += ' eliminated';
 
-                const livesPercent = Math.min(Math.max(lives, 0), 15) / 15 * 100;
+                const livesPercent = Math.min(Math.max(lives, 0), 9) / 9 * 100;
                 const fillClass = isK ? 'killer-lives-fill killer-level' : 'killer-lives-fill';
 
                 html += `<div class="${cardClass}">`;
