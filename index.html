@@ -689,6 +689,261 @@
             font-weight: bold;
         }
 
+        /* Killer Mode Styles */
+        .killer-banner {
+            text-align: center;
+            background: linear-gradient(135deg, #6c5ce7, #a855f7);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .killer-banner h3 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .killer-banner .killer-badge-banner {
+            display: inline-block;
+            background: #d63031;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .killer-dartboard-section {
+            max-width: 450px;
+            margin: 0 auto 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .killer-darts-display {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .killer-dart-slot {
+            width: 70px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #636e72;
+        }
+
+        .killer-dart-slot.filled {
+            color: #00b894;
+            border-color: #00b894;
+        }
+
+        .killer-modifier-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .killer-modifier-btn {
+            padding: 8px 18px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .killer-modifier-btn.active {
+            background: #6c5ce7;
+            border-color: #a855f7;
+        }
+
+        .killer-number-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .killer-num-btn {
+            padding: 12px 0;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .killer-num-btn:hover {
+            background: rgba(108, 92, 231, 0.5);
+            border-color: #6c5ce7;
+        }
+
+        .killer-num-btn:active {
+            transform: scale(0.95);
+        }
+
+        .killer-num-btn.taken {
+            opacity: 0.3;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .killer-num-btn.bull-btn {
+            grid-column: span 3;
+        }
+
+        .killer-num-btn.miss-btn {
+            grid-column: span 2;
+        }
+
+        .killer-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .killer-scoreboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .killer-player-card {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .killer-player-card.current-turn {
+            border-color: #6c5ce7;
+            box-shadow: 0 0 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .killer-player-card.is-killer {
+            border-color: #d63031;
+            background: rgba(214, 48, 49, 0.15);
+        }
+
+        .killer-player-card.eliminated {
+            opacity: 0.4;
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .killer-player-card .player-name {
+            font-weight: bold;
+            font-size: 1em;
+            margin-bottom: 4px;
+        }
+
+        .killer-player-card.eliminated .player-name {
+            text-decoration: line-through;
+        }
+
+        .killer-player-card .player-number {
+            font-size: 0.85em;
+            color: #bbe1fa;
+            margin-bottom: 6px;
+        }
+
+        .killer-lives-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 6px 0 4px;
+        }
+
+        .killer-lives-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.4s ease, background 0.4s ease;
+            background: #00b894;
+        }
+
+        .killer-lives-fill.killer-level {
+            background: #d63031;
+        }
+
+        .killer-lives-count {
+            font-size: 0.85em;
+            color: #b2bec3;
+        }
+
+        .killer-badge {
+            display: inline-block;
+            background: #d63031;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .killer-eliminated-badge {
+            display: inline-block;
+            background: #636e72;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .killer-turn-summary {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px auto;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .killer-life-change {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 8px;
+            margin: 3px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .killer-life-change.positive {
+            background: rgba(0, 184, 148, 0.3);
+            color: #00b894;
+        }
+
+        .killer-life-change.negative {
+            background: rgba(214, 48, 49, 0.3);
+            color: #ff6b6b;
+        }
+
         @media (max-width: 600px) {
             .scores-table {
                 font-size: 0.85em;
@@ -719,6 +974,18 @@
             .yahtzee-actions button {
                 width: 100%;
             }
+
+            .killer-scoreboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .killer-number-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .killer-dartboard-section {
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -743,6 +1010,10 @@
             <label class="mode-option">
                 <input type="radio" name="gameMode" value="yahtzee" onchange="updateModeDescription()">
                 <span class="mode-label" data-i18n="freeChoice">Yahtzee Style</span>
+            </label>
+            <label class="mode-option">
+                <input type="radio" name="gameMode" value="killer" onchange="updateModeDescription()">
+                <span class="mode-label" data-i18n="killer">Killer</span>
             </label>
         </div>
         <p class="mode-description" id="modeDescription" data-i18n="classicDesc">Play contracts in order. Hit the target to add score, miss to halve your capital.</p>
@@ -812,6 +1083,46 @@
                 <button class="btn-secondary" onclick="previousYahtzeeTurn()" id="yahtzeePrevBtn" style="display:none;" data-i18n="previousTurn">← Previous Turn</button>
                 <button class="btn-success" onclick="submitYahtzeeChoice()" data-i18n="confirmChoice">Confirm Choice</button>
             </div>
+        </div>
+
+        <!-- Killer Mode: Banner -->
+        <div class="killer-banner hidden" id="killerBanner">
+            <h3 id="killerBannerText">Choose your number</h3>
+            <p id="killerBannerSub"></p>
+        </div>
+
+        <!-- Killer Mode: Dartboard + Input -->
+        <div class="killer-dartboard-section hidden" id="killerDartboardSection">
+            <div class="killer-darts-display" id="killerDartsDisplay">
+                <div class="killer-dart-slot" id="killerDart1">-</div>
+                <div class="killer-dart-slot" id="killerDart2">-</div>
+                <div class="killer-dart-slot" id="killerDart3">-</div>
+            </div>
+
+            <div class="killer-modifier-buttons" id="killerModifiers">
+                <button class="killer-modifier-btn active" id="killerSingleBtn" onclick="setKillerModifier('single')">Single</button>
+                <button class="killer-modifier-btn" id="killerDoubleBtn" onclick="setKillerModifier('double')">Double</button>
+                <button class="killer-modifier-btn" id="killerTripleBtn" onclick="setKillerModifier('triple')">Triple</button>
+            </div>
+
+            <div class="killer-number-grid" id="killerNumberGrid"></div>
+
+            <div class="killer-actions" id="killerActions">
+                <button class="btn-secondary" onclick="clearLastKillerDart()">← <span data-i18n="undo">Undo</span></button>
+                <button class="btn-secondary" onclick="clearAllKillerDarts()"><span data-i18n="clear">Clear</span></button>
+                <button class="btn-success" onclick="submitKillerTurn()" id="killerConfirmBtn">✓ <span data-i18n="confirm">Confirm</span></button>
+            </div>
+        </div>
+
+        <!-- Killer Mode: Turn Summary -->
+        <div class="killer-turn-summary hidden" id="killerTurnSummary"></div>
+
+        <!-- Killer Mode: Scoreboard -->
+        <div class="killer-scoreboard hidden" id="killerScoreboard"></div>
+
+        <!-- Killer Mode: Previous Turn -->
+        <div class="killer-actions hidden" id="killerPrevSection">
+            <button class="btn-secondary" onclick="previousKillerTurn()" id="killerPrevBtn" style="display:none;" data-i18n="previousTurn">← Previous Turn</button>
         </div>
 
         <table class="scores-table">
@@ -898,6 +1209,7 @@
         <h3 data-i18n="gameRules">📋 Game Rules</h3>
         <p style="margin-bottom: 15px;" data-i18n="rulesClassic"><strong>Classic:</strong> Hit the contract target to add your score to your capital. Miss it and your capital is halved!</p>
         <p style="margin-bottom: 15px;" data-i18n="rulesFreeChoice"><strong>Yahtzee Style:</strong> Choose where to register your score each turn. Scratch contracts you can't fill (score 0).</p>
+        <p style="margin-bottom: 15px;" data-i18n="rulesKiller"><strong>Killer:</strong> Pick a number, gain lives by hitting it (+3) or adjacent segments (+1). At 9 lives become a Killer and attack others. Doubles x2, Triples x3. Eliminated at -1 life. Last one standing wins!</p>
         <div class="rules-grid" id="rulesGrid">
             <!-- Rules will be populated by JavaScript -->
         </div>
@@ -912,8 +1224,10 @@
                 gameMode: "Game Mode",
                 classic: "Classic",
                 freeChoice: "Yahtzee Style",
+                killer: "Killer",
                 classicDesc: "Play contracts in order. Hit the target to add score, miss to halve your capital.",
                 freeChoiceDesc: "Choose where to register your score. Fill or scratch contracts freely.",
+                killerDesc: "Pick a number, gain lives, become a Killer, and eliminate your opponents!",
                 addPlayers: "Add Players",
                 enterPlayerName: "Enter player name",
                 addPlayer: "Add Player",
@@ -956,6 +1270,7 @@
                 gameRules: "📋 Game Rules",
                 rulesClassic: "<strong>Classic:</strong> Hit the contract target to add your score to your capital. Miss it and your capital is halved!",
                 rulesFreeChoice: "<strong>Yahtzee Style:</strong> Choose where to register your score each turn. Scratch contracts you can't fill (score 0).",
+                rulesKiller: "<strong>Killer:</strong> Pick a number, gain lives by hitting it (+3) or adjacent segments (+1). At 9 lives become a Killer and attack others. Doubles x2, Triples x3. Eliminated at -1 life. Last one standing wins!",
                 
                 // Alert
                 selectContractAlert: "Please select a contract to fill or scratch.",
@@ -969,6 +1284,17 @@
                 undo: "Undo",
                 clear: "Clear",
                 confirm: "Confirm",
+
+                // Killer
+                chooseYourNumber: "choose your number!",
+                selectNumberPrompt: "Tap a segment on the dartboard",
+                lives: "lives",
+                killerLabel: "KILLER",
+                eliminatedLabel: "OUT",
+                numberTaken: "This number is already taken!",
+                enterYourDartsKiller: "Throw your 3 darts",
+                noNumberYet: "?",
+                turnSummaryTitle: "Turn Summary",
 
                 // Contracts
                 contracts: {
@@ -994,8 +1320,10 @@
                 gameMode: "Mode de Jeu",
                 classic: "Classique",
                 freeChoice: "Yahtzee Style",
+                killer: "Killer",
                 classicDesc: "Jouez les contrats dans l'ordre. Réussissez pour ajouter le score, ratez pour diviser votre capital par deux.",
                 freeChoiceDesc: "Choisissez où enregistrer votre score. Remplissez ou barrez les contrats librement.",
+                killerDesc: "Choisissez un numéro, gagnez des vies, devenez un Killer et éliminez vos adversaires !",
                 addPlayers: "Ajouter des Joueurs",
                 enterPlayerName: "Nom du joueur",
                 addPlayer: "Ajouter",
@@ -1038,6 +1366,7 @@
                 gameRules: "📋 Règles du Jeu",
                 rulesClassic: "<strong>Classique :</strong> Réussissez le contrat pour ajouter votre score au capital. Ratez et votre capital est divisé par deux !",
                 rulesFreeChoice: "<strong>Yahtzee Style :</strong> Choisissez où enregistrer votre score à chaque tour. Barrez les contrats impossibles (score 0).",
+                rulesKiller: "<strong>Killer :</strong> Choisissez un numéro, gagnez des vies en le touchant (+3) ou les segments adjacents (+1). À 9 vies devenez un Killer et attaquez les autres. Doubles x2, Triples x3. Éliminé à -1 vie. Le dernier debout gagne !",
                 
                 // Alert
                 selectContractAlert: "Veuillez sélectionner un contrat à remplir ou barrer.",
@@ -1051,6 +1380,17 @@
                 undo: "Annuler",
                 clear: "Effacer",
                 confirm: "Confirmer",
+
+                // Killer
+                chooseYourNumber: "choisissez votre numéro !",
+                selectNumberPrompt: "Touchez un segment sur la cible",
+                lives: "vies",
+                killerLabel: "KILLER",
+                eliminatedLabel: "ÉLIMINÉ",
+                numberTaken: "Ce numéro est déjà pris !",
+                enterYourDartsKiller: "Lancez vos 3 fléchettes",
+                noNumberYet: "?",
+                turnSummaryTitle: "Résumé du Tour",
 
                 // Contracts
                 contracts: {
@@ -1076,8 +1416,10 @@
                 gameMode: "Modo de Juego",
                 classic: "Clásico",
                 freeChoice: "Yahtzee Style",
+                killer: "Killer",
                 classicDesc: "Juega los contratos en orden. Acierta para sumar puntos, falla para dividir tu capital a la mitad.",
                 freeChoiceDesc: "Elige dónde registrar tu puntuación. Completa o tacha contratos libremente.",
+                killerDesc: "¡Elige un número, gana vidas, conviértete en Killer y elimina a tus oponentes!",
                 addPlayers: "Añadir Jugadores",
                 enterPlayerName: "Nombre del jugador",
                 addPlayer: "Añadir",
@@ -1120,6 +1462,7 @@
                 gameRules: "📋 Reglas del Juego",
                 rulesClassic: "<strong>Clásico:</strong> Acierta el contrato para sumar tu puntuación al capital. ¡Falla y tu capital se divide a la mitad!",
                 rulesFreeChoice: "<strong>Yahtzee Style:</strong> Elige dónde registrar tu puntuación cada turno. Tacha los contratos que no puedas completar (puntuación 0).",
+                rulesKiller: "<strong>Killer:</strong> Elige un número, gana vidas tocándolo (+3) o segmentos adyacentes (+1). A 9 vidas conviértete en Killer y ataca a los demás. Dobles x2, Triples x3. Eliminado a -1 vida. ¡El último en pie gana!",
                 
                 // Alert
                 selectContractAlert: "Por favor, selecciona un contrato para completar o tachar.",
@@ -1133,6 +1476,17 @@
                 undo: "Deshacer",
                 clear: "Borrar",
                 confirm: "Confirmar",
+
+                // Killer
+                chooseYourNumber: "¡elige tu número!",
+                selectNumberPrompt: "Toca un segmento en la diana",
+                lives: "vidas",
+                killerLabel: "KILLER",
+                eliminatedLabel: "FUERA",
+                numberTaken: "¡Este número ya está ocupado!",
+                enterYourDartsKiller: "Lanza tus 3 dardos",
+                noNumberYet: "?",
+                turnSummaryTitle: "Resumen del Turno",
 
                 // Contracts
                 contracts: {
@@ -1172,6 +1526,16 @@
         let scores = {};
         let yahtzeeHistory = [];
 
+        // Killer state
+        let killerNumbers = {};
+        let killerLives = {};
+        let killerIsKiller = {};
+        let killerEliminated = {};
+        let killerPhase = 'number';
+        let killerHistory = [];
+        let killerDarts = [];
+        let killerModifier = 'single';
+
         // Dart input state
         let dartInputTargetField = null;
         let currentDarts = [];
@@ -1196,6 +1560,14 @@
                 yahtzeeHistory: yahtzeeHistory,
                 scoresHidden: scoresHidden,
                 storedDarts: storedDarts,
+
+                // Killer state
+                killerNumbers: killerNumbers,
+                killerLives: killerLives,
+                killerIsKiller: killerIsKiller,
+                killerEliminated: killerEliminated,
+                killerPhase: killerPhase,
+                killerHistory: killerHistory,
 
                 // UI state
                 isGameStarted: document.getElementById('gameBoard').style.display !== 'none',
@@ -1231,6 +1603,14 @@
                 yahtzeeHistory = gameState.yahtzeeHistory || [];
                 scoresHidden = gameState.scoresHidden || false;
                 storedDarts = gameState.storedDarts || {};
+
+                // Restore killer state
+                killerNumbers = gameState.killerNumbers || {};
+                killerLives = gameState.killerLives || {};
+                killerIsKiller = gameState.killerIsKiller || {};
+                killerEliminated = gameState.killerEliminated || {};
+                killerPhase = gameState.killerPhase || 'number';
+                killerHistory = gameState.killerHistory || [];
 
                 // Apply language (pass true to prevent saving during load)
                 setLanguage(currentLang, true);
@@ -1285,7 +1665,7 @@
                             document.getElementById('classicInputSection').classList.add('hidden');
                             showWinner();
                         }
-                    } else {
+                    } else if (gameMode === 'yahtzee') {
                         document.getElementById('classicRoundDisplay').classList.add('hidden');
                         document.getElementById('classicInputSection').classList.add('hidden');
                         document.getElementById('yahtzeePlayerDisplay').classList.remove('hidden');
@@ -1343,6 +1723,23 @@
 
                         if (gameState.isWinnerShown) {
                             document.getElementById('yahtzeeInputSection').classList.add('hidden');
+                            showWinner();
+                        }
+                    } else if (gameMode === 'killer') {
+                        hideAllModeSections();
+                        document.getElementById('killerBanner').classList.remove('hidden');
+                        document.getElementById('killerDartboardSection').classList.remove('hidden');
+                        document.getElementById('killerScoreboard').classList.remove('hidden');
+                        document.getElementById('killerPrevSection').classList.remove('hidden');
+                        document.querySelector('.scores-table').style.display = 'none';
+
+                        updateKillerDisplay();
+                        buildKillerScoreboard();
+                        updateKillerPrevButton();
+
+                        if (gameState.isWinnerShown) {
+                            document.getElementById('killerDartboardSection').classList.add('hidden');
+                            document.getElementById('killerPrevSection').classList.add('hidden');
                             showWinner();
                         }
                     }
@@ -1439,7 +1836,9 @@
         function updateModeDescription() {
             const mode = document.querySelector('input[name="gameMode"]:checked').value;
             const desc = document.getElementById('modeDescription');
-            desc.textContent = mode === 'classic' ? t('classicDesc') : t('freeChoiceDesc');
+            if (mode === 'classic') desc.textContent = t('classicDesc');
+            else if (mode === 'yahtzee') desc.textContent = t('freeChoiceDesc');
+            else if (mode === 'killer') desc.textContent = t('killerDesc');
         }
 
         function addPlayer() {
@@ -1473,6 +1872,20 @@
             document.getElementById('startBtn').style.display = players.length >= 1 ? 'block' : 'none';
         }
 
+        function hideAllModeSections() {
+            document.getElementById('classicRoundDisplay').classList.add('hidden');
+            document.getElementById('classicInputSection').classList.add('hidden');
+            document.getElementById('yahtzeePlayerDisplay').classList.add('hidden');
+            document.getElementById('yahtzeeInputSection').classList.add('hidden');
+            document.getElementById('hideScoresBtn').classList.add('hidden');
+            document.getElementById('killerBanner').classList.add('hidden');
+            document.getElementById('killerDartboardSection').classList.add('hidden');
+            document.getElementById('killerScoreboard').classList.add('hidden');
+            document.getElementById('killerTurnSummary').classList.add('hidden');
+            document.getElementById('killerPrevSection').classList.add('hidden');
+            document.querySelector('.scores-table').style.display = '';
+        }
+
         function startGame() {
             gameMode = document.querySelector('input[name="gameMode"]:checked').value;
             document.getElementById('setupSection').classList.add('hidden');
@@ -1481,20 +1894,19 @@
             currentPlayerIndex = 0;
             storedDarts = {};
 
+            hideAllModeSections();
+
             if (gameMode === 'classic') {
                 players.forEach(p => {
                     scores[p] = { capital: 0, rounds: [] };
                 });
                 document.getElementById('classicRoundDisplay').classList.remove('hidden');
                 document.getElementById('classicInputSection').classList.remove('hidden');
-                document.getElementById('yahtzeePlayerDisplay').classList.add('hidden');
-                document.getElementById('yahtzeeInputSection').classList.add('hidden');
-                document.getElementById('hideScoresBtn').classList.add('hidden');
                 buildClassicTable();
                 updateRoundDisplay();
                 buildScoreInputs();
                 updatePrevButton();
-            } else {
+            } else if (gameMode === 'yahtzee') {
                 yahtzeeHistory = [];
                 players.forEach(p => {
                     scores[p] = {
@@ -1505,14 +1917,33 @@
                         scores[p].contracts[id] = { score: null, scratched: false };
                     });
                 });
-                document.getElementById('classicRoundDisplay').classList.add('hidden');
-                document.getElementById('classicInputSection').classList.add('hidden');
                 document.getElementById('yahtzeePlayerDisplay').classList.remove('hidden');
                 document.getElementById('yahtzeeInputSection').classList.remove('hidden');
                 document.getElementById('hideScoresBtn').classList.remove('hidden');
                 buildYahtzeeTable();
                 updateYahtzeeDisplay();
                 updateYahtzeePrevButton();
+            } else if (gameMode === 'killer') {
+                killerNumbers = {};
+                killerLives = {};
+                killerIsKiller = {};
+                killerEliminated = {};
+                killerPhase = 'number';
+                killerHistory = [];
+                killerDarts = [];
+                killerModifier = 'single';
+                players.forEach(p => {
+                    killerLives[p] = 0;
+                    killerIsKiller[p] = false;
+                    killerEliminated[p] = false;
+                });
+                document.getElementById('killerBanner').classList.remove('hidden');
+                document.getElementById('killerDartboardSection').classList.remove('hidden');
+                document.getElementById('killerScoreboard').classList.remove('hidden');
+                document.getElementById('killerPrevSection').classList.remove('hidden');
+                document.querySelector('.scores-table').style.display = 'none';
+                updateKillerDisplay();
+                buildKillerScoreboard();
             }
             saveGameState();
         }
@@ -1598,13 +2029,17 @@
 
         function editLastRound() {
             document.getElementById('winnerSection').style.display = 'none';
-            
+
             if (gameMode === 'classic') {
                 document.getElementById('classicInputSection').classList.remove('hidden');
                 previousRound();
-            } else {
+            } else if (gameMode === 'yahtzee') {
                 document.getElementById('yahtzeeInputSection').classList.remove('hidden');
                 previousYahtzeeTurn();
+            } else if (gameMode === 'killer') {
+                document.getElementById('killerDartboardSection').classList.remove('hidden');
+                document.getElementById('killerPrevSection').classList.remove('hidden');
+                previousKillerTurn();
             }
         }
 
@@ -2108,43 +2543,405 @@
             });
         }
 
+        // ==================== KILLER MODE ====================
+
+        function getAdjacentNumbers(num) {
+            if (num === 0 || num === 25) return [];
+            const idx = DARTBOARD_SEQUENCE.indexOf(num);
+            if (idx === -1) return [];
+            const left = DARTBOARD_SEQUENCE[(idx - 1 + DARTBOARD_SEQUENCE.length) % DARTBOARD_SEQUENCE.length];
+            const right = DARTBOARD_SEQUENCE[(idx + 1) % DARTBOARD_SEQUENCE.length];
+            return [left, right];
+        }
+
+        function getMultiplier(modifier) {
+            if (modifier === 'double') return 2;
+            if (modifier === 'triple') return 3;
+            return 1;
+        }
+
+        function buildKillerNumberGrid() {
+            const grid = document.getElementById('killerNumberGrid');
+            const takenNumbers = Object.values(killerNumbers);
+            let html = '';
+            for (let i = 1; i <= 20; i++) {
+                const taken = takenNumbers.includes(i);
+                const cls = taken ? 'killer-num-btn taken' : 'killer-num-btn';
+                const onclick = taken ? '' : `onclick="selectKillerNumber(${i})"`;
+                html += `<button class="${cls}" ${onclick}>${i}</button>`;
+            }
+            grid.innerHTML = html;
+        }
+
+        function buildKillerPlayGrid() {
+            const grid = document.getElementById('killerNumberGrid');
+            let html = '';
+            for (let i = 1; i <= 20; i++) {
+                html += `<button class="killer-num-btn" onclick="addKillerDart(${i})">${i}</button>`;
+            }
+            html += `<button class="killer-num-btn bull-btn" onclick="addKillerDart(25)">BULL (25)</button>`;
+            html += `<button class="killer-num-btn miss-btn" onclick="addKillerDart(0)"><span data-i18n="miss">${t('miss')}</span></button>`;
+            grid.innerHTML = html;
+        }
+
+        function updateKillerDisplay() {
+            const banner = document.getElementById('killerBanner');
+            const bannerText = document.getElementById('killerBannerText');
+            const bannerSub = document.getElementById('killerBannerSub');
+            const modifiers = document.getElementById('killerModifiers');
+            const dartsDisplay = document.getElementById('killerDartsDisplay');
+            const confirmBtn = document.getElementById('killerConfirmBtn');
+
+            const currentPlayer = players[currentPlayerIndex];
+
+            if (killerPhase === 'number') {
+                bannerText.textContent = `${currentPlayer}, ${t('chooseYourNumber')}`;
+                bannerSub.textContent = t('selectNumberPrompt');
+                modifiers.style.display = 'none';
+                dartsDisplay.style.display = 'none';
+                confirmBtn.style.display = 'none';
+                buildKillerNumberGrid();
+            } else {
+                const lives = killerLives[currentPlayer];
+                const isK = killerIsKiller[currentPlayer];
+                let bannerHtml = currentPlayer;
+                if (isK) bannerHtml += ` <span class="killer-badge-banner">${t('killerLabel')}</span>`;
+                bannerText.innerHTML = bannerHtml;
+                bannerSub.textContent = `${lives} ${t('lives')} — ${t('enterYourDartsKiller')}`;
+                modifiers.style.display = 'flex';
+                dartsDisplay.style.display = 'flex';
+                confirmBtn.style.display = '';
+                killerDarts = [];
+                killerModifier = 'single';
+                setKillerModifier('single');
+                updateKillerDartsDisplay();
+                buildKillerPlayGrid();
+            }
+        }
+
+        function buildKillerScoreboard() {
+            const container = document.getElementById('killerScoreboard');
+            const currentPlayer = players[currentPlayerIndex];
+            let html = '';
+
+            players.forEach(player => {
+                const num = killerNumbers[player];
+                const lives = killerLives[player] || 0;
+                const isK = killerIsKiller[player];
+                const elim = killerEliminated[player];
+                const isCurrent = (player === currentPlayer && !elim);
+
+                let cardClass = 'killer-player-card';
+                if (isCurrent) cardClass += ' current-turn';
+                if (isK && !elim) cardClass += ' is-killer';
+                if (elim) cardClass += ' eliminated';
+
+                const livesPercent = Math.min(Math.max(lives, 0), 15) / 15 * 100;
+                const fillClass = isK ? 'killer-lives-fill killer-level' : 'killer-lives-fill';
+
+                html += `<div class="${cardClass}">`;
+                html += `<div class="player-name">${player}</div>`;
+                html += `<div class="player-number">#${num !== undefined ? num : t('noNumberYet')}</div>`;
+                html += `<div class="killer-lives-bar"><div class="${fillClass}" style="width:${livesPercent}%"></div></div>`;
+                html += `<div class="killer-lives-count">${lives} ${t('lives')}</div>`;
+                if (elim) {
+                    html += `<div class="killer-eliminated-badge">${t('eliminatedLabel')}</div>`;
+                } else if (isK) {
+                    html += `<div class="killer-badge">${t('killerLabel')}</div>`;
+                }
+                html += `</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function selectKillerNumber(number) {
+            const takenNumbers = Object.values(killerNumbers);
+            if (takenNumbers.includes(number)) return;
+
+            const currentPlayer = players[currentPlayerIndex];
+            killerNumbers[currentPlayer] = number;
+
+            currentPlayerIndex++;
+            if (currentPlayerIndex >= players.length) {
+                killerPhase = 'play';
+                currentPlayerIndex = 0;
+            }
+
+            updateKillerDisplay();
+            buildKillerScoreboard();
+            saveGameState();
+        }
+
+        function setKillerModifier(modifier) {
+            killerModifier = modifier;
+            document.getElementById('killerSingleBtn').classList.remove('active');
+            document.getElementById('killerDoubleBtn').classList.remove('active');
+            document.getElementById('killerTripleBtn').classList.remove('active');
+            document.getElementById('killer' + modifier.charAt(0).toUpperCase() + modifier.slice(1) + 'Btn').classList.add('active');
+        }
+
+        function addKillerDart(number) {
+            if (killerDarts.length >= 3) return;
+
+            let score = number;
+            let displayText = '';
+            let modifier = killerModifier;
+
+            if (number === 25) {
+                if (killerModifier === 'double') {
+                    score = 50;
+                    displayText = 'Bull×2';
+                } else {
+                    score = 25;
+                    displayText = 'Bull';
+                    modifier = 'single';
+                }
+            } else if (number === 0) {
+                score = 0;
+                displayText = t('miss');
+                modifier = 'miss';
+            } else {
+                if (killerModifier === 'double') {
+                    score = number * 2;
+                    displayText = `D${number}`;
+                } else if (killerModifier === 'triple') {
+                    score = number * 3;
+                    displayText = `T${number}`;
+                } else {
+                    score = number;
+                    displayText = `${number}`;
+                }
+            }
+
+            killerDarts.push({ number, modifier, score, displayText });
+            updateKillerDartsDisplay();
+            setKillerModifier('single');
+        }
+
+        function clearLastKillerDart() {
+            if (killerDarts.length > 0) {
+                killerDarts.pop();
+                updateKillerDartsDisplay();
+            }
+        }
+
+        function clearAllKillerDarts() {
+            killerDarts = [];
+            updateKillerDartsDisplay();
+        }
+
+        function updateKillerDartsDisplay() {
+            for (let i = 0; i < 3; i++) {
+                const slot = document.getElementById(`killerDart${i + 1}`);
+                if (i < killerDarts.length) {
+                    slot.textContent = killerDarts[i].displayText;
+                    slot.classList.add('filled');
+                    slot.classList.remove('empty');
+                } else {
+                    slot.textContent = '-';
+                    slot.classList.remove('filled');
+                }
+            }
+        }
+
+        function processKillerDarts(thrower, darts) {
+            const changes = [];
+            const throwerNum = killerNumbers[thrower];
+            const throwerAdj = getAdjacentNumbers(throwerNum);
+            const isThrowerKiller = killerIsKiller[thrower];
+
+            for (const dart of darts) {
+                if (dart.number === 0 || dart.number === 25) continue;
+
+                const multiplier = getMultiplier(dart.modifier);
+
+                if (dart.number === throwerNum) {
+                    changes.push({ player: thrower, delta: 3 * multiplier, reason: 'own' });
+                } else if (throwerAdj.includes(dart.number)) {
+                    changes.push({ player: thrower, delta: 1 * multiplier, reason: 'adjacent' });
+                }
+
+                if (isThrowerKiller) {
+                    for (const otherPlayer of players) {
+                        if (otherPlayer === thrower || killerEliminated[otherPlayer]) continue;
+                        const otherNum = killerNumbers[otherPlayer];
+                        const otherAdj = getAdjacentNumbers(otherNum);
+
+                        if (dart.number === otherNum) {
+                            changes.push({ player: otherPlayer, delta: -3 * multiplier, reason: 'killed' });
+                        } else if (otherAdj.includes(dart.number)) {
+                            changes.push({ player: otherPlayer, delta: -1 * multiplier, reason: 'adj-killed' });
+                        }
+                    }
+                }
+            }
+
+            return changes;
+        }
+
+        function submitKillerTurn() {
+            if (killerPhase === 'number') return;
+            if (killerDarts.length === 0) return;
+
+            const currentPlayer = players[currentPlayerIndex];
+
+            const snapshot = {
+                playerIndex: currentPlayerIndex,
+                darts: [...killerDarts],
+                livesBefore: { ...killerLives },
+                killerBefore: { ...killerIsKiller },
+                eliminatedBefore: { ...killerEliminated }
+            };
+
+            const changes = processKillerDarts(currentPlayer, killerDarts);
+
+            const aggregated = {};
+            for (const c of changes) {
+                if (!aggregated[c.player]) aggregated[c.player] = 0;
+                aggregated[c.player] += c.delta;
+            }
+
+            for (const [player, delta] of Object.entries(aggregated)) {
+                killerLives[player] += delta;
+            }
+
+            for (const player of players) {
+                if (!killerEliminated[player] && killerLives[player] >= 9) {
+                    killerIsKiller[player] = true;
+                }
+            }
+
+            const newlyEliminated = [];
+            for (const player of players) {
+                if (!killerEliminated[player] && killerLives[player] <= -1) {
+                    killerEliminated[player] = true;
+                    newlyEliminated.push(player);
+                }
+            }
+
+            killerHistory.push(snapshot);
+
+            showKillerTurnSummary(currentPlayer, killerDarts, aggregated, newlyEliminated);
+            updateKillerPrevButton();
+
+            const alivePlayers = players.filter(p => !killerEliminated[p]);
+            if (alivePlayers.length <= 1) {
+                buildKillerScoreboard();
+                document.getElementById('killerDartboardSection').classList.add('hidden');
+                document.getElementById('killerPrevSection').classList.add('hidden');
+                showWinner();
+                saveGameState();
+                return;
+            }
+
+            moveToNextKillerPlayer();
+            buildKillerScoreboard();
+            updateKillerDisplay();
+            saveGameState();
+        }
+
+        function showKillerTurnSummary(player, darts, aggregated, newlyEliminated) {
+            const container = document.getElementById('killerTurnSummary');
+            const dartsText = darts.map(d => d.displayText).join(', ');
+
+            let html = `<strong>${player}</strong>: ${dartsText}<br>`;
+            for (const [p, delta] of Object.entries(aggregated)) {
+                const cls = delta >= 0 ? 'positive' : 'negative';
+                const sign = delta >= 0 ? '+' : '';
+                html += `<span class="killer-life-change ${cls}">${p}: ${sign}${delta}</span> `;
+            }
+            for (const elim of newlyEliminated) {
+                html += `<br><strong style="color:#ff6b6b;">${elim} ${t('eliminatedLabel')}!</strong>`;
+            }
+
+            container.innerHTML = html;
+            container.classList.remove('hidden');
+        }
+
+        function moveToNextKillerPlayer() {
+            const totalPlayers = players.length;
+            let next = (currentPlayerIndex + 1) % totalPlayers;
+            let attempts = 0;
+            while (killerEliminated[players[next]] && attempts < totalPlayers) {
+                next = (next + 1) % totalPlayers;
+                attempts++;
+            }
+            currentPlayerIndex = next;
+        }
+
+        function previousKillerTurn() {
+            if (killerHistory.length === 0) return;
+
+            const snapshot = killerHistory.pop();
+            currentPlayerIndex = snapshot.playerIndex;
+            killerLives = { ...snapshot.livesBefore };
+            killerIsKiller = { ...snapshot.killerBefore };
+            killerEliminated = { ...snapshot.eliminatedBefore };
+
+            document.getElementById('killerDartboardSection').classList.remove('hidden');
+            document.getElementById('killerPrevSection').classList.remove('hidden');
+            document.getElementById('winnerSection').style.display = 'none';
+            document.getElementById('killerTurnSummary').classList.add('hidden');
+
+            updateKillerDisplay();
+            buildKillerScoreboard();
+            updateKillerPrevButton();
+            saveGameState();
+        }
+
+        function updateKillerPrevButton() {
+            const btn = document.getElementById('killerPrevBtn');
+            btn.style.display = killerHistory.length > 0 ? 'inline-block' : 'none';
+        }
+
         // ==================== COMMON ====================
 
         function showWinner() {
             if (gameMode === 'classic') {
                 document.getElementById('classicInputSection').classList.add('hidden');
                 document.getElementById('editScoresBtn').style.display = 'inline-block';
-            } else {
+            } else if (gameMode === 'yahtzee') {
                 document.getElementById('yahtzeeInputSection').classList.add('hidden');
                 document.getElementById('editScoresBtn').style.display = yahtzeeHistory.length > 0 ? 'inline-block' : 'none';
                 scoresHidden = false;
                 document.getElementById('hideScoresBtn').textContent = '👁️';
                 updateScoreVisibility();
+            } else if (gameMode === 'killer') {
+                document.getElementById('killerDartboardSection').classList.add('hidden');
+                document.getElementById('killerPrevSection').classList.add('hidden');
+                document.getElementById('editScoresBtn').style.display = killerHistory.length > 0 ? 'inline-block' : 'none';
             }
-            
-            let highScore = -Infinity;
-            
-            players.forEach(player => {
-                const playerScore = gameMode === 'classic' ? scores[player].capital : scores[player].total;
-                if (playerScore > highScore) {
-                    highScore = playerScore;
-                }
-            });
-            
-            const winners = players.filter(p => {
-                const s = gameMode === 'classic' ? scores[p].capital : scores[p].total;
-                return s === highScore;
-            });
-            
+
             const winnerSection = document.getElementById('winnerSection');
             winnerSection.style.display = 'block';
-            
-            if (winners.length > 1) {
-                document.getElementById('winnerName').textContent = t('itsATie');
-                document.getElementById('winnerScore').textContent = `${winners.join(' & ')} ${t('tiedWith')} ${highScore} ${t('points')}!`;
+
+            if (gameMode === 'killer') {
+                const alivePlayers = players.filter(p => !killerEliminated[p]);
+                const winnerName = alivePlayers.length === 1 ? alivePlayers[0] : players[0];
+                document.getElementById('winnerName').textContent = `🎉 ${winnerName} ${t('wins')} 🎉`;
+                document.getElementById('winnerScore').textContent = `${killerLives[winnerName]} ${t('lives')}`;
             } else {
-                document.getElementById('winnerName').textContent = `🎉 ${winners[0]} ${t('wins')} 🎉`;
-                document.getElementById('winnerScore').textContent = `${t('finalScore')} ${highScore} ${t('points')}`;
+                let highScore = -Infinity;
+                players.forEach(player => {
+                    const playerScore = gameMode === 'classic' ? scores[player].capital : scores[player].total;
+                    if (playerScore > highScore) {
+                        highScore = playerScore;
+                    }
+                });
+
+                const winners = players.filter(p => {
+                    const s = gameMode === 'classic' ? scores[p].capital : scores[p].total;
+                    return s === highScore;
+                });
+
+                if (winners.length > 1) {
+                    document.getElementById('winnerName').textContent = t('itsATie');
+                    document.getElementById('winnerScore').textContent = `${winners.join(' & ')} ${t('tiedWith')} ${highScore} ${t('points')}!`;
+                } else {
+                    document.getElementById('winnerName').textContent = `🎉 ${winners[0]} ${t('wins')} 🎉`;
+                    document.getElementById('winnerScore').textContent = `${t('finalScore')} ${highScore} ${t('points')}`;
+                }
             }
         }
 
@@ -2169,12 +2966,20 @@
             yahtzeeHistory = [];
             storedDarts = {};
 
+            killerNumbers = {};
+            killerLives = {};
+            killerIsKiller = {};
+            killerEliminated = {};
+            killerPhase = 'number';
+            killerHistory = [];
+            killerDarts = [];
+            killerModifier = 'single';
+
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('gameBoard').style.display = 'none';
             document.getElementById('winnerSection').style.display = 'none';
+            hideAllModeSections();
             document.getElementById('classicInputSection').classList.remove('hidden');
-            document.getElementById('yahtzeeInputSection').classList.add('hidden');
-            document.getElementById('hideScoresBtn').classList.add('hidden');
 
             updatePlayerList();
             clearGameState();
