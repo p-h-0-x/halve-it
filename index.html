@@ -703,6 +703,16 @@
             margin: 0;
         }
 
+        .killer-number-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            vertical-align: middle;
+        }
+
         .killer-banner .killer-badge-banner {
             display: inline-block;
             background: #d63031;
@@ -871,16 +881,16 @@
 
         .killer-lives-bar {
             width: 100%;
-            height: 8px;
+            height: 14px;
             background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+            border-radius: 7px;
             overflow: hidden;
             margin: 6px 0 4px;
         }
 
         .killer-lives-fill {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 7px;
             transition: width 0.4s ease, background 0.4s ease;
             background: #00b894;
         }
@@ -1091,6 +1101,9 @@
             <p id="killerBannerSub"></p>
         </div>
 
+        <!-- Killer Mode: Scoreboard -->
+        <div class="killer-scoreboard hidden" id="killerScoreboard"></div>
+
         <!-- Killer Mode: Dartboard + Input -->
         <div class="killer-dartboard-section hidden" id="killerDartboardSection">
             <div class="killer-darts-display" id="killerDartsDisplay">
@@ -1116,9 +1129,6 @@
 
         <!-- Killer Mode: Turn Summary -->
         <div class="killer-turn-summary hidden" id="killerTurnSummary"></div>
-
-        <!-- Killer Mode: Scoreboard -->
-        <div class="killer-scoreboard hidden" id="killerScoreboard"></div>
 
         <!-- Killer Mode: Previous Turn -->
         <div class="killer-actions hidden" id="killerPrevSection">
@@ -2591,6 +2601,7 @@
             const modifiers = document.getElementById('killerModifiers');
             const dartsDisplay = document.getElementById('killerDartsDisplay');
             const confirmBtn = document.getElementById('killerConfirmBtn');
+            const actions = document.getElementById('killerActions');
 
             const currentPlayer = players[currentPlayerIndex];
 
@@ -2600,17 +2611,20 @@
                 modifiers.style.display = 'none';
                 dartsDisplay.style.display = 'none';
                 confirmBtn.style.display = 'none';
+                actions.style.display = currentPlayerIndex > 0 ? 'flex' : 'none';
                 buildKillerNumberGrid();
             } else {
                 const lives = killerLives[currentPlayer];
                 const isK = killerIsKiller[currentPlayer];
-                let bannerHtml = currentPlayer;
+                const playerNum = killerNumbers[currentPlayer];
+                let bannerHtml = `${currentPlayer} <span class="killer-number-badge">#${playerNum}</span>`;
                 if (isK) bannerHtml += ` <span class="killer-badge-banner">${t('killerLabel')}</span>`;
                 bannerText.innerHTML = bannerHtml;
                 bannerSub.textContent = `${lives} ${t('lives')} — ${t('enterYourDartsKiller')}`;
                 modifiers.style.display = 'flex';
                 dartsDisplay.style.display = 'flex';
                 confirmBtn.style.display = '';
+                actions.style.display = 'flex';
                 killerDarts = [];
                 killerModifier = 'single';
                 setKillerModifier('single');
@@ -2720,13 +2734,43 @@
         }
 
         function clearLastKillerDart() {
+            if (killerPhase === 'number') {
+                if (currentPlayerIndex > 0) {
+                    currentPlayerIndex--;
+                    const prevPlayer = players[currentPlayerIndex];
+                    delete killerNumbers[prevPlayer];
+                    updateKillerDisplay();
+                    buildKillerScoreboard();
+                    saveGameState();
+                }
+                return;
+            }
             if (killerDarts.length > 0) {
                 killerDarts.pop();
                 updateKillerDartsDisplay();
+            } else if (killerHistory.length === 0) {
+                // No darts entered and no turns played yet: go back to number phase
+                killerPhase = 'number';
+                currentPlayerIndex = players.length - 1;
+                const lastPlayer = players[currentPlayerIndex];
+                delete killerNumbers[lastPlayer];
+                updateKillerDisplay();
+                buildKillerScoreboard();
+                saveGameState();
             }
         }
 
         function clearAllKillerDarts() {
+            if (killerPhase === 'number') {
+                if (currentPlayerIndex > 0) {
+                    killerNumbers = {};
+                    currentPlayerIndex = 0;
+                    updateKillerDisplay();
+                    buildKillerScoreboard();
+                    saveGameState();
+                }
+                return;
+            }
             killerDarts = [];
             updateKillerDartsDisplay();
         }
@@ -2854,14 +2898,17 @@
             const container = document.getElementById('killerTurnSummary');
             const dartsText = darts.map(d => d.displayText).join(', ');
 
-            let html = `<strong>${player}</strong>: ${dartsText}<br>`;
+            const playerNum = killerNumbers[player];
+            let html = `<strong>${player} <span class="killer-number-badge">#${playerNum}</span></strong>: ${dartsText}<br>`;
             for (const [p, delta] of Object.entries(aggregated)) {
+                const pNum = killerNumbers[p];
                 const cls = delta >= 0 ? 'positive' : 'negative';
                 const sign = delta >= 0 ? '+' : '';
-                html += `<span class="killer-life-change ${cls}">${p}: ${sign}${delta}</span> `;
+                html += `<span class="killer-life-change ${cls}">${p} (#${pNum}): ${sign}${delta}</span> `;
             }
             for (const elim of newlyEliminated) {
-                html += `<br><strong style="color:#ff6b6b;">${elim} ${t('eliminatedLabel')}!</strong>`;
+                const elimNum = killerNumbers[elim];
+                html += `<br><strong style="color:#ff6b6b;">${elim} (#${elimNum}) ${t('eliminatedLabel')}!</strong>`;
             }
 
             container.innerHTML = html;
