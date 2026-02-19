@@ -703,6 +703,16 @@
             margin: 0;
         }
 
+        .killer-number-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            vertical-align: middle;
+        }
+
         .killer-banner .killer-badge-banner {
             display: inline-block;
             background: #d63031;
@@ -2606,7 +2616,8 @@
             } else {
                 const lives = killerLives[currentPlayer];
                 const isK = killerIsKiller[currentPlayer];
-                let bannerHtml = currentPlayer;
+                const playerNum = killerNumbers[currentPlayer];
+                let bannerHtml = `${currentPlayer} <span class="killer-number-badge">#${playerNum}</span>`;
                 if (isK) bannerHtml += ` <span class="killer-badge-banner">${t('killerLabel')}</span>`;
                 bannerText.innerHTML = bannerHtml;
                 bannerSub.textContent = `${lives} ${t('lives')} — ${t('enterYourDartsKiller')}`;
@@ -2887,14 +2898,17 @@
             const container = document.getElementById('killerTurnSummary');
             const dartsText = darts.map(d => d.displayText).join(', ');
 
-            let html = `<strong>${player}</strong>: ${dartsText}<br>`;
+            const playerNum = killerNumbers[player];
+            let html = `<strong>${player} <span class="killer-number-badge">#${playerNum}</span></strong>: ${dartsText}<br>`;
             for (const [p, delta] of Object.entries(aggregated)) {
+                const pNum = killerNumbers[p];
                 const cls = delta >= 0 ? 'positive' : 'negative';
                 const sign = delta >= 0 ? '+' : '';
-                html += `<span class="killer-life-change ${cls}">${p}: ${sign}${delta}</span> `;
+                html += `<span class="killer-life-change ${cls}">${p} (#${pNum}): ${sign}${delta}</span> `;
             }
             for (const elim of newlyEliminated) {
-                html += `<br><strong style="color:#ff6b6b;">${elim} ${t('eliminatedLabel')}!</strong>`;
+                const elimNum = killerNumbers[elim];
+                html += `<br><strong style="color:#ff6b6b;">${elim} (#${elimNum}) ${t('eliminatedLabel')}!</strong>`;
             }
 
             container.innerHTML = html;
