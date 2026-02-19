@@ -2636,7 +2636,7 @@
                 if (isK && !elim) cardClass += ' is-killer';
                 if (elim) cardClass += ' eliminated';
 
-                const livesPercent = Math.min(Math.max(lives, 0), 15) / 15 * 100;
+                const livesPercent = Math.min(Math.max(lives, 0), 9) / 9 * 100;
                 const fillClass = isK ? 'killer-lives-fill killer-level' : 'killer-lives-fill';
 
                 html += `<div class="${cardClass}">`;
@@ -2749,17 +2749,26 @@
             const changes = [];
             const throwerNum = killerNumbers[thrower];
             const throwerAdj = getAdjacentNumbers(throwerNum);
-            const isThrowerKiller = killerIsKiller[thrower];
+            let isThrowerKiller = killerIsKiller[thrower];
+            let runningLives = killerLives[thrower];
 
             for (const dart of darts) {
                 if (dart.number === 0 || dart.number === 25) continue;
 
                 const multiplier = getMultiplier(dart.modifier);
 
+                let livesGained = 0;
                 if (dart.number === throwerNum) {
-                    changes.push({ player: thrower, delta: 3 * multiplier, reason: 'own' });
+                    livesGained = 3 * multiplier;
+                    changes.push({ player: thrower, delta: livesGained, reason: 'own' });
                 } else if (throwerAdj.includes(dart.number)) {
-                    changes.push({ player: thrower, delta: 1 * multiplier, reason: 'adjacent' });
+                    livesGained = 1 * multiplier;
+                    changes.push({ player: thrower, delta: livesGained, reason: 'adjacent' });
+                }
+
+                runningLives += livesGained;
+                if (!isThrowerKiller && runningLives >= 9) {
+                    isThrowerKiller = true;
                 }
 
                 if (isThrowerKiller) {
@@ -2803,7 +2812,7 @@
             }
 
             for (const [player, delta] of Object.entries(aggregated)) {
-                killerLives[player] += delta;
+                killerLives[player] = Math.min(killerLives[player] + delta, 9);
             }
 
             for (const player of players) {
