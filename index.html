@@ -1906,7 +1906,6 @@
         let clockDarts = [];
         let clockModifier = 'single';
         let clockFinishOrder = []; // Track finish order for ranking
-        let clockTurnNumber = 0;  // Current turn number
 
         // Dart input state
         let dartInputTargetField = null;
@@ -1946,7 +1945,6 @@
                 clockFinished: clockFinished,
                 clockHistory: clockHistory,
                 clockFinishOrder: clockFinishOrder,
-                clockTurnNumber: clockTurnNumber,
 
                 // UI state
                 isGameStarted: document.getElementById('gameBoard').style.display !== 'none',
@@ -1996,7 +1994,6 @@
                 clockFinished = gameState.clockFinished || {};
                 clockHistory = gameState.clockHistory || [];
                 clockFinishOrder = gameState.clockFinishOrder || [];
-                clockTurnNumber = gameState.clockTurnNumber || 0;
 
                 // Apply language (pass true to prevent saving during load)
                 setLanguage(currentLang, true);
@@ -2359,7 +2356,6 @@
                 clockDarts = [];
                 clockModifier = 'single';
                 clockFinishOrder = [];
-                clockTurnNumber = 1;
                 players.forEach(p => {
                     clockPosition[p] = 1;
                     clockFinished[p] = false;
@@ -3404,7 +3400,8 @@
                 banner.textContent = `${currentPlayer} - ${t('clockFinished')}`;
                 sub.textContent = '';
             } else {
-                banner.textContent = `${t('clockTurn')} ${clockTurnNumber} — ${currentPlayer}${t('playerTurn')}`;
+                const playerTurnNum = clockHistory.filter(h => h.player === currentPlayer).length + 1;
+                banner.textContent = `${t('clockTurn')} ${playerTurnNum} — ${currentPlayer}${t('playerTurn')}`;
                 const targetName = getClockTargetName(clockPosition[currentPlayer]);
                 sub.textContent = `${t('clockTarget')} ${targetName}`;
             }
@@ -3562,12 +3559,8 @@
                 darts: [...clockDarts],
                 wasFinished: clockFinished[currentPlayer],
                 extraTurn: result.extraTurn,
-                finishOrderLength: clockFinishOrder.length,
-                turnNumber: clockTurnNumber
+                finishOrderLength: clockFinishOrder.length
             });
-
-            // Advance turn number
-            clockTurnNumber++;
 
             // Apply changes
             clockPosition[currentPlayer] = result.endPosition;
@@ -3622,9 +3615,8 @@
 
             const last = clockHistory.pop();
 
-            // Restore position and turn number
+            // Restore position
             clockPosition[last.player] = last.prevPos;
-            clockTurnNumber = last.turnNumber;
 
             // Undo finish if needed
             if (clockFinished[last.player] && !last.wasFinished) {
@@ -3683,8 +3675,9 @@
                 document.getElementById('winnerScore').textContent = `${killerLives[winnerName]} ${t('lives')}`;
             } else if (gameMode === 'clock') {
                 const winnerName = clockFinishOrder.length > 0 ? clockFinishOrder[0] : players[0];
+                const winnerTurns = clockHistory.filter(h => h.player === winnerName).length;
                 document.getElementById('winnerName').textContent = `🎉 ${winnerName} ${t('wins')} 🎉`;
-                document.getElementById('winnerScore').textContent = `${t('clockTurn')} ${clockTurnNumber - 1}`;
+                document.getElementById('winnerScore').textContent = `${t('clockTurn')} ${winnerTurns}`;
             } else {
                 let highScore = -Infinity;
                 players.forEach(player => {
@@ -3745,7 +3738,6 @@
             clockDarts = [];
             clockModifier = 'single';
             clockFinishOrder = [];
-            clockTurnNumber = 0;
 
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('gameBoard').style.display = 'none';
