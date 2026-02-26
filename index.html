@@ -3397,7 +3397,6 @@
                 sub.textContent = `${t('clockTarget')} ${targetName}`;
             }
 
-            buildClockNumberGrid();
             clearAllClockDarts();
         }
 
@@ -3433,23 +3432,52 @@
             }).join('');
         }
 
+        function getClockPreviewTarget() {
+            const currentPlayer = players[currentPlayerIndex];
+            let pos = clockPosition[currentPlayer] || 1;
+
+            // Simulate processing already-entered darts to get the preview target
+            for (let i = 0; i < clockDarts.length; i++) {
+                const dart = clockDarts[i];
+                if (pos > 11) break; // Already finished
+
+                if (pos <= 10) {
+                    if (dart.number === pos) {
+                        const advance = getMultiplier(dart.modifier);
+                        pos = pos + advance;
+                        if (pos > 11) pos = 11; // Cap at bull stage
+                    }
+                } else {
+                    // Target is bull (position 11)
+                    if (dart.number === 25) {
+                        pos = 12; // Finished
+                    }
+                }
+            }
+            return pos;
+        }
+
         function buildClockNumberGrid() {
             const grid = document.getElementById('clockNumberGrid');
-            const currentPlayer = players[currentPlayerIndex];
-            const target = clockPosition[currentPlayer] || 1;
+            const target = getClockPreviewTarget();
+            const modifiers = document.getElementById('clockModifiers');
 
             let html = '';
-            for (let i = 1; i <= 20; i++) {
-                const isTarget = (target <= 10 && i === target);
-                const cls = isTarget ? 'clock-num-btn target' : 'clock-num-btn';
-                html += `<button class="${cls}" onclick="addClockDart(${i})">${i}</button>`;
+            if (target >= 12) {
+                // Player already finished mid-turn - only show miss
+                html += `<button class="clock-num-btn miss-btn" onclick="addClockDart(0)">${t('miss')}</button>`;
+                modifiers.classList.add('hidden');
+            } else if (target > 10) {
+                // Target is Bull - show Bull + Miss, hide modifiers
+                html += `<button class="clock-num-btn target" onclick="addClockDart(25)">${t('clockBull')}</button>`;
+                html += `<button class="clock-num-btn miss-btn" onclick="addClockDart(0)">${t('miss')}</button>`;
+                modifiers.classList.add('hidden');
+            } else {
+                // Target is a number 1-10 - show target + miss, show modifiers
+                html += `<button class="clock-num-btn target" onclick="addClockDart(${target})">${target}</button>`;
+                html += `<button class="clock-num-btn miss-btn" onclick="addClockDart(0)">${t('miss')}</button>`;
+                modifiers.classList.remove('hidden');
             }
-            // Bull button
-            const isBullTarget = target > 10;
-            const bullCls = isBullTarget ? 'clock-num-btn target' : 'clock-num-btn';
-            html += `<button class="${bullCls}" style="grid-column: span 2;" onclick="addClockDart(25)">${t('clockBull')}</button>`;
-            // Miss button
-            html += `<button class="clock-num-btn miss-btn" onclick="addClockDart(0)">${t('miss')}</button>`;
 
             grid.innerHTML = html;
         }
@@ -3498,12 +3526,14 @@
             clockDarts.push({ number, modifier, score, displayText });
             updateClockDartsDisplay();
             setClockModifier('single');
+            buildClockNumberGrid();
         }
 
         function clearLastClockDart() {
             if (clockDarts.length > 0) {
                 clockDarts.pop();
                 updateClockDartsDisplay();
+                buildClockNumberGrid();
             }
         }
 
@@ -3512,6 +3542,7 @@
             clockModifier = 'single';
             setClockModifier('single');
             updateClockDartsDisplay();
+            buildClockNumberGrid();
         }
 
         function updateClockDartsDisplay() {
@@ -3590,9 +3621,8 @@
 
             buildClockScoreboard();
 
-            // Check if all players finished
-            const allFinished = players.every(p => clockFinished[p]);
-            if (allFinished) {
+            // First player to finish wins — game ends immediately
+            if (finished) {
                 showWinner();
                 updateClockPrevButton();
                 saveGameState();
@@ -3603,6 +3633,8 @@
             if (extraTurn) {
                 // Same player gets another turn
                 updateClockDisplay();
+                const sub = document.getElementById('clockBannerSub');
+                sub.textContent = `${t('clockExtraTurn')} — ${t('clockTarget')} ${getClockTargetName(clockPosition[currentPlayer])}`;
             } else {
                 moveToNextClockPlayer();
             }
