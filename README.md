@@ -8,9 +8,10 @@ A single-page web application for scoring the "Halve-It" darts game. No installa
 
 ## ✨ Features
 
-- **🎮 Two Game Modes:**
+- **🎮 Multiple Game Modes:**
   - **Classic Mode**: Play contracts in order. Hit the target to add your score, miss to halve your capital!
   - **Yahtzee Style**: Choose where to register your score each turn. Fill or scratch contracts freely.
+  - **Clock Mode**: Race to hit 1 through 10 in order, then finish with Bull. Doubles and triples advance extra!
 
 - **🌍 Multi-Language Support:**
   - English 🇬🇧
@@ -57,6 +58,15 @@ A single-page web application for scoring the "Halve-It" darts game. No installa
 - Scratch: Voluntarily give up a contract (scores 0)
 - Game ends when all contracts are filled/scratched
 - Winner: Highest total score
+
+### Clock Mode Rules:
+- Players take turns hitting numbers 1 through 10 in order, then Bull to finish
+- Each turn: throw up to 3 darts at your current target
+- Doubles count as 2 advances, triples count as 3 (e.g., triple 1 jumps from 1 to 4)
+- Advancing past 10 always lands on Bull — you can never skip it
+- When your target is Bull, hitting single or double bull finishes the game
+- If your last dart of a turn hits the target (without finishing), you get an extra turn
+- First player to complete all targets wins — game ends immediately
 
 ## 🚀 Quick Start
 

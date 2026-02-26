@@ -1204,11 +1204,17 @@
             display: inline-block;
             background: rgba(249, 212, 35, 0.3);
             color: #f9d423;
-            padding: 4px 12px;
+            padding: 6px 16px;
             border-radius: 8px;
-            font-size: 0.9em;
+            font-size: 1em;
             font-weight: bold;
             margin-top: 10px;
+            animation: extraTurnPulse 1s ease-in-out 3;
+        }
+
+        @keyframes extraTurnPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
         }
 
         @media (max-width: 600px) {
@@ -1413,6 +1419,7 @@
         <div class="clock-banner hidden" id="clockBanner">
             <h3 id="clockBannerText">Player's Turn</h3>
             <p id="clockBannerSub"></p>
+            <div class="clock-extra-turn hidden" id="clockExtraTurnBadge"></div>
         </div>
 
         <!-- Clock Mode: Scoreboard -->
@@ -1538,6 +1545,7 @@
     </div>
 
     <script src="src/contracts.js"></script>
+    <script src="src/clock.js"></script>
     <script>
         // ==================== TRANSLATIONS ====================
         const translations = {
@@ -1627,6 +1635,7 @@
                 clockExtraTurn: "Last dart hit! Extra turn!",
                 clockThrowDarts: "Throw your 3 darts",
                 clockBull: "Bull",
+                clockTurn: "Turn",
 
                 // Contracts
                 contracts: {
@@ -1733,6 +1742,7 @@
                 clockExtraTurn: "Dernière fléchette touchée ! Tour supplémentaire !",
                 clockThrowDarts: "Lancez vos 3 fléchettes",
                 clockBull: "Bull",
+                clockTurn: "Tour",
 
                 // Contracts
                 contracts: {
@@ -1839,6 +1849,7 @@
                 clockExtraTurn: "¡Último dardo acertado! ¡Turno extra!",
                 clockThrowDarts: "Lanza tus 3 dardos",
                 clockBull: "Bull",
+                clockTurn: "Turno",
 
                 // Contracts
                 contracts: {
@@ -1895,6 +1906,7 @@
         let clockDarts = [];
         let clockModifier = 'single';
         let clockFinishOrder = []; // Track finish order for ranking
+        let clockTurnNumber = 0;  // Current turn number
 
         // Dart input state
         let dartInputTargetField = null;
@@ -1934,6 +1946,7 @@
                 clockFinished: clockFinished,
                 clockHistory: clockHistory,
                 clockFinishOrder: clockFinishOrder,
+                clockTurnNumber: clockTurnNumber,
 
                 // UI state
                 isGameStarted: document.getElementById('gameBoard').style.display !== 'none',
@@ -1983,6 +1996,7 @@
                 clockFinished = gameState.clockFinished || {};
                 clockHistory = gameState.clockHistory || [];
                 clockFinishOrder = gameState.clockFinishOrder || [];
+                clockTurnNumber = gameState.clockTurnNumber || 0;
 
                 // Apply language (pass true to prevent saving during load)
                 setLanguage(currentLang, true);
@@ -2345,6 +2359,7 @@
                 clockDarts = [];
                 clockModifier = 'single';
                 clockFinishOrder = [];
+                clockTurnNumber = 1;
                 players.forEach(p => {
                     clockPosition[p] = 1;
                     clockFinished[p] = false;
@@ -2970,12 +2985,6 @@
             return [left, right];
         }
 
-        function getMultiplier(modifier) {
-            if (modifier === 'double') return 2;
-            if (modifier === 'triple') return 3;
-            return 1;
-        }
-
         function buildKillerNumberGrid() {
             const grid = document.getElementById('killerNumberGrid');
             const takenNumbers = Object.values(killerNumbers);
@@ -3387,12 +3396,15 @@
             const currentPlayer = players[currentPlayerIndex];
             const banner = document.getElementById('clockBannerText');
             const sub = document.getElementById('clockBannerSub');
+            const extraBadge = document.getElementById('clockExtraTurnBadge');
+
+            extraBadge.classList.add('hidden');
 
             if (clockFinished[currentPlayer]) {
                 banner.textContent = `${currentPlayer} - ${t('clockFinished')}`;
                 sub.textContent = '';
             } else {
-                banner.textContent = `${currentPlayer}${t('playerTurn')}`;
+                banner.textContent = `${t('clockTurn')} ${clockTurnNumber} — ${currentPlayer}${t('playerTurn')}`;
                 const targetName = getClockTargetName(clockPosition[currentPlayer]);
                 sub.textContent = `${t('clockTarget')} ${targetName}`;
             }
@@ -3406,7 +3418,7 @@
                 const pos = clockPosition[player] || 1;
                 const finished = clockFinished[player];
                 const isCurrent = player === players[currentPlayerIndex];
-                const progress = finished ? 100 : ((pos - 1) / 11) * 100;
+                const progress = getClockProgress(pos, finished);
                 const targetName = finished ? t('clockFinished') : getClockTargetName(pos);
 
                 let classes = 'clock-player-card';
@@ -3432,34 +3444,11 @@
             }).join('');
         }
 
-        function getClockPreviewTarget() {
-            const currentPlayer = players[currentPlayerIndex];
-            let pos = clockPosition[currentPlayer] || 1;
-
-            // Simulate processing already-entered darts to get the preview target
-            for (let i = 0; i < clockDarts.length; i++) {
-                const dart = clockDarts[i];
-                if (pos > 11) break; // Already finished
-
-                if (pos <= 10) {
-                    if (dart.number === pos) {
-                        const advance = getMultiplier(dart.modifier);
-                        pos = pos + advance;
-                        if (pos > 11) pos = 11; // Cap at bull stage
-                    }
-                } else {
-                    // Target is bull (position 11)
-                    if (dart.number === 25) {
-                        pos = 12; // Finished
-                    }
-                }
-            }
-            return pos;
-        }
-
         function buildClockNumberGrid() {
             const grid = document.getElementById('clockNumberGrid');
-            const target = getClockPreviewTarget();
+            const currentPlayer = players[currentPlayerIndex];
+            const startPos = clockPosition[currentPlayer] || 1;
+            const target = getClockPreviewTarget(clockDarts, startPos);
             const modifiers = document.getElementById('clockModifiers');
 
             let html = '';
@@ -3558,63 +3547,32 @@
             }
         }
 
-        function getMultiplier(modifier) {
-            if (modifier === 'double') return 2;
-            if (modifier === 'triple') return 3;
-            return 1;
-        }
-
         function submitClockTurn() {
             if (clockDarts.length === 0) return;
 
             const currentPlayer = players[currentPlayerIndex];
-            const startPos = clockPosition[currentPlayer];
-            let pos = startPos;
-            let lastDartHit = false;
+            const startPos = clockPosition[currentPlayer] || 1;
+            const result = processClockDarts(clockDarts, startPos);
 
-            // Process each dart
-            for (let i = 0; i < clockDarts.length; i++) {
-                const dart = clockDarts[i];
-                if (pos > 11) break; // Already finished
-
-                let hit = false;
-                if (pos <= 10) {
-                    // Target is a number 1-10
-                    if (dart.number === pos) {
-                        hit = true;
-                        const advance = getMultiplier(dart.modifier);
-                        pos = pos + advance;
-                        if (pos > 11) pos = 11; // Cap at bull stage
-                    }
-                } else {
-                    // Target is bull (position 11)
-                    if (dart.number === 25) {
-                        hit = true;
-                        pos = 12; // Finished!
-                    }
-                }
-
-                lastDartHit = (i === clockDarts.length - 1) && hit;
-            }
-
-            const finished = pos >= 12;
-            const extraTurn = lastDartHit && !finished;
-
-            // Save history
+            // Save history (including turn number for undo)
             clockHistory.push({
                 player: currentPlayer,
                 prevPos: startPos,
-                newPos: pos >= 12 ? 12 : pos,
+                newPos: result.endPosition,
                 darts: [...clockDarts],
                 wasFinished: clockFinished[currentPlayer],
-                extraTurn: extraTurn,
-                finishOrderLength: clockFinishOrder.length
+                extraTurn: result.extraTurn,
+                finishOrderLength: clockFinishOrder.length,
+                turnNumber: clockTurnNumber
             });
 
-            // Apply changes
-            clockPosition[currentPlayer] = pos >= 12 ? 12 : pos;
+            // Advance turn number
+            clockTurnNumber++;
 
-            if (finished && !clockFinished[currentPlayer]) {
+            // Apply changes
+            clockPosition[currentPlayer] = result.endPosition;
+
+            if (result.finished && !clockFinished[currentPlayer]) {
                 clockFinished[currentPlayer] = true;
                 clockFinishOrder.push(currentPlayer);
             }
@@ -3622,7 +3580,7 @@
             buildClockScoreboard();
 
             // First player to finish wins — game ends immediately
-            if (finished) {
+            if (result.finished) {
                 showWinner();
                 updateClockPrevButton();
                 saveGameState();
@@ -3630,11 +3588,12 @@
             }
 
             // Move to next player (or same player if extra turn)
-            if (extraTurn) {
+            if (result.extraTurn) {
                 // Same player gets another turn
                 updateClockDisplay();
-                const sub = document.getElementById('clockBannerSub');
-                sub.textContent = `${t('clockExtraTurn')} — ${t('clockTarget')} ${getClockTargetName(clockPosition[currentPlayer])}`;
+                const extraBadge = document.getElementById('clockExtraTurnBadge');
+                extraBadge.textContent = `⚡ ${t('clockExtraTurn')}`;
+                extraBadge.classList.remove('hidden');
             } else {
                 moveToNextClockPlayer();
             }
@@ -3663,8 +3622,9 @@
 
             const last = clockHistory.pop();
 
-            // Restore position
+            // Restore position and turn number
             clockPosition[last.player] = last.prevPos;
+            clockTurnNumber = last.turnNumber;
 
             // Undo finish if needed
             if (clockFinished[last.player] && !last.wasFinished) {
@@ -3724,7 +3684,7 @@
             } else if (gameMode === 'clock') {
                 const winnerName = clockFinishOrder.length > 0 ? clockFinishOrder[0] : players[0];
                 document.getElementById('winnerName').textContent = `🎉 ${winnerName} ${t('wins')} 🎉`;
-                document.getElementById('winnerScore').textContent = '';
+                document.getElementById('winnerScore').textContent = `${t('clockTurn')} ${clockTurnNumber - 1}`;
             } else {
                 let highScore = -Infinity;
                 players.forEach(player => {
@@ -3785,6 +3745,7 @@
             clockDarts = [];
             clockModifier = 'single';
             clockFinishOrder = [];
+            clockTurnNumber = 0;
 
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('gameBoard').style.display = 'none';
