@@ -1538,6 +1538,7 @@
     </div>
 
     <script src="src/contracts.js"></script>
+    <script src="src/clock.js"></script>
     <script>
         // ==================== TRANSLATIONS ====================
         const translations = {
@@ -2970,12 +2971,6 @@
             return [left, right];
         }
 
-        function getMultiplier(modifier) {
-            if (modifier === 'double') return 2;
-            if (modifier === 'triple') return 3;
-            return 1;
-        }
-
         function buildKillerNumberGrid() {
             const grid = document.getElementById('killerNumberGrid');
             const takenNumbers = Object.values(killerNumbers);
@@ -3406,7 +3401,7 @@
                 const pos = clockPosition[player] || 1;
                 const finished = clockFinished[player];
                 const isCurrent = player === players[currentPlayerIndex];
-                const progress = finished ? 100 : ((pos - 1) / 11) * 100;
+                const progress = getClockProgress(pos, finished);
                 const targetName = finished ? t('clockFinished') : getClockTargetName(pos);
 
                 let classes = 'clock-player-card';
@@ -3432,34 +3427,11 @@
             }).join('');
         }
 
-        function getClockPreviewTarget() {
-            const currentPlayer = players[currentPlayerIndex];
-            let pos = clockPosition[currentPlayer] || 1;
-
-            // Simulate processing already-entered darts to get the preview target
-            for (let i = 0; i < clockDarts.length; i++) {
-                const dart = clockDarts[i];
-                if (pos > 11) break; // Already finished
-
-                if (pos <= 10) {
-                    if (dart.number === pos) {
-                        const advance = getMultiplier(dart.modifier);
-                        pos = pos + advance;
-                        if (pos > 11) pos = 11; // Cap at bull stage
-                    }
-                } else {
-                    // Target is bull (position 11)
-                    if (dart.number === 25) {
-                        pos = 12; // Finished
-                    }
-                }
-            }
-            return pos;
-        }
-
         function buildClockNumberGrid() {
             const grid = document.getElementById('clockNumberGrid');
-            const target = getClockPreviewTarget();
+            const currentPlayer = players[currentPlayerIndex];
+            const startPos = clockPosition[currentPlayer] || 1;
+            const target = getClockPreviewTarget(clockDarts, startPos);
             const modifiers = document.getElementById('clockModifiers');
 
             let html = '';
@@ -3558,63 +3530,28 @@
             }
         }
 
-        function getMultiplier(modifier) {
-            if (modifier === 'double') return 2;
-            if (modifier === 'triple') return 3;
-            return 1;
-        }
-
         function submitClockTurn() {
             if (clockDarts.length === 0) return;
 
             const currentPlayer = players[currentPlayerIndex];
             const startPos = clockPosition[currentPlayer];
-            let pos = startPos;
-            let lastDartHit = false;
-
-            // Process each dart
-            for (let i = 0; i < clockDarts.length; i++) {
-                const dart = clockDarts[i];
-                if (pos > 11) break; // Already finished
-
-                let hit = false;
-                if (pos <= 10) {
-                    // Target is a number 1-10
-                    if (dart.number === pos) {
-                        hit = true;
-                        const advance = getMultiplier(dart.modifier);
-                        pos = pos + advance;
-                        if (pos > 11) pos = 11; // Cap at bull stage
-                    }
-                } else {
-                    // Target is bull (position 11)
-                    if (dart.number === 25) {
-                        hit = true;
-                        pos = 12; // Finished!
-                    }
-                }
-
-                lastDartHit = (i === clockDarts.length - 1) && hit;
-            }
-
-            const finished = pos >= 12;
-            const extraTurn = lastDartHit && !finished;
+            const result = processClockDarts(clockDarts, startPos);
 
             // Save history
             clockHistory.push({
                 player: currentPlayer,
                 prevPos: startPos,
-                newPos: pos >= 12 ? 12 : pos,
+                newPos: result.endPosition,
                 darts: [...clockDarts],
                 wasFinished: clockFinished[currentPlayer],
-                extraTurn: extraTurn,
+                extraTurn: result.extraTurn,
                 finishOrderLength: clockFinishOrder.length
             });
 
             // Apply changes
-            clockPosition[currentPlayer] = pos >= 12 ? 12 : pos;
+            clockPosition[currentPlayer] = result.endPosition;
 
-            if (finished && !clockFinished[currentPlayer]) {
+            if (result.finished && !clockFinished[currentPlayer]) {
                 clockFinished[currentPlayer] = true;
                 clockFinishOrder.push(currentPlayer);
             }
@@ -3622,7 +3559,7 @@
             buildClockScoreboard();
 
             // First player to finish wins — game ends immediately
-            if (finished) {
+            if (result.finished) {
                 showWinner();
                 updateClockPrevButton();
                 saveGameState();
@@ -3630,7 +3567,7 @@
             }
 
             // Move to next player (or same player if extra turn)
-            if (extraTurn) {
+            if (result.extraTurn) {
                 // Same player gets another turn
                 updateClockDisplay();
                 const sub = document.getElementById('clockBannerSub');

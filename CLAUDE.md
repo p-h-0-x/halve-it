@@ -14,9 +14,11 @@ This document provides guidance for AI assistants working on this codebase.
 ```
 halve-it/
 ├── src/
-│   └── contracts.js          # Core contract validation logic (shared between app and tests)
+│   ├── contracts.js          # Core contract validation logic (shared between app and tests)
+│   └── clock.js              # Clock mode game logic (shared between app and tests)
 ├── tests/
-│   └── contracts.test.js     # Jest test suite for src/contracts.js
+│   ├── contracts.test.js     # Jest test suite for src/contracts.js
+│   └── clock.test.js         # Jest test suite for src/clock.js
 ├── .github/
 │   └── workflows/
 │       └── tests.yml         # CI: runs tests on Node 18.x and 20.x
@@ -47,6 +49,8 @@ This allows the same code to be `require()`-d by Jest tests and also included vi
 
 **When modifying contract logic**, changes must be made in `src/contracts.js` (not duplicated in `index.html`). The HTML file should reference or inline the contents of `src/contracts.js`.
 
+`src/clock.js` follows the same pattern for Clock mode game logic (dart processing, target advancement, progress calculation). Both modules are loaded via `<script>` tags in `index.html`.
+
 ## Game Modes
 
 ### Classic Mode
@@ -61,6 +65,15 @@ This allows the same code to be `require()`-d by Jest tests and also included vi
 - **Scratch**: Voluntarily give up a contract (scores 0).
 - Game ends when all contracts are filled or scratched.
 - Winner: highest total score.
+
+### Clock Mode
+- Players take turns hitting numbers 1 through 10 in order, then Bull to finish.
+- Doubles count as 2 advances, triples as 3 (e.g., triple 1 = advance from 1 to 4).
+- Advancing past 10 always caps at Bull (position 11) — Bull is never skipped.
+- When target is Bull, hitting single or double bull finishes the game.
+- If the **last dart** of a turn hits the target (without finishing), the player gets an extra turn.
+- First player to finish all targets wins; game ends immediately.
+- Each dart is evaluated against the current target at that point (hits change the target mid-turn).
 
 ## Contracts (in play order)
 
@@ -132,6 +145,28 @@ This allows the same code to be `require()`-d by Jest tests and also included vi
 | `DART_RING_COLORS` | `Object` | Segment → red/green |
 | `DARTBOARD_SEQUENCE` | `number[]` | Clockwise board layout |
 
+## API — `src/clock.js`
+
+| Export | Signature | Purpose |
+|--------|-----------|---------|
+| `getMultiplier` | `(modifier) → number` | Returns 1, 2, or 3 for single/double/triple |
+| `getClockTargetName` | `(position) → string` | Display name for a clock position |
+| `processClockDarts` | `(darts[], startPosition) → Result` | Process darts and return end state |
+| `getClockPreviewTarget` | `(darts[], startPosition) → number` | Preview target after simulating darts |
+| `getClockProgress` | `(position, finished) → number` | Progress percentage (0-100) |
+| `CLOCK_POSITION_BULL` | `11` | Position constant for Bull target |
+| `CLOCK_POSITION_FINISHED` | `12` | Position constant for finished state |
+
+### `processClockDarts` Result Object
+```js
+{
+    endPosition: number,   // Final position after processing all darts
+    lastDartHit: boolean,  // Whether the last dart hit the target
+    finished: boolean,     // Whether the player completed all targets
+    extraTurn: boolean     // Whether the player earns an extra turn
+}
+```
+
 ## Development Workflow
 
 ### Running Tests
@@ -175,9 +210,9 @@ GitHub Actions (`.github/workflows/tests.yml`) runs the full test suite on every
 ## Important Constraints
 
 1. **Do not add runtime dependencies.** The entire point of this project is that it runs offline from a single HTML file. No npm packages, no CDN imports for production.
-2. **Keep contract logic in `src/contracts.js`.** The HTML file should not contain duplicate contract logic.
-3. **Maintain dual-environment compatibility.** Any code in `src/contracts.js` must work in both Node.js (for tests) and browser (for the app) using the `module.exports` guard pattern.
-4. **Test all contract logic changes.** `tests/contracts.test.js` is the source of truth for game rules. When changing contract behavior, update both the implementation and tests.
+2. **Keep game logic in shared modules.** Contract logic in `src/contracts.js`, Clock mode logic in `src/clock.js`. The HTML file should not contain duplicate game logic.
+3. **Maintain dual-environment compatibility.** Any code in `src/*.js` must work in both Node.js (for tests) and browser (for the app) using the `module.exports` guard pattern.
+4. **Test all game logic changes.** `tests/contracts.test.js` and `tests/clock.test.js` are the source of truth for game rules. When changing game behavior, update both the implementation and tests.
 5. **Score calculation for numeric contracts (`20`, `19`, `18`, `17`, `16`, `15`, `14`)**: Only darts that hit the target number contribute to the score — do not sum all darts for these contracts.
 
 ## Multi-Language Support
