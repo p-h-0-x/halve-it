@@ -73,6 +73,7 @@ This allows the same code to be `require()`-d by Jest tests and also included vi
 - When target is Bull, hitting single or double bull finishes the game.
 - If the **last dart** of a turn hits the target (without finishing), the player gets an extra turn.
 - First player to finish all targets wins; game ends immediately.
+- If no one finishes within 10 turns each, the player furthest ahead (highest position) wins. Ties are possible.
 - Each dart is evaluated against the current target at that point (hits change the target mid-turn).
 
 ## Contracts (in play order)
