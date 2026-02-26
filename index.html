@@ -1204,11 +1204,17 @@
             display: inline-block;
             background: rgba(249, 212, 35, 0.3);
             color: #f9d423;
-            padding: 4px 12px;
+            padding: 6px 16px;
             border-radius: 8px;
-            font-size: 0.9em;
+            font-size: 1em;
             font-weight: bold;
             margin-top: 10px;
+            animation: extraTurnPulse 1s ease-in-out 3;
+        }
+
+        @keyframes extraTurnPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
         }
 
         @media (max-width: 600px) {
@@ -1413,6 +1419,7 @@
         <div class="clock-banner hidden" id="clockBanner">
             <h3 id="clockBannerText">Player's Turn</h3>
             <p id="clockBannerSub"></p>
+            <div class="clock-extra-turn hidden" id="clockExtraTurnBadge"></div>
         </div>
 
         <!-- Clock Mode: Scoreboard -->
@@ -3389,6 +3396,9 @@
             const currentPlayer = players[currentPlayerIndex];
             const banner = document.getElementById('clockBannerText');
             const sub = document.getElementById('clockBannerSub');
+            const extraBadge = document.getElementById('clockExtraTurnBadge');
+
+            extraBadge.classList.add('hidden');
 
             if (clockFinished[currentPlayer]) {
                 banner.textContent = `${currentPlayer} - ${t('clockFinished')}`;
@@ -3581,8 +3591,9 @@
             if (result.extraTurn) {
                 // Same player gets another turn
                 updateClockDisplay();
-                const sub = document.getElementById('clockBannerSub');
-                sub.textContent = `${t('clockExtraTurn')} — ${t('clockTarget')} ${getClockTargetName(clockPosition[currentPlayer])}`;
+                const extraBadge = document.getElementById('clockExtraTurnBadge');
+                extraBadge.textContent = `⚡ ${t('clockExtraTurn')}`;
+                extraBadge.classList.remove('hidden');
             } else {
                 moveToNextClockPlayer();
             }
