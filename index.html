@@ -1005,6 +1005,212 @@
             color: #ff6b6b;
         }
 
+        /* Clock Mode */
+        .clock-banner {
+            text-align: center;
+            background: linear-gradient(135deg, #0984e3, #00b894);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .clock-banner h3 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        .clock-banner p {
+            margin: 5px 0 0;
+            opacity: 0.9;
+        }
+
+        .clock-dartboard-section {
+            max-width: 450px;
+            margin: 0 auto 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .clock-darts-display {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .clock-dart-slot {
+            width: 70px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #636e72;
+        }
+
+        .clock-dart-slot.filled {
+            color: #00b894;
+            border-color: #00b894;
+        }
+
+        .clock-modifier-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .clock-modifier-btn {
+            padding: 8px 18px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .clock-modifier-btn.active {
+            background: #0984e3;
+            border-color: #00b894;
+        }
+
+        .clock-number-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .clock-num-btn {
+            padding: 14px 0;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .clock-num-btn:hover {
+            background: rgba(9, 132, 227, 0.5);
+            border-color: #0984e3;
+        }
+
+        .clock-num-btn:active {
+            transform: scale(0.95);
+        }
+
+        .clock-num-btn.target {
+            border-color: #00b894;
+            background: rgba(0, 184, 148, 0.25);
+        }
+
+        .clock-num-btn.miss-btn {
+            grid-column: span 5;
+        }
+
+        .clock-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .clock-scoreboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .clock-player-card {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .clock-player-card.current-turn {
+            border-color: #0984e3;
+            box-shadow: 0 0 15px rgba(9, 132, 227, 0.4);
+        }
+
+        .clock-player-card.finished {
+            opacity: 0.4;
+            border-color: rgba(255,255,255,0.05);
+        }
+
+        .clock-player-card .player-name {
+            font-weight: bold;
+            font-size: 1em;
+            margin-bottom: 4px;
+        }
+
+        .clock-player-card.finished .player-name {
+            text-decoration: line-through;
+        }
+
+        .clock-player-card .player-target {
+            font-size: 0.85em;
+            color: #bbe1fa;
+            margin-bottom: 6px;
+        }
+
+        .clock-progress-bar {
+            width: 100%;
+            height: 14px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 7px;
+            overflow: hidden;
+            margin: 6px 0 4px;
+        }
+
+        .clock-progress-fill {
+            height: 100%;
+            border-radius: 7px;
+            transition: width 0.4s ease;
+            background: linear-gradient(90deg, #0984e3, #00b894);
+        }
+
+        .clock-progress-text {
+            font-size: 0.85em;
+            color: #b2bec3;
+        }
+
+        .clock-finished-badge {
+            display: inline-block;
+            background: #00b894;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.7em;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .clock-extra-turn {
+            display: inline-block;
+            background: rgba(249, 212, 35, 0.3);
+            color: #f9d423;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
         @media (max-width: 600px) {
             .scores-table {
                 font-size: 0.85em;
@@ -1052,6 +1258,14 @@
             .killer-dartboard-section {
                 padding: 15px;
             }
+
+            .clock-scoreboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .clock-dartboard-section {
+                padding: 15px;
+            }
         }
     </style>
 </head>
@@ -1080,6 +1294,10 @@
             <label class="mode-option">
                 <input type="radio" name="gameMode" value="killer" onchange="updateModeDescription()">
                 <span class="mode-label" data-i18n="killer">Killer</span>
+            </label>
+            <label class="mode-option">
+                <input type="radio" name="gameMode" value="clock" onchange="updateModeDescription()">
+                <span class="mode-label" data-i18n="clock">Clock</span>
             </label>
         </div>
         <p class="mode-description" id="modeDescription" data-i18n="classicDesc">Play contracts in order. Hit the target to add score, miss to halve your capital.</p>
@@ -1191,6 +1409,43 @@
             <button class="btn-secondary" onclick="previousKillerTurn()" id="killerPrevBtn" style="display:none;" data-i18n="previousTurn">← Previous Turn</button>
         </div>
 
+        <!-- Clock Mode: Banner -->
+        <div class="clock-banner hidden" id="clockBanner">
+            <h3 id="clockBannerText">Player's Turn</h3>
+            <p id="clockBannerSub"></p>
+        </div>
+
+        <!-- Clock Mode: Scoreboard -->
+        <div class="clock-scoreboard hidden" id="clockScoreboard"></div>
+
+        <!-- Clock Mode: Dart Input -->
+        <div class="clock-dartboard-section hidden" id="clockDartboardSection">
+            <div class="clock-darts-display" id="clockDartsDisplay">
+                <div class="clock-dart-slot" id="clockDart1">-</div>
+                <div class="clock-dart-slot" id="clockDart2">-</div>
+                <div class="clock-dart-slot" id="clockDart3">-</div>
+            </div>
+
+            <div class="clock-modifier-buttons" id="clockModifiers">
+                <button class="clock-modifier-btn active" id="clockSingleBtn" onclick="setClockModifier('single')">Single</button>
+                <button class="clock-modifier-btn" id="clockDoubleBtn" onclick="setClockModifier('double')">Double</button>
+                <button class="clock-modifier-btn" id="clockTripleBtn" onclick="setClockModifier('triple')">Triple</button>
+            </div>
+
+            <div class="clock-number-grid" id="clockNumberGrid"></div>
+
+            <div class="clock-actions" id="clockActions">
+                <button class="btn-secondary" onclick="clearLastClockDart()">← <span data-i18n="undo">Undo</span></button>
+                <button class="btn-secondary" onclick="clearAllClockDarts()"><span data-i18n="clear">Clear</span></button>
+                <button class="btn-success" onclick="submitClockTurn()" id="clockConfirmBtn">✓ <span data-i18n="confirm">Confirm</span></button>
+            </div>
+        </div>
+
+        <!-- Clock Mode: Previous Turn -->
+        <div class="clock-actions hidden" id="clockPrevSection">
+            <button class="btn-secondary" onclick="previousClockTurn()" id="clockPrevBtn" style="display:none;" data-i18n="previousTurn">← Previous Turn</button>
+        </div>
+
         <table class="scores-table">
             <thead id="tableHead"></thead>
             <tbody id="tableBody"></tbody>
@@ -1276,6 +1531,7 @@
         <p style="margin-bottom: 15px;" data-i18n="rulesClassic"><strong>Classic:</strong> Hit the contract target to add your score to your capital. Miss it and your capital is halved!</p>
         <p style="margin-bottom: 15px;" data-i18n="rulesFreeChoice"><strong>Yahtzee Style:</strong> Choose where to register your score each turn. Scratch contracts you can't fill (score 0).</p>
         <p style="margin-bottom: 15px;" data-i18n="rulesKiller"><strong>Killer:</strong> Pick a number, gain lives by hitting it (+3) or adjacent segments (+1). At 9 lives become a Killer and attack others. Doubles x2, Triples x3. Eliminated at -1 life. Last one standing wins!</p>
+        <p style="margin-bottom: 15px;" data-i18n="rulesClock"><strong>Clock:</strong> Hit 1 through 10 in order, then finish with Bull. Doubles advance 2, Triples advance 3. If your last dart hits the target, you get an extra turn! First to finish wins.</p>
         <div class="rules-grid" id="rulesGrid">
             <!-- Rules will be populated by JavaScript -->
         </div>
@@ -1291,9 +1547,11 @@
                 classic: "Classic",
                 freeChoice: "Yahtzee Style",
                 killer: "Killer",
+                clock: "Clock",
                 classicDesc: "Play contracts in order. Hit the target to add score, miss to halve your capital.",
                 freeChoiceDesc: "Choose where to register your score. Fill or scratch contracts freely.",
                 killerDesc: "Pick a number, gain lives, become a Killer, and eliminate your opponents!",
+                clockDesc: "Hit 1 through 10 in order, then finish with Bull. Doubles and triples advance extra! Last dart on target = extra turn.",
                 addPlayers: "Add Players",
                 enterPlayerName: "Enter player name",
                 addPlayer: "Add Player",
@@ -1337,7 +1595,8 @@
                 rulesClassic: "<strong>Classic:</strong> Hit the contract target to add your score to your capital. Miss it and your capital is halved!",
                 rulesFreeChoice: "<strong>Yahtzee Style:</strong> Choose where to register your score each turn. Scratch contracts you can't fill (score 0).",
                 rulesKiller: "<strong>Killer:</strong> Pick a number, gain lives by hitting it (+3) or adjacent segments (+1). At 9 lives become a Killer and attack others. Doubles x2, Triples x3. Eliminated at -1 life. Last one standing wins!",
-                
+                rulesClock: "<strong>Clock:</strong> Hit 1 through 10 in order, then finish with Bull. Doubles advance 2, Triples advance 3. If your last dart hits the target, you get an extra turn! First to finish wins.",
+
                 // Alert
                 selectContractAlert: "Please select a contract to fill or scratch.",
                 invalidScore: "Invalid score for this contract!",
@@ -1361,6 +1620,13 @@
                 enterYourDartsKiller: "Throw your 3 darts",
                 noNumberYet: "?",
                 turnSummaryTitle: "Turn Summary",
+
+                // Clock
+                clockTarget: "Target:",
+                clockFinished: "FINISHED",
+                clockExtraTurn: "Last dart hit! Extra turn!",
+                clockThrowDarts: "Throw your 3 darts",
+                clockBull: "Bull",
 
                 // Contracts
                 contracts: {
@@ -1387,9 +1653,11 @@
                 classic: "Classique",
                 freeChoice: "Yahtzee Style",
                 killer: "Killer",
+                clock: "Clock",
                 classicDesc: "Jouez les contrats dans l'ordre. Réussissez pour ajouter le score, ratez pour diviser votre capital par deux.",
                 freeChoiceDesc: "Choisissez où enregistrer votre score. Remplissez ou barrez les contrats librement.",
                 killerDesc: "Choisissez un numéro, gagnez des vies, devenez un Killer et éliminez vos adversaires !",
+                clockDesc: "Touchez 1 à 10 dans l'ordre, puis finissez avec le Bull. Les doubles et triples avancent plus ! Dernière fléchette sur la cible = tour supplémentaire.",
                 addPlayers: "Ajouter des Joueurs",
                 enterPlayerName: "Nom du joueur",
                 addPlayer: "Ajouter",
@@ -1433,7 +1701,8 @@
                 rulesClassic: "<strong>Classique :</strong> Réussissez le contrat pour ajouter votre score au capital. Ratez et votre capital est divisé par deux !",
                 rulesFreeChoice: "<strong>Yahtzee Style :</strong> Choisissez où enregistrer votre score à chaque tour. Barrez les contrats impossibles (score 0).",
                 rulesKiller: "<strong>Killer :</strong> Choisissez un numéro, gagnez des vies en le touchant (+3) ou les segments adjacents (+1). À 9 vies devenez un Killer et attaquez les autres. Doubles x2, Triples x3. Éliminé à -1 vie. Le dernier debout gagne !",
-                
+                rulesClock: "<strong>Clock :</strong> Touchez 1 à 10 dans l'ordre, puis finissez avec le Bull. Les doubles avancent de 2, les triples de 3. Si votre dernière fléchette touche la cible, tour supplémentaire ! Le premier à finir gagne.",
+
                 // Alert
                 selectContractAlert: "Veuillez sélectionner un contrat à remplir ou barrer.",
                 invalidScore: "Score invalide pour ce contrat !",
@@ -1457,6 +1726,13 @@
                 enterYourDartsKiller: "Lancez vos 3 fléchettes",
                 noNumberYet: "?",
                 turnSummaryTitle: "Résumé du Tour",
+
+                // Clock
+                clockTarget: "Cible :",
+                clockFinished: "TERMINÉ",
+                clockExtraTurn: "Dernière fléchette touchée ! Tour supplémentaire !",
+                clockThrowDarts: "Lancez vos 3 fléchettes",
+                clockBull: "Bull",
 
                 // Contracts
                 contracts: {
@@ -1483,9 +1759,11 @@
                 classic: "Clásico",
                 freeChoice: "Yahtzee Style",
                 killer: "Killer",
+                clock: "Clock",
                 classicDesc: "Juega los contratos en orden. Acierta para sumar puntos, falla para dividir tu capital a la mitad.",
                 freeChoiceDesc: "Elige dónde registrar tu puntuación. Completa o tacha contratos libremente.",
                 killerDesc: "¡Elige un número, gana vidas, conviértete en Killer y elimina a tus oponentes!",
+                clockDesc: "¡Acierta del 1 al 10 en orden, luego termina con Bull. Dobles y triples avanzan más! Último dardo en el objetivo = turno extra.",
                 addPlayers: "Añadir Jugadores",
                 enterPlayerName: "Nombre del jugador",
                 addPlayer: "Añadir",
@@ -1529,7 +1807,8 @@
                 rulesClassic: "<strong>Clásico:</strong> Acierta el contrato para sumar tu puntuación al capital. ¡Falla y tu capital se divide a la mitad!",
                 rulesFreeChoice: "<strong>Yahtzee Style:</strong> Elige dónde registrar tu puntuación cada turno. Tacha los contratos que no puedas completar (puntuación 0).",
                 rulesKiller: "<strong>Killer:</strong> Elige un número, gana vidas tocándolo (+3) o segmentos adyacentes (+1). A 9 vidas conviértete en Killer y ataca a los demás. Dobles x2, Triples x3. Eliminado a -1 vida. ¡El último en pie gana!",
-                
+                rulesClock: "<strong>Clock:</strong> Acierta del 1 al 10 en orden, luego termina con Bull. Los dobles avanzan 2, los triples 3. Si tu último dardo acierta, ¡turno extra! El primero en terminar gana.",
+
                 // Alert
                 selectContractAlert: "Por favor, selecciona un contrato para completar o tachar.",
                 invalidScore: "¡Puntuación inválida para este contrato!",
@@ -1553,6 +1832,13 @@
                 enterYourDartsKiller: "Lanza tus 3 dardos",
                 noNumberYet: "?",
                 turnSummaryTitle: "Resumen del Turno",
+
+                // Clock
+                clockTarget: "Objetivo:",
+                clockFinished: "TERMINADO",
+                clockExtraTurn: "¡Último dardo acertado! ¡Turno extra!",
+                clockThrowDarts: "Lanza tus 3 dardos",
+                clockBull: "Bull",
 
                 // Contracts
                 contracts: {
@@ -1602,6 +1888,14 @@
         let killerDarts = [];
         let killerModifier = 'single';
 
+        // Clock state
+        let clockPosition = {};   // { playerName: currentTarget (1-10, then 11=bull) }
+        let clockFinished = {};   // { playerName: boolean }
+        let clockHistory = [];    // Turn history for undo
+        let clockDarts = [];
+        let clockModifier = 'single';
+        let clockFinishOrder = []; // Track finish order for ranking
+
         // Dart input state
         let dartInputTargetField = null;
         let currentDarts = [];
@@ -1634,6 +1928,12 @@
                 killerEliminated: killerEliminated,
                 killerPhase: killerPhase,
                 killerHistory: killerHistory,
+
+                // Clock state
+                clockPosition: clockPosition,
+                clockFinished: clockFinished,
+                clockHistory: clockHistory,
+                clockFinishOrder: clockFinishOrder,
 
                 // UI state
                 isGameStarted: document.getElementById('gameBoard').style.display !== 'none',
@@ -1677,6 +1977,12 @@
                 killerEliminated = gameState.killerEliminated || {};
                 killerPhase = gameState.killerPhase || 'number';
                 killerHistory = gameState.killerHistory || [];
+
+                // Restore clock state
+                clockPosition = gameState.clockPosition || {};
+                clockFinished = gameState.clockFinished || {};
+                clockHistory = gameState.clockHistory || [];
+                clockFinishOrder = gameState.clockFinishOrder || [];
 
                 // Apply language (pass true to prevent saving during load)
                 setLanguage(currentLang, true);
@@ -1808,6 +2114,23 @@
                             document.getElementById('killerPrevSection').classList.add('hidden');
                             showWinner();
                         }
+                    } else if (gameMode === 'clock') {
+                        hideAllModeSections();
+                        document.getElementById('clockBanner').classList.remove('hidden');
+                        document.getElementById('clockDartboardSection').classList.remove('hidden');
+                        document.getElementById('clockScoreboard').classList.remove('hidden');
+                        document.getElementById('clockPrevSection').classList.remove('hidden');
+                        document.querySelector('.scores-table').style.display = 'none';
+
+                        updateClockDisplay();
+                        buildClockScoreboard();
+                        updateClockPrevButton();
+
+                        if (gameState.isWinnerShown) {
+                            document.getElementById('clockDartboardSection').classList.add('hidden');
+                            document.getElementById('clockPrevSection').classList.add('hidden');
+                            showWinner();
+                        }
                     }
                 } else {
                     // Still in setup phase
@@ -1873,7 +2196,7 @@
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[currentLang][key]) {
-                    if (key === 'rulesClassic' || key === 'rulesFreeChoice') {
+                    if (key === 'rulesClassic' || key === 'rulesFreeChoice' || key === 'rulesKiller' || key === 'rulesClock') {
                         el.innerHTML = translations[currentLang][key];
                     } else {
                         el.textContent = translations[currentLang][key];
@@ -1905,6 +2228,7 @@
             if (mode === 'classic') desc.textContent = t('classicDesc');
             else if (mode === 'yahtzee') desc.textContent = t('freeChoiceDesc');
             else if (mode === 'killer') desc.textContent = t('killerDesc');
+            else if (mode === 'clock') desc.textContent = t('clockDesc');
         }
 
         function addPlayer() {
@@ -1949,6 +2273,10 @@
             document.getElementById('killerScoreboard').classList.add('hidden');
             document.getElementById('killerTurnSummary').classList.add('hidden');
             document.getElementById('killerPrevSection').classList.add('hidden');
+            document.getElementById('clockBanner').classList.add('hidden');
+            document.getElementById('clockDartboardSection').classList.add('hidden');
+            document.getElementById('clockScoreboard').classList.add('hidden');
+            document.getElementById('clockPrevSection').classList.add('hidden');
             document.querySelector('.scores-table').style.display = '';
         }
 
@@ -2010,6 +2338,24 @@
                 document.querySelector('.scores-table').style.display = 'none';
                 updateKillerDisplay();
                 buildKillerScoreboard();
+            } else if (gameMode === 'clock') {
+                clockPosition = {};
+                clockFinished = {};
+                clockHistory = [];
+                clockDarts = [];
+                clockModifier = 'single';
+                clockFinishOrder = [];
+                players.forEach(p => {
+                    clockPosition[p] = 1;
+                    clockFinished[p] = false;
+                });
+                document.getElementById('clockBanner').classList.remove('hidden');
+                document.getElementById('clockDartboardSection').classList.remove('hidden');
+                document.getElementById('clockScoreboard').classList.remove('hidden');
+                document.getElementById('clockPrevSection').classList.remove('hidden');
+                document.querySelector('.scores-table').style.display = 'none';
+                updateClockDisplay();
+                buildClockScoreboard();
             }
             saveGameState();
         }
@@ -2106,6 +2452,10 @@
                 document.getElementById('killerDartboardSection').classList.remove('hidden');
                 document.getElementById('killerPrevSection').classList.remove('hidden');
                 previousKillerTurn();
+            } else if (gameMode === 'clock') {
+                document.getElementById('clockDartboardSection').classList.remove('hidden');
+                document.getElementById('clockPrevSection').classList.remove('hidden');
+                previousClockTurn();
             }
         }
 
@@ -3026,6 +3376,321 @@
             btn.style.display = killerHistory.length > 0 ? 'inline-block' : 'none';
         }
 
+        // ==================== CLOCK MODE ====================
+
+        function getClockTargetName(position) {
+            if (position <= 10) return String(position);
+            return t('clockBull');
+        }
+
+        function updateClockDisplay() {
+            const currentPlayer = players[currentPlayerIndex];
+            const banner = document.getElementById('clockBannerText');
+            const sub = document.getElementById('clockBannerSub');
+
+            if (clockFinished[currentPlayer]) {
+                banner.textContent = `${currentPlayer} - ${t('clockFinished')}`;
+                sub.textContent = '';
+            } else {
+                banner.textContent = `${currentPlayer}${t('playerTurn')}`;
+                const targetName = getClockTargetName(clockPosition[currentPlayer]);
+                sub.textContent = `${t('clockTarget')} ${targetName}`;
+            }
+
+            clearAllClockDarts();
+        }
+
+        function buildClockScoreboard() {
+            const board = document.getElementById('clockScoreboard');
+            board.innerHTML = players.map(player => {
+                const pos = clockPosition[player] || 1;
+                const finished = clockFinished[player];
+                const isCurrent = player === players[currentPlayerIndex];
+                const progress = finished ? 100 : ((pos - 1) / 11) * 100;
+                const targetName = finished ? t('clockFinished') : getClockTargetName(pos);
+
+                let classes = 'clock-player-card';
+                if (isCurrent && !finished) classes += ' current-turn';
+                if (finished) classes += ' finished';
+
+                let finishRank = '';
+                if (finished) {
+                    const rank = clockFinishOrder.indexOf(player) + 1;
+                    if (rank > 0) finishRank = `<div class="clock-finished-badge">#${rank}</div>`;
+                }
+
+                return `
+                    <div class="${classes}">
+                        <div class="player-name">${player}</div>
+                        <div class="player-target">${targetName}</div>
+                        <div class="clock-progress-bar">
+                            <div class="clock-progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        ${finishRank}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getClockPreviewTarget() {
+            const currentPlayer = players[currentPlayerIndex];
+            let pos = clockPosition[currentPlayer] || 1;
+
+            // Simulate processing already-entered darts to get the preview target
+            for (let i = 0; i < clockDarts.length; i++) {
+                const dart = clockDarts[i];
+                if (pos > 11) break; // Already finished
+
+                if (pos <= 10) {
+                    if (dart.number === pos) {
+                        const advance = getMultiplier(dart.modifier);
+                        pos = pos + advance;
+                        if (pos > 11) pos = 11; // Cap at bull stage
+                    }
+                } else {
+                    // Target is bull (position 11)
+                    if (dart.number === 25) {
+                        pos = 12; // Finished
+                    }
+                }
+            }
+            return pos;
+        }
+
+        function buildClockNumberGrid() {
+            const grid = document.getElementById('clockNumberGrid');
+            const target = getClockPreviewTarget();
+            const modifiers = document.getElementById('clockModifiers');
+
+            let html = '';
+            if (target >= 12) {
+                // Player already finished mid-turn - only show miss
+                html += `<button class="clock-num-btn miss-btn" onclick="addClockDart(0)">${t('miss')}</button>`;
+                modifiers.classList.add('hidden');
+            } else if (target > 10) {
+                // Target is Bull - show Bull + Miss, hide modifiers
+                html += `<button class="clock-num-btn target" onclick="addClockDart(25)">${t('clockBull')}</button>`;
+                html += `<button class="clock-num-btn miss-btn" onclick="addClockDart(0)">${t('miss')}</button>`;
+                modifiers.classList.add('hidden');
+            } else {
+                // Target is a number 1-10 - show target + miss, show modifiers
+                html += `<button class="clock-num-btn target" onclick="addClockDart(${target})">${target}</button>`;
+                html += `<button class="clock-num-btn miss-btn" onclick="addClockDart(0)">${t('miss')}</button>`;
+                modifiers.classList.remove('hidden');
+            }
+
+            grid.innerHTML = html;
+        }
+
+        function setClockModifier(modifier) {
+            clockModifier = modifier;
+            document.getElementById('clockSingleBtn').classList.remove('active');
+            document.getElementById('clockDoubleBtn').classList.remove('active');
+            document.getElementById('clockTripleBtn').classList.remove('active');
+            document.getElementById('clock' + modifier.charAt(0).toUpperCase() + modifier.slice(1) + 'Btn').classList.add('active');
+        }
+
+        function addClockDart(number) {
+            if (clockDarts.length >= 3) return;
+
+            let score = number;
+            let displayText = '';
+            let modifier = clockModifier;
+
+            if (number === 25) {
+                if (clockModifier === 'double') {
+                    score = 50;
+                    displayText = 'Bull×2';
+                } else {
+                    score = 25;
+                    displayText = 'Bull';
+                    modifier = 'single';
+                }
+            } else if (number === 0) {
+                score = 0;
+                displayText = t('miss');
+                modifier = 'miss';
+            } else {
+                if (clockModifier === 'double') {
+                    score = number * 2;
+                    displayText = `D${number}`;
+                } else if (clockModifier === 'triple') {
+                    score = number * 3;
+                    displayText = `T${number}`;
+                } else {
+                    score = number;
+                    displayText = `${number}`;
+                }
+            }
+
+            clockDarts.push({ number, modifier, score, displayText });
+            updateClockDartsDisplay();
+            setClockModifier('single');
+            buildClockNumberGrid();
+        }
+
+        function clearLastClockDart() {
+            if (clockDarts.length > 0) {
+                clockDarts.pop();
+                updateClockDartsDisplay();
+                buildClockNumberGrid();
+            }
+        }
+
+        function clearAllClockDarts() {
+            clockDarts = [];
+            clockModifier = 'single';
+            setClockModifier('single');
+            updateClockDartsDisplay();
+            buildClockNumberGrid();
+        }
+
+        function updateClockDartsDisplay() {
+            for (let i = 1; i <= 3; i++) {
+                const slot = document.getElementById(`clockDart${i}`);
+                if (clockDarts.length >= i) {
+                    slot.textContent = clockDarts[i - 1].displayText;
+                    slot.classList.add('filled');
+                } else {
+                    slot.textContent = '-';
+                    slot.classList.remove('filled');
+                }
+            }
+        }
+
+        function getMultiplier(modifier) {
+            if (modifier === 'double') return 2;
+            if (modifier === 'triple') return 3;
+            return 1;
+        }
+
+        function submitClockTurn() {
+            if (clockDarts.length === 0) return;
+
+            const currentPlayer = players[currentPlayerIndex];
+            const startPos = clockPosition[currentPlayer];
+            let pos = startPos;
+            let lastDartHit = false;
+
+            // Process each dart
+            for (let i = 0; i < clockDarts.length; i++) {
+                const dart = clockDarts[i];
+                if (pos > 11) break; // Already finished
+
+                let hit = false;
+                if (pos <= 10) {
+                    // Target is a number 1-10
+                    if (dart.number === pos) {
+                        hit = true;
+                        const advance = getMultiplier(dart.modifier);
+                        pos = pos + advance;
+                        if (pos > 11) pos = 11; // Cap at bull stage
+                    }
+                } else {
+                    // Target is bull (position 11)
+                    if (dart.number === 25) {
+                        hit = true;
+                        pos = 12; // Finished!
+                    }
+                }
+
+                lastDartHit = (i === clockDarts.length - 1) && hit;
+            }
+
+            const finished = pos >= 12;
+            const extraTurn = lastDartHit && !finished;
+
+            // Save history
+            clockHistory.push({
+                player: currentPlayer,
+                prevPos: startPos,
+                newPos: pos >= 12 ? 12 : pos,
+                darts: [...clockDarts],
+                wasFinished: clockFinished[currentPlayer],
+                extraTurn: extraTurn,
+                finishOrderLength: clockFinishOrder.length
+            });
+
+            // Apply changes
+            clockPosition[currentPlayer] = pos >= 12 ? 12 : pos;
+
+            if (finished && !clockFinished[currentPlayer]) {
+                clockFinished[currentPlayer] = true;
+                clockFinishOrder.push(currentPlayer);
+            }
+
+            buildClockScoreboard();
+
+            // First player to finish wins — game ends immediately
+            if (finished) {
+                showWinner();
+                updateClockPrevButton();
+                saveGameState();
+                return;
+            }
+
+            // Move to next player (or same player if extra turn)
+            if (extraTurn) {
+                // Same player gets another turn
+                updateClockDisplay();
+                const sub = document.getElementById('clockBannerSub');
+                sub.textContent = `${t('clockExtraTurn')} — ${t('clockTarget')} ${getClockTargetName(clockPosition[currentPlayer])}`;
+            } else {
+                moveToNextClockPlayer();
+            }
+
+            updateClockPrevButton();
+            saveGameState();
+        }
+
+        function moveToNextClockPlayer() {
+            const startIdx = currentPlayerIndex;
+            do {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+                if (!clockFinished[players[currentPlayerIndex]]) {
+                    updateClockDisplay();
+                    buildClockScoreboard();
+                    return;
+                }
+            } while (currentPlayerIndex !== startIdx);
+
+            // All finished
+            showWinner();
+        }
+
+        function previousClockTurn() {
+            if (clockHistory.length === 0) return;
+
+            const last = clockHistory.pop();
+
+            // Restore position
+            clockPosition[last.player] = last.prevPos;
+
+            // Undo finish if needed
+            if (clockFinished[last.player] && !last.wasFinished) {
+                clockFinished[last.player] = false;
+                clockFinishOrder = clockFinishOrder.filter(p => p !== last.player);
+            }
+
+            // Restore player index
+            currentPlayerIndex = players.indexOf(last.player);
+
+            // Hide winner if shown
+            document.getElementById('winnerSection').style.display = 'none';
+            document.getElementById('clockDartboardSection').classList.remove('hidden');
+            document.getElementById('clockPrevSection').classList.remove('hidden');
+
+            updateClockDisplay();
+            buildClockScoreboard();
+            updateClockPrevButton();
+            saveGameState();
+        }
+
+        function updateClockPrevButton() {
+            const btn = document.getElementById('clockPrevBtn');
+            btn.style.display = clockHistory.length > 0 ? 'inline-block' : 'none';
+        }
+
         // ==================== COMMON ====================
 
         function showWinner() {
@@ -3042,6 +3707,10 @@
                 document.getElementById('killerDartboardSection').classList.add('hidden');
                 document.getElementById('killerPrevSection').classList.add('hidden');
                 document.getElementById('editScoresBtn').style.display = killerHistory.length > 0 ? 'inline-block' : 'none';
+            } else if (gameMode === 'clock') {
+                document.getElementById('clockDartboardSection').classList.add('hidden');
+                document.getElementById('clockPrevSection').classList.add('hidden');
+                document.getElementById('editScoresBtn').style.display = clockHistory.length > 0 ? 'inline-block' : 'none';
             }
 
             const winnerSection = document.getElementById('winnerSection');
@@ -3052,6 +3721,10 @@
                 const winnerName = alivePlayers.length === 1 ? alivePlayers[0] : players[0];
                 document.getElementById('winnerName').textContent = `🎉 ${winnerName} ${t('wins')} 🎉`;
                 document.getElementById('winnerScore').textContent = `${killerLives[winnerName]} ${t('lives')}`;
+            } else if (gameMode === 'clock') {
+                const winnerName = clockFinishOrder.length > 0 ? clockFinishOrder[0] : players[0];
+                document.getElementById('winnerName').textContent = `🎉 ${winnerName} ${t('wins')} 🎉`;
+                document.getElementById('winnerScore').textContent = '';
             } else {
                 let highScore = -Infinity;
                 players.forEach(player => {
@@ -3105,6 +3778,13 @@
             killerHistory = [];
             killerDarts = [];
             killerModifier = 'single';
+
+            clockPosition = {};
+            clockFinished = {};
+            clockHistory = [];
+            clockDarts = [];
+            clockModifier = 'single';
+            clockFinishOrder = [];
 
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('gameBoard').style.display = 'none';
