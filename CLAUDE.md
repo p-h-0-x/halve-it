@@ -155,8 +155,10 @@ This allows the same code to be `require()`-d by Jest tests and also included vi
 | `processClockDarts` | `(darts[], startPosition) → Result` | Process darts and return end state |
 | `getClockPreviewTarget` | `(darts[], startPosition) → number` | Preview target after simulating darts |
 | `getClockProgress` | `(position, finished) → number` | Progress percentage (0-100) |
+| `determineClockWinner` | `(players[], positions, finishOrder[]) → Result` | Determine winner(s) at game end |
 | `CLOCK_POSITION_BULL` | `11` | Position constant for Bull target |
 | `CLOCK_POSITION_FINISHED` | `12` | Position constant for finished state |
+| `CLOCK_MAX_TURNS` | `10` | Maximum turns per player before game ends |
 
 ### `processClockDarts` Result Object
 ```js
@@ -165,6 +167,14 @@ This allows the same code to be `require()`-d by Jest tests and also included vi
     lastDartHit: boolean,  // Whether the last dart hit the target
     finished: boolean,     // Whether the player completed all targets
     extraTurn: boolean     // Whether the player earns an extra turn
+}
+```
+
+### `determineClockWinner` Result Object
+```js
+{
+    winners: string[],     // Array of winner name(s) — multiple if tied
+    isTie: boolean         // Whether the result is a tie
 }
 ```
 

@@ -9,6 +9,7 @@
  * - When target is Bull, hitting single or double bull finishes
  * - Last dart hitting target (without finishing) grants an extra turn
  * - First player to finish wins; game ends immediately
+ * - If no one finishes within 10 turns each, the player furthest ahead wins; ties possible
  * - Each dart is evaluated against the current target at that point
  * - Darts that don't match the current target are misses (no effect)
  */
@@ -16,11 +17,13 @@
 const {
     CLOCK_POSITION_BULL,
     CLOCK_POSITION_FINISHED,
+    CLOCK_MAX_TURNS,
     getMultiplier,
     getClockTargetName,
     processClockDarts,
     getClockPreviewTarget,
-    getClockProgress
+    getClockProgress,
+    determineClockWinner
 } = require('../src/clock');
 
 // Helper to create a dart object for clock mode tests
@@ -43,6 +46,10 @@ describe('Clock mode constants', () => {
 
     test('Finished position is 12', () => {
         expect(CLOCK_POSITION_FINISHED).toBe(12);
+    });
+
+    test('Max turns per player is 10', () => {
+        expect(CLOCK_MAX_TURNS).toBe(10);
     });
 });
 
@@ -454,5 +461,127 @@ describe('getClockProgress', () => {
 
     test('finished flag overrides position', () => {
         expect(getClockProgress(5, true)).toBe(100);
+    });
+});
+
+// ============================================================================
+// determineClockWinner - Winner determination with turn limit
+// ============================================================================
+
+describe('determineClockWinner', () => {
+    describe('when a player finishes', () => {
+        test('first finisher wins', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob'],
+                { Alice: 12, Bob: 5 },
+                ['Alice']
+            );
+            expect(result.winners).toEqual(['Alice']);
+            expect(result.isTie).toBe(false);
+        });
+
+        test('first finisher wins even if others are ahead in position', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob', 'Charlie'],
+                { Alice: 12, Bob: 11, Charlie: 12 },
+                ['Charlie', 'Alice']
+            );
+            expect(result.winners).toEqual(['Charlie']);
+            expect(result.isTie).toBe(false);
+        });
+    });
+
+    describe('when no one finishes (turn limit reached)', () => {
+        test('player with highest position wins', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob'],
+                { Alice: 8, Bob: 5 },
+                []
+            );
+            expect(result.winners).toEqual(['Alice']);
+            expect(result.isTie).toBe(false);
+        });
+
+        test('player at Bull beats player at number', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob'],
+                { Alice: 11, Bob: 9 },
+                []
+            );
+            expect(result.winners).toEqual(['Alice']);
+            expect(result.isTie).toBe(false);
+        });
+
+        test('two players tied at same position', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob'],
+                { Alice: 7, Bob: 7 },
+                []
+            );
+            expect(result.winners).toEqual(['Alice', 'Bob']);
+            expect(result.isTie).toBe(true);
+        });
+
+        test('three players tied at same position', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob', 'Charlie'],
+                { Alice: 5, Bob: 5, Charlie: 5 },
+                []
+            );
+            expect(result.winners).toEqual(['Alice', 'Bob', 'Charlie']);
+            expect(result.isTie).toBe(true);
+        });
+
+        test('two of three players tied, third behind', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob', 'Charlie'],
+                { Alice: 9, Bob: 3, Charlie: 9 },
+                []
+            );
+            expect(result.winners).toEqual(['Alice', 'Charlie']);
+            expect(result.isTie).toBe(true);
+        });
+
+        test('player with no position entry defaults to position 1', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob'],
+                { Alice: 5 },
+                []
+            );
+            expect(result.winners).toEqual(['Alice']);
+            expect(result.isTie).toBe(false);
+        });
+
+        test('all players at starting position is a tie', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob'],
+                { Alice: 1, Bob: 1 },
+                []
+            );
+            expect(result.winners).toEqual(['Alice', 'Bob']);
+            expect(result.isTie).toBe(true);
+        });
+    });
+
+    describe('edge cases', () => {
+        test('single player always wins', () => {
+            const result = determineClockWinner(
+                ['Alice'],
+                { Alice: 3 },
+                []
+            );
+            expect(result.winners).toEqual(['Alice']);
+            expect(result.isTie).toBe(false);
+        });
+
+        test('null finishOrder treated as empty', () => {
+            const result = determineClockWinner(
+                ['Alice', 'Bob'],
+                { Alice: 8, Bob: 5 },
+                null
+            );
+            expect(result.winners).toEqual(['Alice']);
+            expect(result.isTie).toBe(false);
+        });
     });
 });

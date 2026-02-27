@@ -8,6 +8,7 @@
  * - When target is Bull (position 11), hitting single or double bull finishes
  * - If the last dart of a turn hits the current target (and player hasn't finished), extra turn
  * - First player to finish all targets wins; game ends immediately
+ * - If no one finishes within 10 turns each, the player furthest ahead wins; ties possible
  * - Each dart is evaluated against the current target at that point in the turn
  */
 
@@ -16,6 +17,11 @@
  */
 const CLOCK_POSITION_BULL = 11;
 const CLOCK_POSITION_FINISHED = 12;
+
+/**
+ * Maximum number of turns per player before the game ends
+ */
+const CLOCK_MAX_TURNS = 10;
 
 /**
  * Get the multiplier for a dart modifier
@@ -115,15 +121,42 @@ function getClockProgress(position, finished) {
     return ((position - 1) / 11) * 100;
 }
 
+/**
+ * Determine the winner(s) of a clock game.
+ * If any player finished, the first finisher wins.
+ * Otherwise, the player(s) with the highest position win. Ties are possible.
+ *
+ * @param {string[]} players - Array of player names
+ * @param {Object} positions - Map of player name to clock position (1-12)
+ * @param {string[]} finishOrder - Ordered array of players who finished
+ * @returns {Object} { winners: string[], isTie: boolean }
+ */
+function determineClockWinner(players, positions, finishOrder) {
+    if (finishOrder && finishOrder.length > 0) {
+        return { winners: [finishOrder[0]], isTie: false };
+    }
+
+    let highPos = 0;
+    players.forEach(p => {
+        const pos = positions[p] || 1;
+        if (pos > highPos) highPos = pos;
+    });
+
+    const winners = players.filter(p => (positions[p] || 1) === highPos);
+    return { winners, isTie: winners.length > 1 };
+}
+
 // Export for Node.js (tests) while keeping browser globals
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         CLOCK_POSITION_BULL,
         CLOCK_POSITION_FINISHED,
+        CLOCK_MAX_TURNS,
         getMultiplier,
         getClockTargetName,
         processClockDarts,
         getClockPreviewTarget,
-        getClockProgress
+        getClockProgress,
+        determineClockWinner
     };
 }

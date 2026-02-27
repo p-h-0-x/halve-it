@@ -3580,9 +3580,9 @@
                 return;
             }
 
-            // Check if all players have completed 10 turns
+            // Check if all players have completed max turns
             const allPlayersAt10 = players.every(p => {
-                return clockFinished[p] || clockHistory.filter(h => h.player === p).length >= 10;
+                return clockFinished[p] || clockHistory.filter(h => h.player === p).length >= CLOCK_MAX_TURNS;
             });
             if (allPlayersAt10) {
                 showWinner();
@@ -3612,7 +3612,7 @@
                 currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
                 const p = players[currentPlayerIndex];
                 const playerTurns = clockHistory.filter(h => h.player === p).length;
-                if (!clockFinished[p] && playerTurns < 10) {
+                if (!clockFinished[p] && playerTurns < CLOCK_MAX_TURNS) {
                     updateClockDisplay();
                     buildClockScoreboard();
                     return;
@@ -3687,28 +3687,22 @@
                 document.getElementById('winnerName').textContent = `🎉 ${winnerName} ${t('wins')} 🎉`;
                 document.getElementById('winnerScore').textContent = `${killerLives[winnerName]} ${t('lives')}`;
             } else if (gameMode === 'clock') {
-                if (clockFinishOrder.length > 0) {
-                    // Someone finished — first finisher wins
-                    const winnerName = clockFinishOrder[0];
+                const result = determineClockWinner(players, clockPosition, clockFinishOrder);
+                if (!result.isTie) {
+                    const winnerName = result.winners[0];
                     const winnerTurns = clockHistory.filter(h => h.player === winnerName).length;
                     document.getElementById('winnerName').textContent = `🎉 ${winnerName} ${t('wins')} 🎉`;
-                    document.getElementById('winnerScore').textContent = `${t('clockTurn')} ${winnerTurns}`;
-                } else {
-                    // Turn limit reached — winner by highest position
-                    let highPos = 0;
-                    players.forEach(p => {
-                        const pos = clockPosition[p] || 1;
-                        if (pos > highPos) highPos = pos;
-                    });
-                    const winners = players.filter(p => (clockPosition[p] || 1) === highPos);
-                    const targetName = getClockTargetName(highPos);
-                    if (winners.length > 1) {
-                        document.getElementById('winnerName').textContent = t('itsATie');
-                        document.getElementById('winnerScore').textContent = `${winners.join(' & ')} — ${t('clockTarget')} ${targetName}`;
+                    if (clockFinishOrder.length > 0) {
+                        document.getElementById('winnerScore').textContent = `${t('clockTurn')} ${winnerTurns}`;
                     } else {
-                        document.getElementById('winnerName').textContent = `🎉 ${winners[0]} ${t('wins')} 🎉`;
+                        const targetName = getClockTargetName(clockPosition[winnerName] || 1);
                         document.getElementById('winnerScore').textContent = `${t('clockTarget')} ${targetName}`;
                     }
+                } else {
+                    const highPos = clockPosition[result.winners[0]] || 1;
+                    const targetName = getClockTargetName(highPos);
+                    document.getElementById('winnerName').textContent = t('itsATie');
+                    document.getElementById('winnerScore').textContent = `${result.winners.join(' & ')} — ${t('clockTarget')} ${targetName}`;
                 }
             } else {
                 let highScore = -Infinity;
