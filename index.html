@@ -1546,6 +1546,7 @@
 
     <script src="src/contracts.js"></script>
     <script src="src/clock.js"></script>
+    <script src="src/killer.js"></script>
     <script>
         // ==================== TRANSLATIONS ====================
         const translations = {
@@ -2971,15 +2972,7 @@
         }
 
         // ==================== KILLER MODE ====================
-
-        function getAdjacentNumbers(num) {
-            if (num === 0 || num === 25) return [];
-            const idx = DARTBOARD_SEQUENCE.indexOf(num);
-            if (idx === -1) return [];
-            const left = DARTBOARD_SEQUENCE[(idx - 1 + DARTBOARD_SEQUENCE.length) % DARTBOARD_SEQUENCE.length];
-            const right = DARTBOARD_SEQUENCE[(idx + 1) % DARTBOARD_SEQUENCE.length];
-            return [left, right];
-        }
+        // Pure game logic (getAdjacentNumbers, processKillerDarts, etc.) is in src/killer.js
 
         function buildKillerNumberGrid() {
             const grid = document.getElementById('killerNumberGrid');
@@ -3218,49 +3211,14 @@
             }
         }
 
-        function processKillerDarts(thrower, darts) {
-            const changes = [];
-            const throwerNum = killerNumbers[thrower];
-            const throwerAdj = getAdjacentNumbers(throwerNum);
-            let isThrowerKiller = killerIsKiller[thrower];
-            let runningLives = killerLives[thrower];
-
-            for (const dart of darts) {
-                if (dart.number === 0 || dart.number === 25) continue;
-
-                const multiplier = getMultiplier(dart.modifier);
-                const wasKillerBeforeDart = isThrowerKiller;
-
-                let livesGained = 0;
-                if (dart.number === throwerNum) {
-                    livesGained = 3 * multiplier;
-                    changes.push({ player: thrower, delta: livesGained, reason: 'own' });
-                } else if (throwerAdj.includes(dart.number)) {
-                    livesGained = 1 * multiplier;
-                    changes.push({ player: thrower, delta: livesGained, reason: 'adjacent' });
-                }
-
-                runningLives += livesGained;
-                if (!isThrowerKiller && runningLives >= 9) {
-                    isThrowerKiller = true;
-                }
-
-                if (wasKillerBeforeDart) {
-                    for (const otherPlayer of players) {
-                        if (otherPlayer === thrower || killerEliminated[otherPlayer]) continue;
-                        const otherNum = killerNumbers[otherPlayer];
-                        const otherAdj = getAdjacentNumbers(otherNum);
-
-                        if (dart.number === otherNum) {
-                            changes.push({ player: otherPlayer, delta: -3 * multiplier, reason: 'killed' });
-                        } else if (otherAdj.includes(dart.number)) {
-                            changes.push({ player: otherPlayer, delta: -1 * multiplier, reason: 'adj-killed' });
-                        }
-                    }
-                }
-            }
-
-            return changes;
+        function _processKillerDarts(thrower, darts) {
+            return processKillerDarts(thrower, darts, {
+                players,
+                killerNumbers,
+                killerIsKiller,
+                killerLives,
+                killerEliminated
+            });
         }
 
         function submitKillerTurn() {
@@ -3277,30 +3235,19 @@
                 eliminatedBefore: { ...killerEliminated }
             };
 
-            const changes = processKillerDarts(currentPlayer, killerDarts);
+            const changes = _processKillerDarts(currentPlayer, killerDarts);
+            const result = applyKillerChanges(changes, killerLives, killerIsKiller, killerEliminated);
 
+            killerLives = result.lives;
+            killerIsKiller = result.isKiller;
+            killerEliminated = result.eliminated;
+            const newlyEliminated = result.newlyEliminated;
+
+            // Build aggregated for turn summary display
             const aggregated = {};
             for (const c of changes) {
                 if (!aggregated[c.player]) aggregated[c.player] = 0;
                 aggregated[c.player] += c.delta;
-            }
-
-            for (const [player, delta] of Object.entries(aggregated)) {
-                killerLives[player] = Math.min(killerLives[player] + delta, 9);
-            }
-
-            for (const player of players) {
-                if (!killerEliminated[player] && killerLives[player] >= 9) {
-                    killerIsKiller[player] = true;
-                }
-            }
-
-            const newlyEliminated = [];
-            for (const player of players) {
-                if (!killerEliminated[player] && killerLives[player] <= -1) {
-                    killerEliminated[player] = true;
-                    newlyEliminated.push(player);
-                }
             }
 
             killerHistory.push(snapshot);
