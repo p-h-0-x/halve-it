@@ -341,6 +341,233 @@
             margin-bottom: 15px;
         }
 
+        /* ==================== TOURNAMENT STYLES ==================== */
+
+        .tournament-toggle {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .tournament-toggle input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .tournament-hub {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tournament-hub.hidden {
+            display: none;
+        }
+
+        .tournament-hub h2 {
+            text-align: center;
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+
+        .bracket-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 20px 0;
+            min-height: 200px;
+            align-items: flex-start;
+        }
+
+        .bracket-round {
+            display: flex;
+            flex-direction: column;
+            min-width: 170px;
+            flex-shrink: 0;
+        }
+
+        .bracket-round-title {
+            text-align: center;
+            color: #3282b8;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            padding: 5px 10px;
+            background: rgba(50, 130, 184, 0.2);
+            border-radius: 8px;
+        }
+
+        .bracket-match {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #636e72;
+            transition: all 0.3s ease;
+        }
+
+        .bracket-match.completed {
+            border-left-color: #00b894;
+        }
+
+        .bracket-match.in-progress {
+            border-left-color: #e94560;
+            box-shadow: 0 0 10px rgba(233, 69, 96, 0.3);
+        }
+
+        .bracket-match.bye {
+            border-style: dashed;
+            border-left-style: dashed;
+            border-color: rgba(255, 255, 255, 0.15);
+            opacity: 0.7;
+        }
+
+        .bracket-match-player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 5px;
+            margin: 2px 0;
+            font-size: 0.9em;
+        }
+
+        .bracket-match-player.winner {
+            background: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+            font-weight: bold;
+        }
+
+        .bracket-match-player.loser {
+            opacity: 0.5;
+        }
+
+        .bracket-match-vs {
+            text-align: center;
+            color: #636e72;
+            font-size: 0.75em;
+            margin: 2px 0;
+        }
+
+        .bracket-match-empty {
+            background: rgba(0, 0, 0, 0.15);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #636e72;
+            font-style: italic;
+            font-size: 0.85em;
+        }
+
+        .match-picker {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .match-picker h3 {
+            color: #3282b8;
+            margin-bottom: 15px;
+        }
+
+        .available-players {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .match-picker-player {
+            padding: 10px 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 1em;
+        }
+
+        .match-picker-player:hover {
+            border-color: #3282b8;
+            background: rgba(50, 130, 184, 0.2);
+        }
+
+        .match-picker-player.selected {
+            border-color: #00b894;
+            background: rgba(0, 184, 148, 0.2);
+            color: #00b894;
+            font-weight: bold;
+        }
+
+        .tournament-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tournament-champion-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .tournament-champion-section .champion-trophy {
+            font-size: 5em;
+            margin-bottom: 15px;
+        }
+
+        .tournament-champion-section h2 {
+            color: #f9d423;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .tournament-champion-section h3 {
+            color: #e94560;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .tie-resolution {
+            margin-top: 15px;
+        }
+
+        .tie-resolution p {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .tie-resolution-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tie-resolution-btn {
+            padding: 10px 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid #3282b8;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .tie-resolution-btn:hover {
+            background: rgba(50, 130, 184, 0.3);
+            border-color: #00b894;
+        }
+
         .rules-section {
             max-width: 800px;
             margin: 30px auto;
@@ -1287,6 +1514,14 @@
             <button class="lang-btn" onclick="setLanguage('es')">🇪🇸 Español</button>
         </div>
 
+        <!-- Tournament Toggle -->
+        <div class="tournament-toggle">
+            <label class="mode-option" style="justify-content: center;">
+                <input type="checkbox" id="tournamentCheckbox" onchange="toggleTournamentMode()">
+                <span class="mode-label" data-i18n="tournament">Tournament</span>
+            </label>
+        </div>
+
         <h2 data-i18n="gameMode">Game Mode</h2>
         <div class="mode-selector">
             <label class="mode-option">
@@ -1315,7 +1550,35 @@
         </div>
         <div class="player-list" id="playerList"></div>
         <br>
-        <button class="btn-success" onclick="startGame()" id="startBtn" style="display:none;" data-i18n="startGame">Start Game</button>
+        <button class="btn-success" onclick="handleStartClick()" id="startBtn" style="display:none;" data-i18n="startGame">Start Game</button>
+    </div>
+
+    <!-- Tournament Hub -->
+    <div class="tournament-hub hidden" id="tournamentHub">
+        <h2 data-i18n="tournamentBracket">Tournament Bracket</h2>
+
+        <!-- Bracket Visualization -->
+        <div class="bracket-container" id="bracketContainer"></div>
+
+        <!-- Player Picker for next match -->
+        <div class="match-picker" id="matchPicker">
+            <h3 data-i18n="selectMatchPlayers">Select players for next match</h3>
+            <div class="available-players" id="availablePlayers"></div>
+            <button class="btn-success" id="startMatchBtn" onclick="startTournamentMatch()" data-i18n="startMatch" disabled>Start Match</button>
+        </div>
+
+        <!-- Champion celebration (shown when tournament ends) -->
+        <div class="tournament-champion-section hidden" id="tournamentChampionSection">
+            <div class="champion-trophy">🏆🏆🏆</div>
+            <h2 data-i18n="tournamentComplete">Tournament Complete!</h2>
+            <h3 id="championName"></h3>
+        </div>
+
+        <!-- Tournament actions -->
+        <div class="tournament-actions">
+            <button class="btn-primary hidden" onclick="newTournament()" id="newTournamentBtn" data-i18n="newTournament">New Tournament</button>
+            <button class="btn-danger" onclick="exitTournament()" data-i18n="exitTournament">Exit Tournament</button>
+        </div>
     </div>
 
     <!-- Game Board -->
@@ -1469,7 +1732,13 @@
             <p id="winnerScore"></p>
             <br>
             <button class="btn-secondary" onclick="editLastRound()" id="editScoresBtn" data-i18n="editScores">← Edit Scores</button>
-            <button class="btn-primary" onclick="resetGame()" data-i18n="playAgain">Play Again</button>
+            <button class="btn-primary" onclick="resetGame()" id="playAgainBtn" data-i18n="playAgain">Play Again</button>
+            <button class="btn-primary hidden" onclick="returnToTournament()" id="backToTournamentBtn" data-i18n="backToTournament">Back to Tournament</button>
+            <!-- Tie Resolution UI (tournament mode) -->
+            <div class="tie-resolution hidden" id="tieResolutionUI">
+                <p data-i18n="tieResolution">Tie! Select the advancing player:</p>
+                <div class="tie-resolution-buttons" id="tiePlayerButtons"></div>
+            </div>
         </div>
     </div>
 
@@ -1637,6 +1906,29 @@
                 clockBull: "Bull",
                 clockTurn: "Turn",
 
+                // Tournament
+                tournament: "Tournament",
+                tournamentDesc: "Single elimination tournament. Pick a game type, register players, and compete!",
+                startTournament: "Start Tournament",
+                tournamentBracket: "Tournament Bracket",
+                selectMatchPlayers: "Select players for next match",
+                startMatch: "Start Match",
+                backToTournament: "Back to Tournament",
+                exitTournament: "Exit Tournament",
+                roundN: "Round",
+                semiFinals: "Semi-Finals",
+                quarterFinals: "Quarter-Finals",
+                final: "Final",
+                tournamentChampion: "Tournament Champion!",
+                tournamentComplete: "Tournament Complete!",
+                tieResolution: "Tie! Select the advancing player:",
+                newTournament: "New Tournament",
+                minPlayersTourn: "Add at least 3 players for a tournament",
+                bye: "Bye",
+                matchVs: "vs",
+                tournamentRegistrants: "Tournament Registrants",
+                matchScore: "Score",
+
                 // Contracts
                 contracts: {
                     capital: { name: "Capital", desc: "First 3 darts - establish your starting score" },
@@ -1743,6 +2035,29 @@
                 clockThrowDarts: "Lancez vos 3 fléchettes",
                 clockBull: "Bull",
                 clockTurn: "Tour",
+
+                // Tournament
+                tournament: "Tournoi",
+                tournamentDesc: "Tournoi à élimination directe. Choisissez un type de jeu, inscrivez les joueurs et jouez !",
+                startTournament: "Démarrer le Tournoi",
+                tournamentBracket: "Tableau du Tournoi",
+                selectMatchPlayers: "Sélectionnez les joueurs pour le prochain match",
+                startMatch: "Lancer le Match",
+                backToTournament: "Retour au Tournoi",
+                exitTournament: "Quitter le Tournoi",
+                roundN: "Tour",
+                semiFinals: "Demi-Finales",
+                quarterFinals: "Quarts de Finale",
+                final: "Finale",
+                tournamentChampion: "Champion du Tournoi !",
+                tournamentComplete: "Tournoi Terminé !",
+                tieResolution: "Égalité ! Sélectionnez le joueur qui avance :",
+                newTournament: "Nouveau Tournoi",
+                minPlayersTourn: "Ajoutez au moins 3 joueurs pour un tournoi",
+                bye: "Exempt",
+                matchVs: "contre",
+                tournamentRegistrants: "Inscrits au Tournoi",
+                matchScore: "Score",
 
                 // Contracts
                 contracts: {
@@ -1851,6 +2166,29 @@
                 clockBull: "Bull",
                 clockTurn: "Turno",
 
+                // Tournament
+                tournament: "Torneo",
+                tournamentDesc: "Torneo de eliminación directa. Elige un tipo de juego, registra jugadores y compite!",
+                startTournament: "Iniciar Torneo",
+                tournamentBracket: "Cuadro del Torneo",
+                selectMatchPlayers: "Selecciona jugadores para el próximo partido",
+                startMatch: "Iniciar Partido",
+                backToTournament: "Volver al Torneo",
+                exitTournament: "Salir del Torneo",
+                roundN: "Ronda",
+                semiFinals: "Semifinales",
+                quarterFinals: "Cuartos de Final",
+                final: "Final",
+                tournamentChampion: "¡Campeón del Torneo!",
+                tournamentComplete: "¡Torneo Completado!",
+                tieResolution: "¡Empate! Selecciona el jugador que avanza:",
+                newTournament: "Nuevo Torneo",
+                minPlayersTourn: "Añade al menos 3 jugadores para un torneo",
+                bye: "Exento",
+                matchVs: "contra",
+                tournamentRegistrants: "Inscritos en el Torneo",
+                matchScore: "Puntuación",
+
                 // Contracts
                 contracts: {
                     capital: { name: "Capital", desc: "3 primeros dardos - establece tu puntuación inicial" },
@@ -1913,6 +2251,11 @@
         let currentModifier = 'single';
         let storedDarts = {}; // Store darts for each player: { playerKey: [dart1, dart2, dart3] }
 
+        // Tournament state
+        let tournamentMode = false;
+        let tournamentState = null;
+        let tournamentSelectedPlayers = [];
+
         // ==================== LOCAL STORAGE FUNCTIONS ====================
 
         const STORAGE_KEY = 'halveItGameState';
@@ -1945,6 +2288,12 @@
                 clockFinished: clockFinished,
                 clockHistory: clockHistory,
                 clockFinishOrder: clockFinishOrder,
+
+                // Tournament state
+                tournamentMode: tournamentMode,
+                tournamentState: tournamentState,
+                isTournamentHub: document.getElementById('tournamentHub') &&
+                    !document.getElementById('tournamentHub').classList.contains('hidden'),
 
                 // UI state
                 isGameStarted: document.getElementById('gameBoard').style.display !== 'none',
@@ -1994,6 +2343,10 @@
                 clockFinished = gameState.clockFinished || {};
                 clockHistory = gameState.clockHistory || [];
                 clockFinishOrder = gameState.clockFinishOrder || [];
+
+                // Restore tournament state
+                tournamentMode = gameState.tournamentMode || false;
+                tournamentState = gameState.tournamentState || null;
 
                 // Apply language (pass true to prevent saving during load)
                 setLanguage(currentLang, true);
@@ -2143,6 +2496,20 @@
                             showWinner();
                         }
                     }
+                } else if (tournamentMode && tournamentState && gameState.isTournamentHub) {
+                    // Restore tournament hub
+                    document.getElementById('setupSection').classList.add('hidden');
+                    document.getElementById('tournamentHub').classList.remove('hidden');
+
+                    // Restore tournament checkbox
+                    document.getElementById('tournamentCheckbox').checked = true;
+
+                    if (tournamentState.champion) {
+                        showTournamentChampion();
+                    } else {
+                        buildBracket();
+                        buildMatchPicker();
+                    }
                 } else {
                     // Still in setup phase
                     // Restore game mode selection
@@ -2150,6 +2517,15 @@
                     if (modeRadio) {
                         modeRadio.checked = true;
                     }
+
+                    // Restore tournament checkbox state
+                    if (tournamentMode) {
+                        document.getElementById('tournamentCheckbox').checked = true;
+                        const startBtn = document.getElementById('startBtn');
+                        startBtn.setAttribute('data-i18n', 'startTournament');
+                        startBtn.textContent = t('startTournament');
+                    }
+
                     updatePlayerList();
                 }
 
@@ -2270,7 +2646,8 @@
                 </div>
             `).join('');
             
-            document.getElementById('startBtn').style.display = players.length >= 1 ? 'block' : 'none';
+            const minPlayers = tournamentMode ? 3 : 1;
+            document.getElementById('startBtn').style.display = players.length >= minPlayers ? 'block' : 'none';
         }
 
         function hideAllModeSections() {
@@ -2291,8 +2668,18 @@
             document.querySelector('.scores-table').style.display = '';
         }
 
+        function handleStartClick() {
+            if (tournamentMode) {
+                startTournament();
+            } else {
+                startGame();
+            }
+        }
+
         function startGame() {
-            gameMode = document.querySelector('input[name="gameMode"]:checked').value;
+            if (!tournamentMode) {
+                gameMode = document.querySelector('input[name="gameMode"]:checked').value;
+            }
             document.getElementById('setupSection').classList.add('hidden');
             document.getElementById('gameBoard').style.display = 'block';
             currentRound = 0;
@@ -3659,6 +4046,12 @@
         // ==================== COMMON ====================
 
         function showWinner() {
+            // Tournament mode: intercept and handle match result
+            if (tournamentMode && tournamentState) {
+                handleTournamentMatchEnd();
+                return;
+            }
+
             if (gameMode === 'classic') {
                 document.getElementById('classicInputSection').classList.add('hidden');
                 document.getElementById('editScoresBtn').style.display = 'inline-block';
@@ -3729,6 +4122,12 @@
         }
 
         function resetGame() {
+            // In tournament mode, go back to bracket instead of setup
+            if (tournamentMode && tournamentState) {
+                returnToTournament();
+                return;
+            }
+
             const confirmMessage = {
                 'en': 'Are you sure you want to reset the game? All progress will be lost.',
                 'fr': 'Êtes-vous sûr de vouloir recommencer ? Toute la progression sera perdue.',
@@ -3770,6 +4169,545 @@
             document.getElementById('winnerSection').style.display = 'none';
             hideAllModeSections();
             document.getElementById('classicInputSection').classList.remove('hidden');
+
+            updatePlayerList();
+            clearGameState();
+        }
+
+        // ==================== TOURNAMENT MODE ====================
+
+        function toggleTournamentMode() {
+            tournamentMode = document.getElementById('tournamentCheckbox').checked;
+            const startBtn = document.getElementById('startBtn');
+            if (tournamentMode) {
+                startBtn.setAttribute('data-i18n', 'startTournament');
+                startBtn.textContent = t('startTournament');
+                document.getElementById('modeDescription').textContent = t('tournamentDesc');
+            } else {
+                startBtn.setAttribute('data-i18n', 'startGame');
+                startBtn.textContent = t('startGame');
+                updateModeDescription();
+            }
+            updatePlayerList();
+            saveGameState();
+        }
+
+        function startTournament() {
+            if (players.length < 3) {
+                alert(t('minPlayersTourn'));
+                return;
+            }
+            const selectedMode = document.querySelector('input[name="gameMode"]:checked').value;
+            tournamentState = {
+                gameType: selectedMode,
+                registrants: [...players],
+                rounds: [{
+                    roundNumber: 1,
+                    matches: []
+                }],
+                currentRound: 0,
+                champion: null
+            };
+            gameMode = selectedMode;
+
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('tournamentHub').classList.remove('hidden');
+            tournamentSelectedPlayers = [];
+            buildBracket();
+            buildMatchPicker();
+            saveGameState();
+        }
+
+        function getTournamentRoundName(roundIndex, totalRounds) {
+            const remaining = totalRounds - roundIndex;
+            if (remaining === 1) return t('final');
+            if (remaining === 2) return t('semiFinals');
+            if (remaining === 3) return t('quarterFinals');
+            return `${t('roundN')} ${roundIndex + 1}`;
+        }
+
+        function estimateTotalRounds(numPlayers) {
+            return Math.ceil(Math.log2(Math.max(numPlayers, 2)));
+        }
+
+        function buildBracket() {
+            const container = document.getElementById('bracketContainer');
+            container.innerHTML = '';
+
+            if (!tournamentState) return;
+
+            const totalRounds = estimateTotalRounds(tournamentState.registrants.length);
+
+            // Render existing rounds
+            tournamentState.rounds.forEach((round, idx) => {
+                const roundDiv = document.createElement('div');
+                roundDiv.className = 'bracket-round';
+
+                const title = document.createElement('div');
+                title.className = 'bracket-round-title';
+                title.textContent = getTournamentRoundName(idx, totalRounds);
+                roundDiv.appendChild(title);
+
+                if (round.matches.length === 0 && idx === tournamentState.currentRound) {
+                    const empty = document.createElement('div');
+                    empty.className = 'bracket-match-empty';
+                    empty.textContent = '...';
+                    roundDiv.appendChild(empty);
+                }
+
+                round.matches.forEach(match => {
+                    const matchDiv = document.createElement('div');
+                    matchDiv.className = 'bracket-match';
+                    if (match.completed) {
+                        matchDiv.classList.add('completed');
+                    }
+                    if (match.isBye) {
+                        matchDiv.classList.add('bye');
+                    }
+
+                    match.players.forEach((player, pIdx) => {
+                        if (pIdx > 0) {
+                            const vs = document.createElement('div');
+                            vs.className = 'bracket-match-vs';
+                            vs.textContent = match.isBye ? '' : t('matchVs');
+                            matchDiv.appendChild(vs);
+                        }
+                        const playerDiv = document.createElement('div');
+                        playerDiv.className = 'bracket-match-player';
+                        if (match.completed && match.winner === player) {
+                            playerDiv.classList.add('winner');
+                        } else if (match.completed && match.winner !== player) {
+                            playerDiv.classList.add('loser');
+                        }
+
+                        const nameSpan = document.createElement('span');
+                        nameSpan.textContent = player;
+                        playerDiv.appendChild(nameSpan);
+
+                        if (match.completed && match.scores && match.scores[player] !== undefined) {
+                            const scoreSpan = document.createElement('span');
+                            scoreSpan.style.fontSize = '0.85em';
+                            scoreSpan.style.color = '#f9d423';
+                            scoreSpan.textContent = match.scores[player];
+                            playerDiv.appendChild(scoreSpan);
+                        }
+
+                        matchDiv.appendChild(playerDiv);
+                    });
+
+                    if (match.isBye) {
+                        const byeDiv = document.createElement('div');
+                        byeDiv.className = 'bracket-match-vs';
+                        byeDiv.textContent = `(${t('bye')})`;
+                        matchDiv.appendChild(byeDiv);
+                    }
+
+                    container.appendChild(matchDiv);
+                    roundDiv.appendChild(matchDiv);
+                });
+
+                container.appendChild(roundDiv);
+            });
+
+            // Show placeholder columns for future rounds
+            for (let i = tournamentState.rounds.length; i < totalRounds; i++) {
+                const roundDiv = document.createElement('div');
+                roundDiv.className = 'bracket-round';
+
+                const title = document.createElement('div');
+                title.className = 'bracket-round-title';
+                title.textContent = getTournamentRoundName(i, totalRounds);
+                roundDiv.appendChild(title);
+
+                const empty = document.createElement('div');
+                empty.className = 'bracket-match-empty';
+                empty.textContent = '...';
+                roundDiv.appendChild(empty);
+
+                container.appendChild(roundDiv);
+            }
+        }
+
+        function getAvailablePlayers() {
+            if (!tournamentState) return [];
+
+            const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
+            if (!currentRoundData) return [];
+
+            if (tournamentState.currentRound === 0) {
+                // Round 1: all registrants not yet in a match
+                const matched = new Set(currentRoundData.matches.flatMap(m => m.players));
+                return tournamentState.registrants.filter(p => !matched.has(p));
+            } else {
+                // Subsequent rounds: winners of previous round not yet in a match
+                const prevRound = tournamentState.rounds[tournamentState.currentRound - 1];
+                const prevWinners = prevRound.matches.map(m => m.winner).filter(Boolean);
+                const matched = new Set(currentRoundData.matches.flatMap(m => m.players));
+                return prevWinners.filter(p => !matched.has(p));
+            }
+        }
+
+        function buildMatchPicker() {
+            const picker = document.getElementById('matchPicker');
+            const pool = getAvailablePlayers();
+            const availableDiv = document.getElementById('availablePlayers');
+            const startMatchBtn = document.getElementById('startMatchBtn');
+
+            // If champion is determined, hide picker
+            if (tournamentState && tournamentState.champion) {
+                picker.classList.add('hidden');
+                return;
+            }
+
+            if (pool.length < 2) {
+                // Check if round needs advancing
+                checkRoundComplete();
+                const newPool = getAvailablePlayers();
+                if (newPool.length < 2) {
+                    picker.classList.add('hidden');
+                    return;
+                }
+                // Re-run with new pool after round advance
+                buildMatchPicker();
+                return;
+            }
+
+            picker.classList.remove('hidden');
+            tournamentSelectedPlayers = [];
+            availableDiv.innerHTML = '';
+
+            pool.forEach(player => {
+                const btn = document.createElement('button');
+                btn.className = 'match-picker-player';
+                btn.textContent = player;
+                btn.onclick = () => toggleMatchPlayerSelection(player, btn);
+                availableDiv.appendChild(btn);
+            });
+
+            startMatchBtn.disabled = true;
+        }
+
+        function toggleMatchPlayerSelection(player, btn) {
+            const idx = tournamentSelectedPlayers.indexOf(player);
+            if (idx >= 0) {
+                tournamentSelectedPlayers.splice(idx, 1);
+                btn.classList.remove('selected');
+            } else {
+                tournamentSelectedPlayers.push(player);
+                btn.classList.add('selected');
+            }
+            document.getElementById('startMatchBtn').disabled = tournamentSelectedPlayers.length < 2;
+        }
+
+        function startTournamentMatch() {
+            if (tournamentSelectedPlayers.length < 2) return;
+
+            // Record the match as in-progress
+            const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
+            currentRoundData.matches.push({
+                players: [...tournamentSelectedPlayers],
+                winner: null,
+                scores: null,
+                completed: false,
+                isBye: false
+            });
+
+            // Set up the game with selected players
+            players = [...tournamentSelectedPlayers];
+            gameMode = tournamentState.gameType;
+
+            // Programmatically check the right radio button
+            const radio = document.querySelector(`input[name="gameMode"][value="${gameMode}"]`);
+            if (radio) radio.checked = true;
+
+            // Hide tournament hub, show setup momentarily (startGame hides it)
+            document.getElementById('tournamentHub').classList.add('hidden');
+            document.getElementById('setupSection').classList.remove('hidden');
+
+            // Start the game
+            startGame();
+            saveGameState();
+        }
+
+        function getMatchWinners() {
+            // Determine match winner(s) based on game mode
+            if (gameMode === 'killer') {
+                const alivePlayers = players.filter(p => !killerEliminated[p]);
+                return alivePlayers.length >= 1 ? [alivePlayers[0]] : [players[0]];
+            } else if (gameMode === 'clock') {
+                const result = determineClockWinner(players, clockPosition, clockFinishOrder);
+                return result.winners;
+            } else {
+                // Classic or Yahtzee
+                let highScore = -Infinity;
+                players.forEach(player => {
+                    const playerScore = gameMode === 'classic' ? scores[player].capital : scores[player].total;
+                    if (playerScore > highScore) {
+                        highScore = playerScore;
+                    }
+                });
+                return players.filter(p => {
+                    const s = gameMode === 'classic' ? scores[p].capital : scores[p].total;
+                    return s === highScore;
+                });
+            }
+        }
+
+        function getMatchScores() {
+            // Extract scores for display in bracket
+            const matchScores = {};
+            players.forEach(player => {
+                if (gameMode === 'classic') {
+                    matchScores[player] = scores[player] ? scores[player].capital : 0;
+                } else if (gameMode === 'yahtzee') {
+                    matchScores[player] = scores[player] ? scores[player].total : 0;
+                } else if (gameMode === 'killer') {
+                    matchScores[player] = killerLives[player] || 0;
+                } else if (gameMode === 'clock') {
+                    if (clockFinished[player]) {
+                        matchScores[player] = t('clockFinished');
+                    } else {
+                        matchScores[player] = getClockTargetName(clockPosition[player] || 1);
+                    }
+                }
+            });
+            return matchScores;
+        }
+
+        function handleTournamentMatchEnd() {
+            // Hide mode-specific input sections
+            if (gameMode === 'classic') {
+                document.getElementById('classicInputSection').classList.add('hidden');
+            } else if (gameMode === 'yahtzee') {
+                document.getElementById('yahtzeeInputSection').classList.add('hidden');
+                scoresHidden = false;
+                document.getElementById('hideScoresBtn').textContent = '👁️';
+                updateScoreVisibility();
+            } else if (gameMode === 'killer') {
+                document.getElementById('killerDartboardSection').classList.add('hidden');
+                document.getElementById('killerPrevSection').classList.add('hidden');
+            } else if (gameMode === 'clock') {
+                document.getElementById('clockDartboardSection').classList.add('hidden');
+                document.getElementById('clockPrevSection').classList.add('hidden');
+            }
+
+            const winnerSection = document.getElementById('winnerSection');
+            winnerSection.style.display = 'block';
+
+            const matchWinners = getMatchWinners();
+            const matchScores = getMatchScores();
+
+            // Hide normal buttons, show tournament button
+            document.getElementById('editScoresBtn').style.display = 'none';
+            document.getElementById('playAgainBtn').style.display = 'none';
+            document.getElementById('backToTournamentBtn').classList.remove('hidden');
+            document.getElementById('backToTournamentBtn').style.display = 'inline-block';
+
+            if (matchWinners.length === 1) {
+                // Clear winner
+                const winner = matchWinners[0];
+                document.getElementById('winnerName').textContent = `🎉 ${winner} ${t('wins')} 🎉`;
+
+                const scoreStr = matchScores[winner] !== undefined ? matchScores[winner] : '';
+                document.getElementById('winnerScore').textContent = scoreStr !== '' ? `${t('matchScore')}: ${scoreStr}` : '';
+
+                recordMatchResult(winner, matchScores);
+                document.getElementById('tieResolutionUI').classList.add('hidden');
+            } else {
+                // Tie - show manual resolution
+                document.getElementById('winnerName').textContent = t('itsATie');
+                document.getElementById('winnerScore').textContent = matchWinners.join(' & ');
+                document.getElementById('backToTournamentBtn').style.display = 'none';
+
+                showTieResolution(matchWinners, matchScores);
+            }
+
+            saveGameState();
+        }
+
+        function showTieResolution(tiedPlayers, matchScores) {
+            const tieUI = document.getElementById('tieResolutionUI');
+            const buttonsDiv = document.getElementById('tiePlayerButtons');
+            tieUI.classList.remove('hidden');
+            buttonsDiv.innerHTML = '';
+
+            tiedPlayers.forEach(player => {
+                const btn = document.createElement('button');
+                btn.className = 'tie-resolution-btn';
+                btn.textContent = player;
+                btn.onclick = () => {
+                    recordMatchResult(player, matchScores);
+                    tieUI.classList.add('hidden');
+                    document.getElementById('winnerName').textContent = `🎉 ${player} ${t('wins')} 🎉`;
+                    document.getElementById('backToTournamentBtn').style.display = 'inline-block';
+                    saveGameState();
+                };
+                buttonsDiv.appendChild(btn);
+            });
+        }
+
+        function recordMatchResult(winner, matchScores) {
+            if (!tournamentState) return;
+
+            const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
+            // Find the latest incomplete match
+            const match = currentRoundData.matches.find(m => !m.completed);
+            if (!match) return;
+
+            match.winner = winner;
+            match.scores = matchScores || {};
+            match.completed = true;
+            saveGameState();
+        }
+
+        function returnToTournament() {
+            // Hide game board and winner section
+            document.getElementById('gameBoard').style.display = 'none';
+            document.getElementById('winnerSection').style.display = 'none';
+
+            // Reset tournament button visibility for next time
+            document.getElementById('backToTournamentBtn').classList.add('hidden');
+            document.getElementById('backToTournamentBtn').style.display = 'none';
+            document.getElementById('playAgainBtn').style.display = '';
+            document.getElementById('tieResolutionUI').classList.add('hidden');
+
+            // Reset game state
+            currentRound = 0;
+            currentPlayerIndex = 0;
+            scores = {};
+            scoresHidden = false;
+            selectedContract = null;
+            selectedScratch = null;
+            isScratchMode = false;
+            yahtzeeHistory = [];
+            storedDarts = {};
+            killerNumbers = {};
+            killerLives = {};
+            killerIsKiller = {};
+            killerEliminated = {};
+            killerPhase = 'number';
+            killerHistory = [];
+            killerDarts = [];
+            killerModifier = 'single';
+            clockPosition = {};
+            clockFinished = {};
+            clockHistory = [];
+            clockDarts = [];
+            clockModifier = 'single';
+            clockFinishOrder = [];
+
+            hideAllModeSections();
+
+            // Check round completion and advance if needed
+            checkRoundComplete();
+
+            // Show tournament hub
+            document.getElementById('tournamentHub').classList.remove('hidden');
+
+            // Check if champion was determined
+            if (tournamentState && tournamentState.champion) {
+                showTournamentChampion();
+            } else {
+                buildBracket();
+                buildMatchPicker();
+            }
+
+            saveGameState();
+        }
+
+        function checkRoundComplete() {
+            if (!tournamentState) return;
+
+            const available = getAvailablePlayers();
+            const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
+            if (!currentRoundData) return;
+
+            const allMatchesDone = currentRoundData.matches.length > 0 &&
+                currentRoundData.matches.every(m => m.completed);
+
+            if (allMatchesDone && available.length <= 1) {
+                const winners = currentRoundData.matches.map(m => m.winner).filter(Boolean);
+
+                // If 1 unmatched player, they auto-advance (bye)
+                if (available.length === 1) {
+                    const byePlayer = available[0];
+                    currentRoundData.matches.push({
+                        players: [byePlayer],
+                        winner: byePlayer,
+                        scores: {},
+                        completed: true,
+                        isBye: true
+                    });
+                    winners.push(byePlayer);
+                }
+
+                if (winners.length <= 1) {
+                    // Tournament complete
+                    tournamentState.champion = winners[0] || null;
+                } else {
+                    // Create next round
+                    tournamentState.currentRound++;
+                    tournamentState.rounds.push({
+                        roundNumber: tournamentState.currentRound + 1,
+                        matches: []
+                    });
+                }
+            }
+        }
+
+        function showTournamentChampion() {
+            if (!tournamentState || !tournamentState.champion) return;
+
+            const championSection = document.getElementById('tournamentChampionSection');
+            const matchPicker = document.getElementById('matchPicker');
+
+            document.getElementById('championName').textContent = `🎉 ${tournamentState.champion} 🎉`;
+            championSection.classList.remove('hidden');
+            matchPicker.classList.add('hidden');
+            document.getElementById('newTournamentBtn').classList.remove('hidden');
+
+            buildBracket();
+        }
+
+        function exitTournament() {
+            const confirmMsg = {
+                'en': 'Exit tournament? All tournament progress will be lost.',
+                'fr': 'Quitter le tournoi ? Toute la progression sera perdue.',
+                'es': '¿Salir del torneo? Se perderá todo el progreso.'
+            };
+
+            if (!confirm(confirmMsg[currentLang])) return;
+
+            tournamentMode = false;
+            tournamentState = null;
+            tournamentSelectedPlayers = [];
+
+            document.getElementById('tournamentHub').classList.add('hidden');
+            document.getElementById('tournamentChampionSection').classList.add('hidden');
+            document.getElementById('newTournamentBtn').classList.add('hidden');
+            document.getElementById('gameBoard').style.display = 'none';
+            document.getElementById('winnerSection').style.display = 'none';
+            document.getElementById('setupSection').classList.remove('hidden');
+
+            // Reset tournament checkbox
+            document.getElementById('tournamentCheckbox').checked = false;
+            const startBtn = document.getElementById('startBtn');
+            startBtn.setAttribute('data-i18n', 'startGame');
+            startBtn.textContent = t('startGame');
+
+            players = [];
+            updatePlayerList();
+            clearGameState();
+        }
+
+        function newTournament() {
+            tournamentState = null;
+            tournamentSelectedPlayers = [];
+
+            document.getElementById('tournamentHub').classList.add('hidden');
+            document.getElementById('tournamentChampionSection').classList.add('hidden');
+            document.getElementById('newTournamentBtn').classList.add('hidden');
+            document.getElementById('setupSection').classList.remove('hidden');
 
             updatePlayerList();
             clearGameState();
