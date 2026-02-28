@@ -4164,6 +4164,20 @@
             clockModifier = 'single';
             clockFinishOrder = [];
 
+            // Reset dart input state
+            currentDarts = [];
+            currentModifier = 'single';
+            dartInputTargetField = null;
+
+            // Close dart input modal if open
+            document.getElementById('dartInputModal').classList.remove('active');
+
+            // Reset winner section button visibility
+            document.getElementById('playAgainBtn').style.display = '';
+            document.getElementById('backToTournamentBtn').classList.add('hidden');
+            document.getElementById('backToTournamentBtn').style.display = 'none';
+            document.getElementById('tieResolutionUI').classList.add('hidden');
+
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('gameBoard').style.display = 'none';
             document.getElementById('winnerSection').style.display = 'none';
@@ -4595,6 +4609,14 @@
             clockDarts = [];
             clockModifier = 'single';
             clockFinishOrder = [];
+
+            // Reset dart input state
+            currentDarts = [];
+            currentModifier = 'single';
+            dartInputTargetField = null;
+
+            // Close dart input modal if open
+            document.getElementById('dartInputModal').classList.remove('active');
 
             hideAllModeSections();
 
