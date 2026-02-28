@@ -1581,6 +1581,42 @@
                 padding: 15px;
             }
         }
+
+        /* Test Mode Panel */
+        .test-mode-panel {
+            position: fixed;
+            bottom: 16px;
+            right: 16px;
+            background: #2d2d4e;
+            border: 2px solid #e94560;
+            border-radius: 12px;
+            padding: 10px 14px;
+            z-index: 9999;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            max-width: 320px;
+        }
+        .test-mode-panel.hidden { display: none; }
+        .test-mode-label {
+            color: #e94560;
+            font-weight: bold;
+            font-size: 12px;
+            width: 100%;
+        }
+        .test-mode-panel button {
+            background: #e94560;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .test-mode-panel button:hover {
+            background: #d63551;
+        }
     </style>
 </head>
 <body>
@@ -1832,6 +1868,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Test Mode Panel (activated via ?testmode URL param) -->
+    <div id="testModePanel" class="test-mode-panel hidden"></div>
 
     <!-- Dart Input Modal -->
     <div class="dart-input-modal" id="dartInputModal">
@@ -2368,6 +2407,9 @@
         let tournamentState = null;
         let tournamentSelectedPlayers = [];
 
+        // Test mode (activated via ?testmode URL parameter)
+        const isTestMode = new URLSearchParams(window.location.search).has('testmode');
+
         // ==================== LOCAL STORAGE FUNCTIONS ====================
 
         const STORAGE_KEY = 'halveItGameState';
@@ -2607,6 +2649,11 @@
                             document.getElementById('clockPrevSection').classList.add('hidden');
                             showWinner();
                         }
+                    }
+
+                    // Show test mode panel if game is active and not showing winner
+                    if (!gameState.isWinnerShown) {
+                        showTestModePanel();
                     }
                 } else if (tournamentMode && tournamentState && gameState.isTournamentHub) {
                     // Restore tournament hub
@@ -2869,6 +2916,7 @@
                 buildClockScoreboard();
             }
             saveGameState();
+            showTestModePanel();
         }
 
         // ==================== CLASSIC MODE ====================
@@ -4156,9 +4204,70 @@
             btn.style.display = clockHistory.length > 0 ? 'inline-block' : 'none';
         }
 
+        // ==================== TEST MODE ====================
+
+        function showTestModePanel() {
+            if (!isTestMode) return;
+            const panel = document.getElementById('testModePanel');
+            panel.innerHTML = '<div class="test-mode-label">TEST MODE</div>';
+            players.forEach(player => {
+                const btn = document.createElement('button');
+                btn.textContent = `${player} wins`;
+                btn.onclick = () => forceWin(player);
+                panel.appendChild(btn);
+            });
+            panel.classList.remove('hidden');
+        }
+
+        function hideTestModePanel() {
+            document.getElementById('testModePanel').classList.add('hidden');
+        }
+
+        function forceWin(player) {
+            if (!players.includes(player)) return;
+
+            hideTestModePanel();
+
+            if (gameMode === 'classic') {
+                players.forEach(p => {
+                    scores[p].capital = (p === player) ? 1000 : 0;
+                });
+                currentRound = CONTRACT_IDS.length;
+            } else if (gameMode === 'yahtzee') {
+                players.forEach(p => {
+                    CONTRACT_IDS.forEach(id => {
+                        if (scores[p].contracts[id].score === null) {
+                            scores[p].contracts[id].scratched = true;
+                        }
+                    });
+                    scores[p].total = (p === player) ? 1000 : 0;
+                });
+            } else if (gameMode === 'killer') {
+                players.forEach(p => {
+                    if (p !== player) {
+                        killerEliminated[p] = true;
+                        killerLives[p] = 0;
+                    } else {
+                        killerLives[p] = 5;
+                    }
+                });
+            } else if (gameMode === 'clock') {
+                clockPosition[player] = CLOCK_POSITION_FINISHED;
+                clockFinished[player] = true;
+                if (!clockFinishOrder.includes(player)) {
+                    clockFinishOrder.push(player);
+                }
+            }
+
+            saveGameState();
+            showWinner();
+        }
+
         // ==================== COMMON ====================
 
         function showWinner() {
+            hideTestModePanel();
+
             // Tournament mode: intercept and handle match result
             if (tournamentMode && tournamentState) {
                 handleTournamentMatchEnd();
@@ -4235,6 +4344,8 @@
         }
 
         function resetGame() {
+            hideTestModePanel();
+
             // In tournament mode, cancel the in-progress match and go back to bracket
             if (tournamentMode && tournamentState) {
                 const confirmMsg = {
