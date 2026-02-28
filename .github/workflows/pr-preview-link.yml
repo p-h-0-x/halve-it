@@ -12,6 +12,56 @@ jobs:
       pull-requests: write
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build preview links
+        id: links
+        run: |
+          REPO="${{ github.repository }}"
+          BRANCH="${{ github.head_ref }}"
+          BASE_URL="https://htmlpreview.github.io/?https://github.com/${REPO}/blob/${BRANCH}"
+
+          # Get all HTML files changed in this PR
+          CHANGED_HTML=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- '*.html' | sort)
+
+          # Get all non-HTML files changed (js, css, etc.)
+          CHANGED_OTHER=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- ':!*.html' | sort)
+
+          LINKS=""
+
+          # Always include index.html as the main preview
+          LINKS="| \`index.html\` | [Open Preview](${BASE_URL}/index.html) |"$'\n'
+
+          # Add any other changed HTML files
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            [ "$file" = "index.html" ] && continue
+            LINKS="${LINKS}| \`${file}\` | [Open Preview](${BASE_URL}/${file}) |"$'\n'
+          done <<< "$CHANGED_HTML"
+
+          # Build list of changed non-HTML files for context
+          OTHER_FILES=""
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            OTHER_FILES="${OTHER_FILES}- \`${file}\`"$'\n'
+          done <<< "$CHANGED_OTHER"
+
+          # Write to output using heredoc
+          {
+            echo "links<<LINKS_EOF"
+            echo -n "$LINKS"
+            echo "LINKS_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          {
+            echo "other_files<<OTHER_EOF"
+            echo -n "$OTHER_FILES"
+            echo "OTHER_EOF"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Find existing comment
         uses: peter-evans/find-comment@v3
         id: find-comment
@@ -29,11 +79,14 @@ jobs:
           body: |
             ## 🎯 Test this PR
 
-            You can test the changes in this PR using the link below:
+            | File | Preview |
+            |------|---------|
+            ${{ steps.links.outputs.links }}
 
-            **[Open Preview](https://htmlpreview.github.io/?https://github.com/${{ github.repository }}/blob/${{ github.head_ref }}/index.html)**
+            ${{ steps.links.outputs.other_files != '' && '**Other changed files** (included in previews via `<script>` tags):' || '' }}
+            ${{ steps.links.outputs.other_files }}
 
-            > Preview is served via [htmlpreview.github.io](https://htmlpreview.github.io) directly from the branch source — no deployment needed.
+            > Preview is served via [htmlpreview.github.io](https://htmlpreview.github.io) directly from the branch source — no deployment needed. All referenced files (JS, CSS) are loaded from the same branch.
 
             ---
             *Updated for commit ${{ github.event.pull_request.head.sha }}*
