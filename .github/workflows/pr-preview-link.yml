@@ -1,0 +1,39 @@
+name: PR Preview Link
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  preview-link:
+    name: Add Preview Link
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Find existing comment
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '## 🎯 Test this PR'
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            ## 🎯 Test this PR
+
+            You can test the changes in this PR using the link below:
+
+            **[Open Preview](https://htmlpreview.github.io/?https://github.com/${{ github.repository }}/blob/${{ github.head_ref }}/index.html)**
+
+            > Preview is served via [htmlpreview.github.io](https://htmlpreview.github.io) directly from the branch source — no deployment needed.
+
+            ---
+            *Updated for commit ${{ github.event.pull_request.head.sha }}*
