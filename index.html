@@ -568,6 +568,87 @@
             border-color: #00b894;
         }
 
+        .tournament-player-mgmt {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .tournament-player-mgmt summary {
+            cursor: pointer;
+            color: #3282b8;
+            font-weight: bold;
+            font-size: 1.1em;
+            padding: 5px 0;
+        }
+
+        .tournament-player-mgmt summary:hover {
+            color: #00b894;
+        }
+
+        .tournament-player-add {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .tournament-player-add input {
+            flex: 1;
+            min-width: 150px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: white;
+            font-size: 1em;
+        }
+
+        .tournament-player-roster {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tournament-roster-player {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #ccc;
+        }
+
+        .tournament-roster-player.eliminated {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+
+        .tournament-roster-player.withdrawn {
+            opacity: 0.4;
+            text-decoration: line-through;
+            border-color: #e94560;
+        }
+
+        .tournament-roster-remove {
+            background: none;
+            border: none;
+            color: #e94560;
+            cursor: pointer;
+            font-size: 1.1em;
+            padding: 0 2px;
+            line-height: 1;
+        }
+
+        .tournament-roster-remove:hover {
+            color: #ff6b81;
+        }
+
         .rules-section {
             max-width: 800px;
             margin: 30px auto;
@@ -1560,6 +1641,16 @@
         <!-- Bracket Visualization -->
         <div class="bracket-container" id="bracketContainer"></div>
 
+        <!-- Player Management (add/remove during tournament) -->
+        <details class="tournament-player-mgmt" id="tournamentPlayerMgmt">
+            <summary data-i18n="managePlayers">Manage Players</summary>
+            <div class="tournament-player-add">
+                <input type="text" id="tournamentAddPlayerInput" data-i18n-placeholder="addPlayerName" placeholder="New player name" maxlength="20" onkeypress="if(event.key==='Enter')addTournamentPlayer()">
+                <button class="btn-success" onclick="addTournamentPlayer()" data-i18n="addPlayer">Add Player</button>
+            </div>
+            <div class="tournament-player-roster" id="tournamentPlayerRoster"></div>
+        </details>
+
         <!-- Player Picker for next match -->
         <div class="match-picker" id="matchPicker">
             <h3 data-i18n="selectMatchPlayers">Select players for next match</h3>
@@ -1928,6 +2019,13 @@
                 matchVs: "vs",
                 tournamentRegistrants: "Tournament Registrants",
                 matchScore: "Score",
+                managePlayers: "Manage Players",
+                addPlayer: "Add Player",
+                addPlayerName: "New player name",
+                removePlayer: "Remove",
+                withdrawn: "withdrawn",
+                playerAlreadyExists: "This player is already in the tournament.",
+                cannotRemoveInMatch: "Cannot remove a player who is in an active match.",
 
                 // Contracts
                 contracts: {
@@ -2058,6 +2156,13 @@
                 matchVs: "contre",
                 tournamentRegistrants: "Inscrits au Tournoi",
                 matchScore: "Score",
+                managePlayers: "Gérer les Joueurs",
+                addPlayer: "Ajouter un Joueur",
+                addPlayerName: "Nom du nouveau joueur",
+                removePlayer: "Retirer",
+                withdrawn: "retiré",
+                playerAlreadyExists: "Ce joueur est déjà dans le tournoi.",
+                cannotRemoveInMatch: "Impossible de retirer un joueur en match.",
 
                 // Contracts
                 contracts: {
@@ -2188,6 +2293,13 @@
                 matchVs: "contra",
                 tournamentRegistrants: "Inscritos en el Torneo",
                 matchScore: "Puntuación",
+                managePlayers: "Gestionar Jugadores",
+                addPlayer: "Agregar Jugador",
+                addPlayerName: "Nombre del nuevo jugador",
+                removePlayer: "Eliminar",
+                withdrawn: "retirado",
+                playerAlreadyExists: "Este jugador ya está en el torneo.",
+                cannotRemoveInMatch: "No se puede eliminar un jugador en partido activo.",
 
                 // Contracts
                 contracts: {
@@ -2508,6 +2620,7 @@
                         showTournamentChampion();
                     } else {
                         buildBracket();
+                        buildPlayerRoster();
                         buildMatchPicker();
                     }
                 } else {
@@ -4164,6 +4277,20 @@
             clockModifier = 'single';
             clockFinishOrder = [];
 
+            // Reset dart input state
+            currentDarts = [];
+            currentModifier = 'single';
+            dartInputTargetField = null;
+
+            // Close dart input modal if open
+            document.getElementById('dartInputModal').classList.remove('active');
+
+            // Reset winner section button visibility
+            document.getElementById('playAgainBtn').style.display = '';
+            document.getElementById('backToTournamentBtn').classList.add('hidden');
+            document.getElementById('backToTournamentBtn').style.display = 'none';
+            document.getElementById('tieResolutionUI').classList.add('hidden');
+
             document.getElementById('setupSection').classList.remove('hidden');
             document.getElementById('gameBoard').style.display = 'none';
             document.getElementById('winnerSection').style.display = 'none';
@@ -4206,7 +4333,8 @@
                     matches: []
                 }],
                 currentRound: 0,
-                champion: null
+                champion: null,
+                withdrawn: []
             };
             gameMode = selectedMode;
 
@@ -4214,6 +4342,7 @@
             document.getElementById('tournamentHub').classList.remove('hidden');
             tournamentSelectedPlayers = [];
             buildBracket();
+            buildPlayerRoster();
             buildMatchPicker();
             saveGameState();
         }
@@ -4334,17 +4463,149 @@
             const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
             if (!currentRoundData) return [];
 
+            const withdrawn = new Set(tournamentState.withdrawn || []);
+            const matched = new Set(currentRoundData.matches.flatMap(m => m.players));
+
             if (tournamentState.currentRound === 0) {
-                // Round 1: all registrants not yet in a match
-                const matched = new Set(currentRoundData.matches.flatMap(m => m.players));
-                return tournamentState.registrants.filter(p => !matched.has(p));
+                // Round 1: all registrants not yet in a match and not withdrawn
+                return tournamentState.registrants.filter(p => !matched.has(p) && !withdrawn.has(p));
             } else {
-                // Subsequent rounds: winners of previous round not yet in a match
+                // Subsequent rounds: winners of previous round not yet in a match and not withdrawn
                 const prevRound = tournamentState.rounds[tournamentState.currentRound - 1];
                 const prevWinners = prevRound.matches.map(m => m.winner).filter(Boolean);
-                const matched = new Set(currentRoundData.matches.flatMap(m => m.players));
-                return prevWinners.filter(p => !matched.has(p));
+                return prevWinners.filter(p => !matched.has(p) && !withdrawn.has(p));
             }
+        }
+
+        function addTournamentPlayer() {
+            const input = document.getElementById('tournamentAddPlayerInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (tournamentState.registrants.includes(name)) {
+                alert(t('playerAlreadyExists'));
+                return;
+            }
+
+            // Add to registrants
+            tournamentState.registrants.push(name);
+
+            // If not withdrawn, make them available in the current round
+            if (!tournamentState.withdrawn) {
+                tournamentState.withdrawn = [];
+            }
+
+            input.value = '';
+            saveGameState();
+            buildBracket();
+            buildPlayerRoster();
+            buildMatchPicker();
+        }
+
+        function removeTournamentPlayer(name) {
+            if (!tournamentState) return;
+
+            // Initialize withdrawn list if needed
+            if (!tournamentState.withdrawn) {
+                tournamentState.withdrawn = [];
+            }
+
+            // Check if already withdrawn
+            if (tournamentState.withdrawn.includes(name)) return;
+
+            // Check if player is in an in-progress match (not yet completed)
+            const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
+            if (currentRoundData) {
+                const inProgressMatch = currentRoundData.matches.find(
+                    m => !m.completed && m.players.includes(name)
+                );
+                if (inProgressMatch) {
+                    alert(t('cannotRemoveInMatch'));
+                    return;
+                }
+            }
+
+            // Mark as withdrawn
+            tournamentState.withdrawn.push(name);
+
+            // If they were in the available pool for the current round, give their
+            // pending opponent(s) a bye by simply removing this player from future matching.
+            // The checkRoundComplete logic will handle byes when pool shrinks.
+
+            saveGameState();
+            buildBracket();
+            buildPlayerRoster();
+            buildMatchPicker();
+        }
+
+        function buildPlayerRoster() {
+            const mgmt = document.getElementById('tournamentPlayerMgmt');
+            if (mgmt) mgmt.style.display = '';
+            const roster = document.getElementById('tournamentPlayerRoster');
+            if (!roster || !tournamentState) return;
+            roster.innerHTML = '';
+
+            const withdrawn = tournamentState.withdrawn || [];
+            const available = getAvailablePlayers();
+            const eliminated = getEliminatedPlayers();
+
+            tournamentState.registrants.forEach(name => {
+                const tag = document.createElement('div');
+                tag.className = 'tournament-roster-player';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = name;
+                tag.appendChild(nameSpan);
+
+                if (withdrawn.includes(name)) {
+                    tag.classList.add('withdrawn');
+                    const label = document.createElement('span');
+                    label.textContent = ` (${t('withdrawn')})`;
+                    label.style.fontSize = '0.8em';
+                    tag.appendChild(label);
+                } else if (eliminated.includes(name)) {
+                    tag.classList.add('eliminated');
+                } else if (available.includes(name)) {
+                    // Can be removed — show remove button
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'tournament-roster-remove';
+                    removeBtn.textContent = '✕';
+                    removeBtn.title = t('removePlayer');
+                    removeBtn.onclick = () => {
+                        const msg = {
+                            'en': `Remove ${name} from the tournament?`,
+                            'fr': `Retirer ${name} du tournoi ?`,
+                            'es': `¿Eliminar a ${name} del torneo?`
+                        };
+                        if (confirm(msg[currentLang])) {
+                            removeTournamentPlayer(name);
+                        }
+                    };
+                    tag.appendChild(removeBtn);
+                }
+
+                roster.appendChild(tag);
+            });
+        }
+
+        function getEliminatedPlayers() {
+            if (!tournamentState) return [];
+            const withdrawn = tournamentState.withdrawn || [];
+            const eliminated = [];
+
+            // A player is eliminated if they lost a match (were in a completed match but are not the winner)
+            tournamentState.rounds.forEach(round => {
+                round.matches.forEach(match => {
+                    if (match.completed && !match.isBye) {
+                        match.players.forEach(p => {
+                            if (p !== match.winner && !withdrawn.includes(p)) {
+                                eliminated.push(p);
+                            }
+                        });
+                    }
+                });
+            });
+            return eliminated;
         }
 
         function buildMatchPicker() {
@@ -4596,6 +4857,14 @@
             clockModifier = 'single';
             clockFinishOrder = [];
 
+            // Reset dart input state
+            currentDarts = [];
+            currentModifier = 'single';
+            dartInputTargetField = null;
+
+            // Close dart input modal if open
+            document.getElementById('dartInputModal').classList.remove('active');
+
             hideAllModeSections();
 
             // Check round completion and advance if needed
@@ -4609,6 +4878,7 @@
                 showTournamentChampion();
             } else {
                 buildBracket();
+                buildPlayerRoster();
                 buildMatchPicker();
             }
 
@@ -4664,6 +4934,7 @@
             document.getElementById('championName').textContent = `🎉 ${tournamentState.champion} 🎉`;
             championSection.classList.remove('hidden');
             matchPicker.classList.add('hidden');
+            document.getElementById('tournamentPlayerMgmt').style.display = 'none';
             document.getElementById('newTournamentBtn').classList.remove('hidden');
 
             buildBracket();
