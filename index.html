@@ -4237,16 +4237,20 @@
         function resetGame() {
             // In tournament mode, cancel the in-progress match and go back to bracket
             if (tournamentMode && tournamentState) {
-                const confirmMsg = {
-                    'en': 'Cancel this match and return to the tournament bracket?',
-                    'fr': 'Annuler ce match et revenir au tableau du tournoi ?',
-                    'es': '¿Cancelar este partido y volver al cuadro del torneo?'
-                };
-                if (!confirm(confirmMsg[currentLang])) return;
-
-                // Remove the incomplete match so the players become available again
+                // If match is already completed or tournament is over, return to hub
                 const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
-                if (currentRoundData) {
+                const hasIncomplete = currentRoundData &&
+                    currentRoundData.matches.some(m => !m.completed);
+
+                if (hasIncomplete) {
+                    const confirmMsg = {
+                        'en': 'Cancel this match and return to the tournament bracket?',
+                        'fr': 'Annuler ce match et revenir au tableau du tournoi ?',
+                        'es': '¿Cancelar este partido y volver al cuadro del torneo?'
+                    };
+                    if (!confirm(confirmMsg[currentLang])) return;
+
+                    // Remove the incomplete match so the players become available again
                     const incompleteIdx = currentRoundData.matches.findIndex(m => !m.completed);
                     if (incompleteIdx >= 0) {
                         currentRoundData.matches.splice(incompleteIdx, 1);
