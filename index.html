@@ -4350,7 +4350,8 @@
                 }],
                 currentRound: 0,
                 champion: null,
-                withdrawn: []
+                withdrawn: [],
+                lateEntries: {}
             };
             gameMode = selectedMode;
 
@@ -4489,7 +4490,18 @@
                 // Subsequent rounds: winners of previous round not yet in a match and not withdrawn
                 const prevRound = tournamentState.rounds[tournamentState.currentRound - 1];
                 const prevWinners = prevRound.matches.map(m => m.winner).filter(Boolean);
-                return prevWinners.filter(p => !matched.has(p) && !withdrawn.has(p));
+                const pool = prevWinners.filter(p => !matched.has(p) && !withdrawn.has(p));
+
+                // Include late entries added during or for this round
+                const lateEntries = tournamentState.lateEntries || {};
+                for (const [player, joinedRound] of Object.entries(lateEntries)) {
+                    if (joinedRound === tournamentState.currentRound &&
+                        !matched.has(player) && !withdrawn.has(player) && !pool.includes(player)) {
+                        pool.push(player);
+                    }
+                }
+
+                return pool;
             }
         }
 
@@ -4506,9 +4518,16 @@
             // Add to registrants
             tournamentState.registrants.push(name);
 
-            // If not withdrawn, make them available in the current round
             if (!tournamentState.withdrawn) {
                 tournamentState.withdrawn = [];
+            }
+
+            // Track late entries so they appear in the available pool for non-first rounds
+            if (!tournamentState.lateEntries) {
+                tournamentState.lateEntries = {};
+            }
+            if (tournamentState.currentRound > 0) {
+                tournamentState.lateEntries[name] = tournamentState.currentRound;
             }
 
             input.value = '';
