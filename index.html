@@ -4241,25 +4241,31 @@
                 const hasIncomplete = currentRoundData &&
                     currentRoundData.matches.some(m => !m.completed);
 
-                if (hasIncomplete) {
-                    const confirmMsg = {
-                        'en': 'Cancel this match and return to the tournament bracket?',
-                        'fr': 'Annuler ce match et revenir au tableau du tournoi ?',
-                        'es': '¿Cancelar este partido y volver al cuadro del torneo?'
-                    };
-                    if (!confirm(confirmMsg[currentLang])) return;
+                const confirmMsg = {
+                    'en': 'Cancel this match and return to the tournament bracket?',
+                    'fr': 'Annuler ce match et revenir au tableau du tournoi ?',
+                    'es': '¿Cancelar este partido y volver al cuadro del torneo?'
+                };
+                if (!confirm(confirmMsg[currentLang])) return;
 
-                    // Remove the incomplete match so the players become available again
+                if (hasIncomplete) {
+                    // Match in progress — remove it so the players become available again
                     const incompleteIdx = currentRoundData.matches.findIndex(m => !m.completed);
                     if (incompleteIdx >= 0) {
                         currentRoundData.matches.splice(incompleteIdx, 1);
                     }
-
-                    returnToTournament();
-                    return;
+                } else if (currentRoundData) {
+                    // Match already completed — revert the last completed match
+                    const lastCompletedIdx = currentRoundData.matches.length - 1;
+                    if (lastCompletedIdx >= 0) {
+                        currentRoundData.matches.splice(lastCompletedIdx, 1);
+                    }
+                    // Clear champion if it was just set
+                    tournamentState.champion = null;
                 }
 
-                // Match already completed — fall through to full reset below
+                returnToTournament();
+                return;
             }
 
             const confirmMessage = {
@@ -4317,21 +4323,6 @@
             document.getElementById('winnerSection').style.display = 'none';
             hideAllModeSections();
             document.getElementById('classicInputSection').classList.remove('hidden');
-
-            // Clear tournament state if active
-            if (tournamentMode) {
-                tournamentMode = false;
-                tournamentState = null;
-                tournamentSelectedPlayers = [];
-                document.getElementById('tournamentHub').classList.add('hidden');
-                document.getElementById('tournamentChampionSection').classList.add('hidden');
-                document.getElementById('newTournamentBtn').classList.add('hidden');
-                document.getElementById('tournamentCheckbox').checked = false;
-                const startBtn = document.getElementById('startBtn');
-                startBtn.setAttribute('data-i18n', 'startGame');
-                startBtn.textContent = t('startGame');
-                updateModeDescription();
-            }
 
             updatePlayerList();
             clearGameState();
