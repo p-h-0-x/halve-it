@@ -4235,9 +4235,8 @@
         }
 
         function resetGame() {
-            // In tournament mode, cancel the in-progress match and go back to bracket
+            // In tournament mode with an in-progress match, offer to cancel it
             if (tournamentMode && tournamentState) {
-                // If match is already completed or tournament is over, return to hub
                 const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
                 const hasIncomplete = currentRoundData &&
                     currentRoundData.matches.some(m => !m.completed);
@@ -4255,10 +4254,12 @@
                     if (incompleteIdx >= 0) {
                         currentRoundData.matches.splice(incompleteIdx, 1);
                     }
+
+                    returnToTournament();
+                    return;
                 }
 
-                returnToTournament();
-                return;
+                // Match already completed — fall through to full reset below
             }
 
             const confirmMessage = {
@@ -4316,6 +4317,21 @@
             document.getElementById('winnerSection').style.display = 'none';
             hideAllModeSections();
             document.getElementById('classicInputSection').classList.remove('hidden');
+
+            // Clear tournament state if active
+            if (tournamentMode) {
+                tournamentMode = false;
+                tournamentState = null;
+                tournamentSelectedPlayers = [];
+                document.getElementById('tournamentHub').classList.add('hidden');
+                document.getElementById('tournamentChampionSection').classList.add('hidden');
+                document.getElementById('newTournamentBtn').classList.add('hidden');
+                document.getElementById('tournamentCheckbox').checked = false;
+                const startBtn = document.getElementById('startBtn');
+                startBtn.setAttribute('data-i18n', 'startGame');
+                startBtn.textContent = t('startGame');
+                updateModeDescription();
+            }
 
             updatePlayerList();
             clearGameState();
