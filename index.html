@@ -4235,8 +4235,12 @@
         }
 
         function resetGame() {
-            // In tournament mode, cancel the in-progress match and go back to bracket
+            // In tournament mode with an in-progress match, offer to cancel it
             if (tournamentMode && tournamentState) {
+                const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
+                const hasIncomplete = currentRoundData &&
+                    currentRoundData.matches.some(m => !m.completed);
+
                 const confirmMsg = {
                     'en': 'Cancel this match and return to the tournament bracket?',
                     'fr': 'Annuler ce match et revenir au tableau du tournoi ?',
@@ -4244,13 +4248,20 @@
                 };
                 if (!confirm(confirmMsg[currentLang])) return;
 
-                // Remove the incomplete match so the players become available again
-                const currentRoundData = tournamentState.rounds[tournamentState.currentRound];
-                if (currentRoundData) {
+                if (hasIncomplete) {
+                    // Match in progress — remove it so the players become available again
                     const incompleteIdx = currentRoundData.matches.findIndex(m => !m.completed);
                     if (incompleteIdx >= 0) {
                         currentRoundData.matches.splice(incompleteIdx, 1);
                     }
+                } else if (currentRoundData) {
+                    // Match already completed — revert the last completed match
+                    const lastCompletedIdx = currentRoundData.matches.length - 1;
+                    if (lastCompletedIdx >= 0) {
+                        currentRoundData.matches.splice(lastCompletedIdx, 1);
+                    }
+                    // Clear champion if it was just set
+                    tournamentState.champion = null;
                 }
 
                 returnToTournament();
@@ -4350,7 +4361,8 @@
                 }],
                 currentRound: 0,
                 champion: null,
-                withdrawn: []
+                withdrawn: [],
+                lateEntries: {}
             };
             gameMode = selectedMode;
 
@@ -4489,7 +4501,18 @@
                 // Subsequent rounds: winners of previous round not yet in a match and not withdrawn
                 const prevRound = tournamentState.rounds[tournamentState.currentRound - 1];
                 const prevWinners = prevRound.matches.map(m => m.winner).filter(Boolean);
-                return prevWinners.filter(p => !matched.has(p) && !withdrawn.has(p));
+                const pool = prevWinners.filter(p => !matched.has(p) && !withdrawn.has(p));
+
+                // Include late entries added during or for this round
+                const lateEntries = tournamentState.lateEntries || {};
+                for (const [player, joinedRound] of Object.entries(lateEntries)) {
+                    if (joinedRound === tournamentState.currentRound &&
+                        !matched.has(player) && !withdrawn.has(player) && !pool.includes(player)) {
+                        pool.push(player);
+                    }
+                }
+
+                return pool;
             }
         }
 
@@ -4506,9 +4529,16 @@
             // Add to registrants
             tournamentState.registrants.push(name);
 
-            // If not withdrawn, make them available in the current round
             if (!tournamentState.withdrawn) {
                 tournamentState.withdrawn = [];
+            }
+
+            // Track late entries so they appear in the available pool for non-first rounds
+            if (!tournamentState.lateEntries) {
+                tournamentState.lateEntries = {};
+            }
+            if (tournamentState.currentRound > 0) {
+                tournamentState.lateEntries[name] = tournamentState.currentRound;
             }
 
             input.value = '';
